@@ -49,9 +49,9 @@ contract VaultCore is VaultStorage {
         require(_amount > 0, "Amount must be greater than 0");
 
         uint256 price = IOracle(priceProvider).price(_asset);
-        if (price > 1e8) {
-            price = 1e8;
-        }
+        // if (price > 1e8) {
+        //     price = 1e8;
+        // }
         uint256 assetDecimals = Helpers.getDecimals(_asset);
         uint256 unitAdjustedDeposit = _amount.scaleBy(int8(18 - assetDecimals));
         uint256 priceAdjustedDeposit = _amount.mulTruncateScale(
@@ -602,8 +602,8 @@ contract VaultCore is VaultStorage {
     }
 
     /**
-     * @notice Get an array of the supported asset prices in USD.
-     * @return uint256[] Array of asset prices in USD (1e18)
+     * @notice Get an array of the supported asset prices in cUSD.
+     * @return uint256[] Array of asset prices in cUSD (1e18)
      */
     function _getAssetPrices(bool useMax)
         internal
@@ -616,7 +616,8 @@ contract VaultCore is VaultStorage {
         // Price from Oracle is returned with 8 decimals
         // _amount is in assetDecimals
         for (uint256 i = 0; i < allAssets.length; i++) {
-            assetPrices[i] = oracle.price(allAssets[i]).scaleBy(int8(18 - 8));
+            // assetPrices[i] = oracle.price(allAssets[i]).scaleBy(int8(18 - 8));
+            assetPrices[i] = oracle.price(allAssets[i]);
         }
     }
 
