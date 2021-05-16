@@ -8,6 +8,8 @@ const addresses = {};
 addresses.zero = "0x0000000000000000000000000000000000000000";
 addresses.dead = "0x0000000000000000000000000000000000000001";
 
+addresses.registry = "0x000000000000000000000000000000000000ce10"
+
 addresses.mainnet = {};
 // Native stablecoins
 addresses.mainnet.Binance = "0x3f5CE5FBFe3E9af3971dD833D26bA9b5C936f0bE";
