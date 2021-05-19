@@ -17,85 +17,60 @@ contract FlipperDev is Governable {
     uint256 constant MAXIMUM_PER_TRADE = (25000 * 1e18);
 
     // Settable coin addresses allow easy testing and use of mock currencies.
-    IERC20 dai = IERC20(0);
+    IERC20 cusd = IERC20(0);
+    IERC20 ceur = IERC20(0);
     OUSD ousd = OUSD(0);
-    IERC20 usdc = IERC20(0);
-    Tether usdt = Tether(0);
 
     // ---------------------
     // Dev constructor
     // ---------------------
     constructor(
-        address dai_,
+        address cusd_,
+        address ceur_,
         address ousd_,
-        address usdc_,
-        address usdt_
     ) public {
-        dai = IERC20(dai_);
+        cusd = IERC20(cusd_);
+        ceur = IERC20(ceur_);
         ousd = OUSD(ousd_);
-        usdc = IERC20(usdc_);
-        usdt = Tether(usdt_);
         require(address(ousd) != address(0));
-        require(address(dai) != address(0));
-        require(address(usdc) != address(0));
-        require(address(usdt) != address(0));
+        require(address(ceur) != address(0));
+        require(address(cusd) != address(0));
     }
 
     // -----------------
     // Trading functions
     // -----------------
 
-    /// @notice Purchase OUSD with Dai
+    /// @notice Purchase OUSD with cUSD
     /// @param amount Amount of OUSD to purchase, in 18 fixed decimals.
-    function buyOusdWithDai(uint256 amount) external {
+    function buyOusdWithCusd(uint256 amount) external {
         require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        require(dai.transferFrom(msg.sender, address(this), amount));
+        require(cusd.transferFrom(msg.sender, address(this), amount));
         require(ousd.transfer(msg.sender, amount));
     }
 
-    /// @notice Sell OUSD for Dai
+    /// @notice Sell OUSD for cUSD
     /// @param amount Amount of OUSD to sell, in 18 fixed decimals.
-    function sellOusdForDai(uint256 amount) external {
+    function sellOusdForCusd(uint256 amount) external {
         require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        require(dai.transfer(msg.sender, amount));
+        require(cusd.transfer(msg.sender, amount));
         require(ousd.transferFrom(msg.sender, address(this), amount));
     }
 
-    /// @notice Purchase OUSD with USDC
+    /// @notice Purchase OUSD with cEUR
     /// @param amount Amount of OUSD to purchase, in 18 fixed decimals.
-    function buyOusdWithUsdc(uint256 amount) external {
+    function buyOusdWithCeur(uint256 amount) external {
         require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
         // Potential rounding error is an intentional tradeoff
-        require(usdc.transferFrom(msg.sender, address(this), amount / 1e12));
+        require(ceur.transferFrom(msg.sender, address(this), amount / 1e12));
         require(ousd.transfer(msg.sender, amount));
     }
 
-    /// @notice Sell OUSD for USDC
+    /// @notice Sell OUSD for cEUR
     /// @param amount Amount of OUSD to sell, in 18 fixed decimals.
-    function sellOusdForUsdc(uint256 amount) external {
+    function sellOusdForCeur(uint256 amount) external {
         require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        require(usdc.transfer(msg.sender, amount / 1e12));
-        require(ousd.transferFrom(msg.sender, address(this), amount));
-    }
-
-    /// @notice Purchase OUSD with USDT
-    /// @param amount Amount of OUSD to purchase, in 18 fixed decimals.
-    function buyOusdWithUsdt(uint256 amount) external {
-        require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        // Potential rounding error is an intentional tradeoff
-        // USDT does not return a boolean and reverts,
-        // so no need for a require.
-        usdt.transferFrom(msg.sender, address(this), amount / 1e12);
-        require(ousd.transfer(msg.sender, amount));
-    }
-
-    /// @notice Sell OUSD for USDT
-    /// @param amount Amount of OUSD to sell, in 18 fixed decimals.
-    function sellOusdForUsdt(uint256 amount) external {
-        require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        // USDT does not return a boolean and reverts,
-        // so no need for a require.
-        usdt.transfer(msg.sender, amount / 1e12);
+        require(ceur.transfer(msg.sender, amount / 1e12));
         require(ousd.transferFrom(msg.sender, address(this), amount));
     }
 
