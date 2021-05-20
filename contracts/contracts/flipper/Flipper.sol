@@ -6,7 +6,7 @@ import "../interfaces/Tether.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-// Contract to exchange usdt, usdc, dai from and to ousd.
+// Contract to exchange usdt, ceur, cusd from and to ousd.
 //   - 1 to 1. No slippage
 //   - Optimized for low gas usage
 //   - No guarantee of availability
@@ -18,7 +18,7 @@ contract Flipper is Governable {
 
     // Saves approx 4K gas per swap by using hardcoded addresses.
     IERC20 cusd = IERC20(0x765DE816845861e75A25fCA122bb6898B8B1282a);
-    IERC20 ceur = IERC20(0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73);
+    IERC20 ceur = IERC20(0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73);
     OUSD constant ousd = OUSD(0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86);
 
     // -----------
@@ -85,12 +85,8 @@ contract Flipper is Governable {
     /// @notice Owner function to withdraw all tradable tokens
     /// @dev Equivalent to "pausing" the contract.
     function withdrawAll() external onlyGovernor nonReentrant {
-        IERC20(dai).safeTransfer(_governor(), dai.balanceOf(address(this)));
+        IERC20(cusd).safeTransfer(_governor(), cusd.balanceOf(address(this)));
         IERC20(ousd).safeTransfer(_governor(), ousd.balanceOf(address(this)));
-        IERC20(address(usdt)).safeTransfer(
-            _governor(),
-            usdt.balanceOf(address(this))
-        );
-        IERC20(usdc).safeTransfer(_governor(), usdc.balanceOf(address(this)));
+        IERC20(ceur).safeTransfer(_governor(), ceur.balanceOf(address(this)));
     }
 }
