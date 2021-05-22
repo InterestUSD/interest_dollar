@@ -1,9 +1,52 @@
-pragma solidity 0.5.11;
+pragma solidity ^0.5.11;
 
-import "../interfaces/chainlink/AggregatorV3Interface.sol";
-import { IOracle } from "../interfaces/IOracle.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
-contract OracleRouterBase is IOracle {
+interface ISortedOracles {
+    function medianRate(address) external view returns (uint256, uint256);
+
+    function medianTimestamp(address) external view returns (uint256);
+}
+
+interface IRegistry {
+    function getAddressForOrDie(bytes32) external view returns (address);
+}
+
+contract UsingRegistry {
+    bytes32 constant GOLD_TOKEN_REGISTRY_ID =
+        keccak256(abi.encodePacked("GoldToken"));
+    bytes32 constant STABLE_TOKEN_REGISTRY_ID =
+        keccak256(abi.encodePacked("StableToken"));
+    bytes32 constant STABLE_EUR_TOKEN_REGISTRY_ID =
+        keccak256(abi.encodePacked("StableTokenEUR"));
+    bytes32 constant SORTED_ORACLES_REGISTRY_ID =
+        keccak256(abi.encodePacked("SortedOracles"));
+
+    IRegistry public constant registry =
+        IRegistry(0x000000000000000000000000000000000000ce10);
+
+    function getGoldToken() internal view returns (address) {
+        return registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
+    }
+
+    function getStableToken() internal view returns (address) {
+        return registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
+    }
+
+    function getStableTokenEUR() internal view returns (address) {
+        return registry.getAddressForOrDie(STABLE_EUR_TOKEN_REGISTRY_ID);
+    }
+
+    function getSortedOracles() internal view returns (ISortedOracles) {
+        return
+            ISortedOracles(
+                registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
+            );
+    }
+}
+
+contract OracleRouterBase is UsingRegistry {
+    using SafeMath for uint256;
     uint256 constant MIN_DRIFT = uint256(70000000);
     uint256 constant MAX_DRIFT = uint256(130000000);
 
@@ -14,25 +57,24 @@ contract OracleRouterBase is IOracle {
     function feed(address asset) internal view returns (address);
 
     /**
-     * @notice Returns the total price in 8 digit USD for a given asset.
+     * @notice Returns the total price in 18 digit cUSD for a given asset.
      * @param asset address of the asset
-     * @return uint256 USD price of 1 of the asset, in 8 decimal fixed
+     * @return uint256 cUSD price of 1 of the asset, in 18 decimal fixed
      */
     function price(address asset) external view returns (uint256) {
-        address _feed = feed(asset);
-        require(_feed != address(0), "Asset not available");
-        (
-            uint80 roundID,
-            int256 _iprice,
-            uint256 startedAt,
-            uint256 timeStamp,
-            uint80 answeredInRound
-        ) = AggregatorV3Interface(_feed).latestRoundData();
-        uint256 _price = uint256(_iprice);
-        require(_price <= MAX_DRIFT, "Oracle: Price exceeds max");
-        require(_price >= MIN_DRIFT, "Oracle: Price under min");
-        return uint256(_price);
+        // if cUSD
+        address cUSD_addr = getStableToken();
+        if (asset == cUSD_addr) {
+            return 1 ether;
+        } else if (asset == getStableTokenEUR()) {
+            return
+                _asset_price(asset).mul(1 ether).div(_asset_price(cUSD_addr));
+        } else {
+            require(false, "Asset not available");
+        }
     }
+
+    function _asset_price(address asset) internal view returns (uint256);
 }
 
 contract OracleRouter is OracleRouterBase {
@@ -41,30 +83,35 @@ contract OracleRouter is OracleRouterBase {
      * @param asset address of the asset
      */
     function feed(address asset) internal view returns (address) {
-        // DAI
-        if (asset == address(0x6B175474E89094C44Da98b954EedeAC495271d0F)) {
-            return address(0xAed0c38402a5d19df6E4c03F4E2DceD6e29c1ee9);
-            // USDC
-        } else if (
-            asset == address(0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48)
-        ) {
-            return address(0x8fFfFfd4AfB6115b954Bd326cbe7B4BA576818f6);
-            // USDT
-        } else if (
-            asset == address(0xdAC17F958D2ee523a2206206994597C13D831ec7)
-        ) {
-            return address(0x3E7d1eAB13ad0104d2750B8863b489D65364e32D);
-        } else {
-            require(false, "Asset not available");
-        }
+        return address(0x000000000000000000000000000000000000ce10);
+    }
+
+    function _asset_price(address asset) internal view returns (uint256) {
+        uint256 _price;
+        uint256 _divisor;
+        ISortedOracles _oracles = getSortedOracles();
+        (_price, _divisor) = _oracles.medianRate(asset);
+        require(_price > 0, "Reported price is 0");
+        uint256 _reportTime = _oracles.medianTimestamp(asset);
+        require(
+            block.timestamp.sub(_reportTime) < 10 minutes,
+            "Reported price is older than 10 minutes"
+        );
+        return _divisor.mul(1 ether).div(_price);
     }
 }
 
-contract OracleRouterDev is OracleRouterBase {
+contract OracleRouterDev {
     mapping(address => address) public assetToFeed;
+
+    mapping(address => uint256) public assetToPrice;
 
     function setFeed(address _asset, address _feed) external {
         assetToFeed[_asset] = _feed;
+    }
+
+    function setPrice(address _asset, uint256 _price) external {
+        assetToPrice[_asset] = _price;
     }
 
     /**
@@ -73,5 +120,9 @@ contract OracleRouterDev is OracleRouterBase {
      */
     function feed(address asset) internal view returns (address) {
         return assetToFeed[asset];
+    }
+
+    function price(address asset) internal view returns (uint256) {
+        return assetToPrice[asset];
     }
 }
