@@ -7,6 +7,9 @@ require("hardhat-contract-sizer");
 require("hardhat-deploy-ethers");
 require("@openzeppelin/hardhat-upgrades");
 
+require("@ubeswap/hardhat-celo");
+const { fornoURLs, ICeloNetwork } = require("@ubeswap/hardhat-celo");
+
 const { accounts, fund, mint, redeem, transfer } = require("./tasks/account");
 const { debug } = require("./tasks/debug");
 const { env } = require("./tasks/env");
@@ -35,19 +38,19 @@ const {
   yield,
 } = require("./tasks/vault");
 
-const MAINNET_DEPLOYER = "0x71F78361537A6f7B6818e7A760c8bC0146D93f50";
+const MAINNET_DEPLOYER = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
 // Mainnet contracts are governed by the Governor contract (which derives off Timelock).
-const MAINNET_GOVERNOR = "0x8e7bDFeCd1164C46ad51b58e49A611F954D23377";
-const MAINNET_MULTISIG = "0xe011fa2a6df98c69383457d87a056ed0103aa352";
+const MAINNET_GOVERNOR = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
+const MAINNET_MULTISIG = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
 const MAINNET_CLAIM_ADJUSTER = MAINNET_DEPLOYER;
-const MAINNET_STRATEGIST = "0xf14bbdf064e3f67f51cd9bd646ae3716ad938fdc";
+const MAINNET_STRATEGIST = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
 
 const mnemonic =
   "replace hover unaware super where filter stone fine garlic address matrix basic";
 
 let privateKeys = [];
 
-let derivePath = "m/44'/60'/0'/0/";
+let derivePath = "m/44'/52752'/0'/0/";
 for (let i = 0; i <= 10; i++) {
   const wallet = new ethers.Wallet.fromMnemonic(mnemonic, `${derivePath}${i}`);
   privateKeys.push(wallet.privateKey);
@@ -187,6 +190,7 @@ module.exports = {
   },
   networks: {
     hardhat: {
+      chainId: 31337,
       accounts: {
         mnemonic,
       },
@@ -194,19 +198,27 @@ module.exports = {
     localhost: {
       timeout: 60000,
     },
-    rinkeby: {
-      url: `${process.env.PROVIDER_URL}`,
+    alfajores: {
+      url: fornoURLs[ICeloNetwork.ALFAJORES],
       accounts: [
         process.env.DEPLOYER_PK || privateKeys[1],
         process.env.GOVERNOR_PK || privateKeys[1],
       ],
+      chainId: ICeloNetwork.ALFAJORES,
+      live: true,
+      gasPrice: 0.5 * 10 ** 9,
+      gas: 8000000,
     },
     mainnet: {
-      url: `${process.env.PROVIDER_URL}`,
+      url: fornoURLs[ICeloNetwork.MAINNET],
       accounts: [
         process.env.DEPLOYER_PK || privateKeys[0],
         process.env.GOVERNOR_PK || privateKeys[0],
       ],
+      chainId: ICeloNetwork.MAINNET,
+      live: true,
+      gasPrice: 0.5 * 10 ** 9,
+      gas: 8000000,
     },
   },
   mocha: {

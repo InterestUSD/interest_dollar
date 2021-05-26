@@ -54,7 +54,8 @@
     "truffle": "^5.1.45",
     "truffle-flattener": "^1.5.0",
     "web3-utils": "^1.2.11",
-    "@celo/contractkit": "^1.2.0"
+    "@celo/contractkit": "^1.2.0",
+    "@ubeswap/hardhat-celo": "^0.9.0"
   },
   "husky": {
     "hooks": {
