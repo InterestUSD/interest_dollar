@@ -8,7 +8,11 @@ require("hardhat-deploy-ethers");
 require("@openzeppelin/hardhat-upgrades");
 
 require("@ubeswap/hardhat-celo");
-const { fornoURLs, ICeloNetwork } = require("@ubeswap/hardhat-celo");
+const {
+  fornoURLs,
+  ICeloNetwork,
+  derivationPath,
+} = require("@ubeswap/hardhat-celo");
 
 const { accounts, fund, mint, redeem, transfer } = require("./tasks/account");
 const { debug } = require("./tasks/debug");
@@ -46,11 +50,11 @@ const MAINNET_CLAIM_ADJUSTER = MAINNET_DEPLOYER;
 const MAINNET_STRATEGIST = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
 
 const mnemonic =
-  "replace hover unaware super where filter stone fine garlic address matrix basic";
+  "try news balcony swim primary absorb acoustic ladder lizard invest hen nominee slim rib spell sport swing industry sad unfair glide conduct exclude ship";
 
 let privateKeys = [];
 
-let derivePath = "m/44'/52752'/0'/0/";
+let derivePath = derivationPath;
 for (let i = 0; i <= 10; i++) {
   const wallet = new ethers.Wallet.fromMnemonic(mnemonic, `${derivePath}${i}`);
   privateKeys.push(wallet.privateKey);
@@ -201,7 +205,7 @@ module.exports = {
     alfajores: {
       url: fornoURLs[ICeloNetwork.ALFAJORES],
       accounts: [
-        process.env.DEPLOYER_PK || privateKeys[1],
+        process.env.DEPLOYER_PK || privateKeys[0],
         process.env.GOVERNOR_PK || privateKeys[1],
       ],
       chainId: ICeloNetwork.ALFAJORES,
@@ -213,7 +217,7 @@ module.exports = {
       url: fornoURLs[ICeloNetwork.MAINNET],
       accounts: [
         process.env.DEPLOYER_PK || privateKeys[0],
-        process.env.GOVERNOR_PK || privateKeys[0],
+        process.env.GOVERNOR_PK || privateKeys[1],
       ],
       chainId: ICeloNetwork.MAINNET,
       live: true,
