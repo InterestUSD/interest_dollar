@@ -5,7 +5,6 @@ const {
   getAssetAddresses,
   getOracleAddresses,
   isMainnet,
-  isMainnetOrRinkebyOrFork,
 } = require("../test/helpers.js");
 const {
   log,
@@ -59,7 +58,7 @@ const deployAaveStrategy = async () => {
   await withConfirmation(
     cAaveStrategy.connect(sDeployer).transferGovernance(governorAddr)
   );
-  log(`AaveStrategy transferGovernance(${governorAddr} called`);
+  log(`AaveStrategy transferGovernance(${governorAddr}) called`);
 
   // On Mainnet the governance transfer gets executed separately, via the
   // multi-sig wallet. On other networks, this migration script can claim
@@ -231,18 +230,28 @@ const configureVault = async () => {
     (await ethers.getContract("VaultProxy")).address
   );
   // Set up supported assets for Vault
+  // await withConfirmation(
+  //   cVault.connect(sGovernor).supportAsset(assetAddresses.DAI)
+  // );
+  // log("Added DAI asset to Vault");
+  // await withConfirmation(
+  //   cVault.connect(sGovernor).supportAsset(assetAddresses.USDT)
+  // );
+  // log("Added USDT asset to Vault");
+  // await withConfirmation(
+  //   cVault.connect(sGovernor).supportAsset(assetAddresses.USDC)
+  // );
+  // log("Added USDC asset to Vault");
   await withConfirmation(
-    cVault.connect(sGovernor).supportAsset(assetAddresses.DAI)
+    cVault.connect(sGovernor).supportAsset(assetAddresses.CUSD)
   );
-  log("Added DAI asset to Vault");
+  log("Added cUSD asset to Vault");
+
   await withConfirmation(
-    cVault.connect(sGovernor).supportAsset(assetAddresses.USDT)
+    cVault.connect(sGovernor).supportAsset(assetAddresses.CEUR)
   );
-  log("Added USDT asset to Vault");
-  await withConfirmation(
-    cVault.connect(sGovernor).supportAsset(assetAddresses.USDC)
-  );
-  log("Added USDC asset to Vault");
+  log("Added cEUR asset to Vault");
+
   // Unpause deposits
   await withConfirmation(cVault.connect(sGovernor).unpauseCapital());
   log("Unpaused deposits on Vault");
@@ -253,50 +262,50 @@ const configureVault = async () => {
 };
 
 /**
- * Deploy the OracleRouter and initialise it with Chainlink sources.
+ * Deploy the OracleRouter.
  */
 const deployOracles = async () => {
-  const { deployerAddr } = await getNamedAccounts();
+  // const { deployerAddr } = await getNamedAccounts();
   // Signers
-  const sDeployer = await ethers.provider.getSigner(deployerAddr);
+  // const sDeployer = await ethers.provider.getSigner(deployerAddr);
 
   // TODO: Change this to intelligently decide which router contract to deploy?
   const oracleContract = isMainnet ? "OracleRouter" : "OracleRouterDev";
   await deployWithConfirmation("OracleRouter", [], oracleContract);
-  const oracleRouter = await ethers.getContract("OracleRouter");
+  // const oracleRouter = await ethers.getContract("OracleRouter");
 
-  // Register feeds
-  // Not needed in production
-  const oracleAddresses = await getOracleAddresses(deployments);
-  const assetAddresses = await getAssetAddresses(deployments);
-  withConfirmation(
-    oracleRouter
-      .connect(sDeployer)
-      .setFeed(assetAddresses.DAI, oracleAddresses.chainlink.DAI_USD)
-  );
-  withConfirmation(
-    oracleRouter
-      .connect(sDeployer)
-      .setFeed(assetAddresses.USDC, oracleAddresses.chainlink.USDC_USD)
-  );
-  withConfirmation(
-    oracleRouter
-      .connect(sDeployer)
-      .setFeed(assetAddresses.USDT, oracleAddresses.chainlink.USDT_USD)
-  );
-  withConfirmation(
-    oracleRouter
-      .connect(sDeployer)
-      .setFeed(assetAddresses.TUSD, oracleAddresses.chainlink.TUSD_USD)
-  );
-  withConfirmation(
-    oracleRouter
-      .connect(sDeployer)
-      .setFeed(
-        assetAddresses.NonStandardToken,
-        oracleAddresses.chainlink.NonStandardToken_USD
-      )
-  );
+  // // Register feeds
+  // // Not needed in production
+  // const oracleAddresses = await getOracleAddresses(deployments);
+  // const assetAddresses = await getAssetAddresses(deployments);
+  // withConfirmation(
+  //   oracleRouter
+  //     .connect(sDeployer)
+  //     .setFeed(assetAddresses.DAI, oracleAddresses.chainlink.DAI_USD)
+  // );
+  // withConfirmation(
+  //   oracleRouter
+  //     .connect(sDeployer)
+  //     .setFeed(assetAddresses.USDC, oracleAddresses.chainlink.USDC_USD)
+  // );
+  // withConfirmation(
+  //   oracleRouter
+  //     .connect(sDeployer)
+  //     .setFeed(assetAddresses.USDT, oracleAddresses.chainlink.USDT_USD)
+  // );
+  // withConfirmation(
+  //   oracleRouter
+  //     .connect(sDeployer)
+  //     .setFeed(assetAddresses.TUSD, oracleAddresses.chainlink.TUSD_USD)
+  // );
+  // withConfirmation(
+  //   oracleRouter
+  //     .connect(sDeployer)
+  //     .setFeed(
+  //       assetAddresses.NonStandardToken,
+  //       oracleAddresses.chainlink.NonStandardToken_USD
+  //     )
+  // );
 };
 
 /**
@@ -440,12 +449,12 @@ const main = async () => {
   console.log("Running 001_core deployment...");
   await deployOracles();
   await deployCore();
-  await deployCompoundStrategy();
+  // await deployCompoundStrategy();
   await deployAaveStrategy();
-  await deployThreePoolStrategy();
+  // await deployThreePoolStrategy();
   await configureVault();
   await deployFlipper();
-  await deployBuyback();
+  // await deployBuyback();
   console.log("001_core deploy done.");
   return true;
 };
