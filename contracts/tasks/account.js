@@ -1,8 +1,5 @@
-// USDT has its own ABI because of non standard returns
-const usdtAbi = require("../test/abi/usdt.json").abi;
-const daiAbi = require("../test/abi/erc20.json");
-const tusdAbi = require("../test/abi/erc20.json");
-const usdcAbi = require("../test/abi/erc20.json");
+const cusdAbi = require("../test/abi/erc20.json");
+const ceurAbi = require("../test/abi/erc20.json");
 
 // By default we use 10 test accounts.
 const defaultNumAccounts = 10;
@@ -26,8 +23,8 @@ async function accounts(taskArguments, hre, privateKeys) {
   const accounts = await hre.ethers.getSigners();
   const roles = ["Deployer", "Governor"];
 
-  const isMainnetOrRinkeby = ["mainnet", "rinkeby"].includes(hre.network.name);
-  if (isMainnetOrRinkeby) {
+  const isMainnetOrAlfajores = ["mainnet", "alfajores"].includes(hre.network.name);
+  if (isMainnetOrAlfajores) {
     privateKeys = [process.env.DEPLOYER_PK, process.env.GOVERNOR_PK];
   }
 

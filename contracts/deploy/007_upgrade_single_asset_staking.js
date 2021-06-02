@@ -4,7 +4,7 @@
 const {
   isMainnet,
   isFork,
-  isMainnetOrRinkebyOrFork,
+  isMainnetOrAlfajoresOrFork,
 } = require("../test/helpers.js");
 const {
   log,
@@ -70,6 +70,6 @@ upgradeSingleAssetStaking.dependencies = ["core"];
 
 // No need to execute on dev and test network since the contract already gets
 // deployed with the latest code by the 004_single_asset_staking script.
-upgradeSingleAssetStaking.skip = () => !isMainnetOrRinkebyOrFork;
+upgradeSingleAssetStaking.skip = () => !isMainnetOrAlfajoresOrFork;
 
 module.exports = upgradeSingleAssetStaking;

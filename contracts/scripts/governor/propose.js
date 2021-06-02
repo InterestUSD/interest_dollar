@@ -15,13 +15,13 @@
 const { ethers, getNamedAccounts } = require("hardhat");
 const { utils } = require("ethers");
 
-const { isMainnet, isRinkeby } = require("../../test/helpers.js");
+const { isMainnet, isAlfajores } = require("../../test/helpers.js");
 const { proposeArgs } = require("../../utils/governor");
 const { getTxOpts } = require("../../utils/tx");
 const addresses = require("../../utils/addresses");
 
-// Wait for 3 blocks confirmation on Mainnet/Rinkeby.
-const NUM_CONFIRMATIONS = isMainnet || isRinkeby ? 3 : 0;
+// Wait for 3 blocks confirmation on Mainnet/Alfajores.
+const NUM_CONFIRMATIONS = isMainnet || isAlfajores ? 3 : 0;
 
 async function proposeVaultv2GovernanceArgs() {
   const mixOracle = await ethers.getContract("MixOracle");

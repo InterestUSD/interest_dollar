@@ -8,8 +8,8 @@ const { utils } = require("ethers");
 const {
   isMainnet,
   isFork,
-  isRinkeby,
-  isMainnetOrRinkebyOrFork,
+  isAlfajores,
+  isMainnetOrAlfajoresOrFork,
 } = require("../test/helpers.js");
 
 const {
@@ -20,11 +20,11 @@ const {
 const addresses = require("../utils/addresses.js");
 const { getTxOpts } = require("../utils/tx");
 
-// Wait for 3 blocks confirmation on Mainnet/Rinkeby.
-const NUM_CONFIRMATIONS = isMainnet || isRinkeby ? 3 : 0;
+// Wait for 3 blocks confirmation on Mainnet/Alfajores.
+const NUM_CONFIRMATIONS = isMainnet || isAlfajores ? 3 : 0;
 
 function log(msg, deployResult = null) {
-  if (isMainnetOrRinkebyOrFork || process.env.VERBOSE) {
+  if (isMainnetOrAlfajoresOrFork || process.env.VERBOSE) {
     if (deployResult && deployResult.receipt) {
       const gasUsed = Number(deployResult.receipt.gasUsed.toString());
       msg += ` Address: ${deployResult.address} Gas Used: ${gasUsed}`;
@@ -112,7 +112,7 @@ const impersonateGuardian = async () => {
  * @returns {Promise<void>}
  */
 const executeProposal = async (proposalArgs, description, v1 = false) => {
-  if (isMainnet || isRinkeby) {
+  if (isMainnet || isAlfajores) {
     throw new Error("executeProposal only works on local test network");
   }
 

@@ -121,12 +121,12 @@ async function humanBalance(user, contract) {
 
 const isFork = process.env.FORK === "true";
 const isLocalhost = !isFork && hre.network.name === "localhost";
-const isRinkeby = hre.network.name === "rinkeby";
+const isAlfajores = hre.network.name === "alfajores";
 const isMainnet = hre.network.name === "mainnet";
 const isTest = process.env.IS_TEST === "true";
 const isSmokeTest = process.env.SMOKE_TEST === "true";
 const isMainnetOrFork = isMainnet || isFork;
-const isMainnetOrRinkebyOrFork = isMainnetOrFork || isRinkeby;
+const isMainnetOrAlfajoresOrFork = isMainnetOrFork || isAlfajores;
 
 // Fixture loader that is compatible with Ganache
 const loadFixture = createFixtureLoader(
@@ -216,23 +216,27 @@ const getOracleAddresses = async (deployments) => {
 const getAssetAddresses = async (deployments) => {
   if (isMainnetOrFork) {
     return {
-      USDT: addresses.mainnet.USDT,
-      USDC: addresses.mainnet.USDC,
-      TUSD: addresses.mainnet.TUSD,
-      DAI: addresses.mainnet.DAI,
-      cDAI: addresses.mainnet.cDAI,
-      cUSDC: addresses.mainnet.cUSDC,
-      cUSDT: addresses.mainnet.cUSDT,
-      WETH: addresses.mainnet.WETH,
-      COMP: addresses.mainnet.COMP,
-      ThreePool: addresses.mainnet.ThreePool,
-      ThreePoolToken: addresses.mainnet.ThreePoolToken,
-      ThreePoolGauge: addresses.mainnet.ThreePoolGauge,
-      CRV: addresses.mainnet.CRV,
-      CRVMinter: addresses.mainnet.CRVMinter,
-      aDAI: addresses.mainnet.aDAI,
-      aUSDC: addresses.mainnet.aUSDC,
-      aUSDT: addresses.mainnet.aUSDT,
+      CUSD: addresses.mainnet.CUSD,
+      CEUR: addresses.mainnet.CEUR,
+      // USDT: addresses.mainnet.USDT,
+      // USDC: addresses.mainnet.USDC,
+      // TUSD: addresses.mainnet.TUSD,
+      // DAI: addresses.mainnet.DAI,
+      // cDAI: addresses.mainnet.cDAI,
+      // cUSDC: addresses.mainnet.cUSDC,
+      // cUSDT: addresses.mainnet.cUSDT,
+      // WETH: addresses.mainnet.WETH,
+      // COMP: addresses.mainnet.COMP,
+      // ThreePool: addresses.mainnet.ThreePool,
+      // ThreePoolToken: addresses.mainnet.ThreePoolToken,
+      // ThreePoolGauge: addresses.mainnet.ThreePoolGauge,
+      // CRV: addresses.mainnet.CRV,
+      // CRVMinter: addresses.mainnet.CRVMinter,
+      mCUSD: addresses.mainnet.mCUSD,
+      mCEUR: addresses.mainnet.mCEUR,
+      // aDAI: addresses.mainnet.aDAI,
+      // aUSDC: addresses.mainnet.aUSDC,
+      // aUSDT: addresses.mainnet.aUSDT,
       AAVE: addresses.mainnet.Aave,
       AAVE_ADDRESS_PROVIDER: addresses.mainnet.AAVE_ADDRESS_PROVIDER,
       OGN: addresses.mainnet.OGN,
@@ -240,28 +244,30 @@ const getAssetAddresses = async (deployments) => {
     };
   } else {
     return {
-      USDT: (await deployments.get("MockUSDT")).address,
-      USDC: (await deployments.get("MockUSDC")).address,
-      TUSD: (await deployments.get("MockTUSD")).address,
-      DAI: (await deployments.get("MockDAI")).address,
-      cDAI: (await deployments.get("MockCDAI")).address,
-      cUSDC: (await deployments.get("MockCUSDC")).address,
-      cUSDT: (await deployments.get("MockCUSDT")).address,
+      // USDT: (await deployments.get("MockUSDT")).address,
+      // USDC: (await deployments.get("MockUSDC")).address,
+      // TUSD: (await deployments.get("MockTUSD")).address,
+      // DAI: (await deployments.get("MockDAI")).address,
+      // cDAI: (await deployments.get("MockCDAI")).address,
+      // cUSDC: (await deployments.get("MockCUSDC")).address,
+      // cUSDT: (await deployments.get("MockCUSDT")).address,
       NonStandardToken: (await deployments.get("MockNonStandardToken")).address,
-      WETH: (await deployments.get("MockWETH")).address,
-      COMP: (await deployments.get("MockCOMP")).address,
-      ThreePool: (await deployments.get("MockCurvePool")).address,
-      ThreePoolToken: (await deployments.get("Mock3CRV")).address,
-      ThreePoolGauge: (await deployments.get("MockCurveGauge")).address,
-      CRV: (await deployments.get("MockCRV")).address,
-      CRVMinter: (await deployments.get("MockCRVMinter")).address,
-      aDAI: (await deployments.get("MockADAI")).address,
-      aUSDC: (await deployments.get("MockAUSDC")).address,
-      aUSDT: (await deployments.get("MockAUSDT")).address,
+      // WETH: (await deployments.get("MockWETH")).address,
+      // COMP: (await deployments.get("MockCOMP")).address,
+      // ThreePool: (await deployments.get("MockCurvePool")).address,
+      // ThreePoolToken: (await deployments.get("Mock3CRV")).address,
+      // ThreePoolGauge: (await deployments.get("MockCurveGauge")).address,
+      // CRV: (await deployments.get("MockCRV")).address,
+      // CRVMinter: (await deployments.get("MockCRVMinter")).address,
+      // aDAI: (await deployments.get("MockADAI")).address,
+      // aUSDC: (await deployments.get("MockAUSDC")).address,
+      // aUSDT: (await deployments.get("MockAUSDT")).address,
+      mCUSD: (await deployments.get("MockMCUSD")).address,
+      mCEUR: (await deployments.get("MockMCEUR")).address,
       AAVE: (await deployments.get("MockAave")).address,
       AAVE_ADDRESS_PROVIDER: (await deployments.get("MockAave")).address,
-      OGN: isRinkeby
-        ? addresses.rinkeby.OGN
+      OGN: isAlfajores
+        ? addresses.alfajores.OGN
         : (await deployments.get("MockOGN")).address,
       uniswapRouter: (await deployments.get("MockUniswapRouter")).address,
     };
@@ -344,13 +350,15 @@ module.exports = {
   expectApproxSupply,
   advanceTime,
   isMainnet,
-  isRinkeby,
+  // isAlfajores,
+  isAlfajores,
   isFork,
   isTest,
   isSmokeTest,
   isLocalhost,
   isMainnetOrFork,
-  isMainnetOrRinkebyOrFork,
+  // isMainnetOrAlfajoresOrFork,
+  isMainnetOrAlfajoresOrFork,
   loadFixture,
   getOracleAddress,
   setOracleTokenPriceUsd,

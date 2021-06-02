@@ -97,7 +97,7 @@ addresses.mainnet.CompensationClaims =
 /* --- Alfajores --- */
 addresses.alfajores  = {};
 
-// addresses.alfajores.OGN = "0xA115e16ef6e217f7a327a57031F75cE0487AaDb8";
+addresses.alfajores.OGN = "0xA115e16ef6e217f7a327a57031F75cE0487AaDb8";
 
 // // Compound
 // addresses.alfajores.cDAI = "0x6d7f0754ffeb405d23c51ce938289d4835be3b14";
