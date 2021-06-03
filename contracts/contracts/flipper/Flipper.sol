@@ -6,7 +6,7 @@ import "../interfaces/Tether.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-// Contract to exchange usdt, ceur, cusd from and to ousd.
+// Contract to exchange ceur, cusd from and to ousd.
 //   - 1 to 1. No slippage
 //   - Optimized for low gas usage
 //   - No guarantee of availability

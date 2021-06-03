@@ -1,49 +1,8 @@
 pragma solidity ^0.5.11;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
-
-interface ISortedOracles {
-    function medianRate(address) external view returns (uint256, uint256);
-
-    function medianTimestamp(address) external view returns (uint256);
-}
-
-interface IRegistry {
-    function getAddressForOrDie(bytes32) external view returns (address);
-}
-
-contract UsingRegistry {
-    bytes32 constant GOLD_TOKEN_REGISTRY_ID =
-        keccak256(abi.encodePacked("GoldToken"));
-    bytes32 constant STABLE_TOKEN_REGISTRY_ID =
-        keccak256(abi.encodePacked("StableToken"));
-    bytes32 constant STABLE_EUR_TOKEN_REGISTRY_ID =
-        keccak256(abi.encodePacked("StableTokenEUR"));
-    bytes32 constant SORTED_ORACLES_REGISTRY_ID =
-        keccak256(abi.encodePacked("SortedOracles"));
-
-    IRegistry public constant registry =
-        IRegistry(0x000000000000000000000000000000000000ce10);
-
-    function getGoldToken() internal view returns (address) {
-        return registry.getAddressForOrDie(GOLD_TOKEN_REGISTRY_ID);
-    }
-
-    function getStableToken() internal view returns (address) {
-        return registry.getAddressForOrDie(STABLE_TOKEN_REGISTRY_ID);
-    }
-
-    function getStableTokenEUR() internal view returns (address) {
-        return registry.getAddressForOrDie(STABLE_EUR_TOKEN_REGISTRY_ID);
-    }
-
-    function getSortedOracles() internal view returns (ISortedOracles) {
-        return
-            ISortedOracles(
-                registry.getAddressForOrDie(SORTED_ORACLES_REGISTRY_ID)
-            );
-    }
-}
+import { UsingRegistry } from "../utils/UsingRegistry.sol";
+import { ISortedOracles } from "../interfaces/ISortedOracles.sol";
 
 contract OracleRouterBase is UsingRegistry {
     using SafeMath for uint256;
