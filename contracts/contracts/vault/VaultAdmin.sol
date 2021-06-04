@@ -9,8 +9,9 @@ pragma solidity 0.5.11;
 import "./VaultStorage.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
+import { UsingRegistry } from "../utils/UsingRegistry.sol";
 
-contract VaultAdmin is VaultStorage {
+contract VaultAdmin is VaultStorage, UsingRegistry {
     /**
      * @dev Verifies that the caller is the Vault, Governor, or Strategist.
      */
@@ -180,8 +181,9 @@ contract VaultAdmin is VaultStorage {
         }
 
         if (strategyIndex < allStrategies.length) {
-            allStrategies[strategyIndex] = allStrategies[allStrategies.length -
-                1];
+            allStrategies[strategyIndex] = allStrategies[
+                allStrategies.length - 1
+            ];
             allStrategies.pop();
 
             // Withdraw all assets
@@ -354,9 +356,8 @@ contract VaultAdmin is VaultStorage {
 
             if (uniswapAddr != address(0)) {
                 IERC20 rewardToken = IERC20(strategy.rewardTokenAddress());
-                uint256 rewardTokenAmount = rewardToken.balanceOf(
-                    address(this)
-                );
+                uint256 rewardTokenAmount =
+                    rewardToken.balanceOf(address(this));
                 if (rewardTokenAmount > 0) {
                     // Give Uniswap full amount allowance
                     rewardToken.safeApprove(uniswapAddr, 0);
@@ -365,8 +366,9 @@ contract VaultAdmin is VaultStorage {
                     // Uniswap redemption path
                     address[] memory path = new address[](3);
                     path[0] = strategy.rewardTokenAddress();
-                    path[1] = IUniswapV2Router(uniswapAddr).WETH();
-                    path[2] = allAssets[1]; // USDT
+                    // path[1] = IUniswapV2Router(uniswapAddr).WETH();
+                    path[1] = getGoldToken();  // CELO
+                    path[2] = allAssets[0]; // cUSD
 
                     return
                         IUniswapV2Router(uniswapAddr).swapExactTokensForTokens(
