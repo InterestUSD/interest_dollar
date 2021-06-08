@@ -244,6 +244,8 @@ const getAssetAddresses = async (deployments) => {
     };
   } else {
     return {
+      CUSD: (await deployments.get("MockCUSD")).address,
+      CEUR: (await deployments.get("MockCEUR")).address,
       // USDT: (await deployments.get("MockUSDT")).address,
       // USDC: (await deployments.get("MockUSDC")).address,
       // TUSD: (await deployments.get("MockTUSD")).address,

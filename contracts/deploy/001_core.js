@@ -50,8 +50,8 @@ const deployAaveStrategy = async () => {
       assetAddresses.AAVE_ADDRESS_PROVIDER,
       cVaultProxy.address,
       addresses.zero, // No reward token for Aave
-      [assetAddresses.DAI],
-      [assetAddresses.aDAI]
+      [assetAddresses.CUSD],
+      [assetAddresses.mCUSD]
     )
   );
   log("Initialized AaveStrategy");
@@ -394,10 +394,9 @@ const deployFlipper = async () => {
   const ousd = await ethers.getContract("OUSDProxy");
 
   await deployWithConfirmation("FlipperDev", [
-    assetAddresses.DAI,
+    assetAddresses.CUSD,
+    assetAddresses.CEUR,
     ousd.address,
-    assetAddresses.USDC,
-    assetAddresses.USDT,
   ]);
   const flipper = await ethers.getContract("FlipperDev");
   await withConfirmation(flipper.transferGovernance(governorAddr));
