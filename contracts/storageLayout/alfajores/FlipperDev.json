@@ -1,0 +1,30 @@
+{
+  "storage": [
+    {
+      "contract": "FlipperDev",
+      "label": "cusd",
+      "type": "t_contract(IERC20)1292",
+      "src": "contracts/flipper/FlipperDev.sol:20"
+    },
+    {
+      "contract": "FlipperDev",
+      "label": "ceur",
+      "type": "t_contract(IERC20)1292",
+      "src": "contracts/flipper/FlipperDev.sol:21"
+    },
+    {
+      "contract": "FlipperDev",
+      "label": "ousd",
+      "type": "t_contract(OUSD)15293",
+      "src": "contracts/flipper/FlipperDev.sol:22"
+    }
+  ],
+  "types": {
+    "t_contract(IERC20)1292": {
+      "label": "contract IERC20"
+    },
+    "t_contract(OUSD)15293": {
+      "label": "contract OUSD"
+    }
+  }
+}
