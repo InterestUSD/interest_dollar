@@ -72,7 +72,6 @@ const trustee = async (hre) => {
     await executeProposal(propArgs, propDescription);
     log("Proposal executed.");
   } else {
-
     await withConfirmation(
       cVaultProxy
         .connect(sGovernor)

@@ -8,7 +8,7 @@ const addresses = {};
 addresses.zero = "0x0000000000000000000000000000000000000000";
 addresses.dead = "0x0000000000000000000000000000000000000001";
 
-addresses.registry = "0x000000000000000000000000000000000000ce10"
+addresses.registry = "0x000000000000000000000000000000000000ce10";
 
 addresses.mainnet = {};
 // Native stablecoins
@@ -95,7 +95,7 @@ addresses.mainnet.CompensationClaims =
   "0x9C94df9d594BA1eb94430C006c269C314B1A8281";
 
 /* --- Alfajores --- */
-addresses.alfajores  = {};
+addresses.alfajores = {};
 
 addresses.alfajores.OGN = "0xA115e16ef6e217f7a327a57031F75cE0487AaDb8";
 

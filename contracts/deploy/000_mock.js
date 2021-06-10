@@ -1,7 +1,11 @@
 const { parseUnits } = require("ethers").utils;
 const { isMainnetOrAlfajoresOrFork } = require("../test/helpers");
 
-const deployMocks = async ({ getNamedAccounts, deployments, getUnnamedAccounts }) => {
+const deployMocks = async ({
+  getNamedAccounts,
+  deployments,
+  getUnnamedAccounts,
+}) => {
   const { deploy } = deployments;
   const { deployerAddr, governorAddr } = await getNamedAccounts();
 
