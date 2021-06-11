@@ -3,7 +3,7 @@ const hre = require("hardhat");
 const addresses = require("../utils/addresses");
 const {
   getAssetAddresses,
-  getOracleAddresses,
+  // getOracleAddresses,
   isMainnet,
 } = require("../test/helpers.js");
 const {
@@ -13,7 +13,7 @@ const {
 } = require("../utils/deploy");
 
 /**
- * Deploy AAVE Strategy which only supports DAI.
+ * Deploy AAVE Strategy which only supports cUSD.
  * Deploys a proxy, the actual strategy, initializes the proxy and initializes
  * the strategy.
  */
@@ -75,142 +75,142 @@ const deployAaveStrategy = async () => {
   return cAaveStrategy;
 };
 
-/**
- * Deploy Compound Strategy which only supports DAI.
- * Deploys a proxy, the actual strategy, initializes the proxy and initializes
- * the strategy.
- */
-const deployCompoundStrategy = async () => {
-  const assetAddresses = await getAssetAddresses(deployments);
-  const { deployerAddr, governorAddr } = await getNamedAccounts();
-  // Signers
-  const sDeployer = await ethers.provider.getSigner(deployerAddr);
-  const sGovernor = await ethers.provider.getSigner(governorAddr);
+// /**
+//  * Deploy Compound Strategy which only supports DAI.
+//  * Deploys a proxy, the actual strategy, initializes the proxy and initializes
+//  * the strategy.
+//  */
+// const deployCompoundStrategy = async () => {
+//   const assetAddresses = await getAssetAddresses(deployments);
+//   const { deployerAddr, governorAddr } = await getNamedAccounts();
+//   // Signers
+//   const sDeployer = await ethers.provider.getSigner(deployerAddr);
+//   const sGovernor = await ethers.provider.getSigner(governorAddr);
 
-  const cVaultProxy = await ethers.getContract("VaultProxy");
+//   const cVaultProxy = await ethers.getContract("VaultProxy");
 
-  const dCompoundStrategyProxy = await deployWithConfirmation(
-    "CompoundStrategyProxy"
-  );
-  const cCompoundStrategyProxy = await ethers.getContract(
-    "CompoundStrategyProxy"
-  );
-  const dCompoundStrategy = await deployWithConfirmation("CompoundStrategy");
-  const cCompoundStrategy = await ethers.getContractAt(
-    "CompoundStrategy",
-    dCompoundStrategyProxy.address
-  );
-  await withConfirmation(
-    cCompoundStrategyProxy["initialize(address,address,bytes)"](
-      dCompoundStrategy.address,
-      deployerAddr,
-      []
-    )
-  );
-  log("Initialized CompoundStrategyProxy");
-  await withConfirmation(
-    cCompoundStrategy
-      .connect(sDeployer)
-      .initialize(
-        addresses.dead,
-        cVaultProxy.address,
-        assetAddresses.COMP,
-        [assetAddresses.DAI],
-        [assetAddresses.cDAI]
-      )
-  );
-  log("Initialized CompoundStrategy");
-  await withConfirmation(
-    cCompoundStrategy.connect(sDeployer).transferGovernance(governorAddr)
-  );
-  log(`CompoundStrategy transferGovernance(${governorAddr} called`);
+//   const dCompoundStrategyProxy = await deployWithConfirmation(
+//     "CompoundStrategyProxy"
+//   );
+//   const cCompoundStrategyProxy = await ethers.getContract(
+//     "CompoundStrategyProxy"
+//   );
+//   const dCompoundStrategy = await deployWithConfirmation("CompoundStrategy");
+//   const cCompoundStrategy = await ethers.getContractAt(
+//     "CompoundStrategy",
+//     dCompoundStrategyProxy.address
+//   );
+//   await withConfirmation(
+//     cCompoundStrategyProxy["initialize(address,address,bytes)"](
+//       dCompoundStrategy.address,
+//       deployerAddr,
+//       []
+//     )
+//   );
+//   log("Initialized CompoundStrategyProxy");
+//   await withConfirmation(
+//     cCompoundStrategy
+//       .connect(sDeployer)
+//       .initialize(
+//         addresses.dead,
+//         cVaultProxy.address,
+//         assetAddresses.COMP,
+//         [assetAddresses.DAI],
+//         [assetAddresses.cDAI]
+//       )
+//   );
+//   log("Initialized CompoundStrategy");
+//   await withConfirmation(
+//     cCompoundStrategy.connect(sDeployer).transferGovernance(governorAddr)
+//   );
+//   log(`CompoundStrategy transferGovernance(${governorAddr} called`);
 
-  // On Mainnet the governance transfer gets executed separately, via the
-  // multi-sig wallet. On other networks, this migration script can claim
-  // governance by the governor.
-  if (!isMainnet) {
-    await withConfirmation(
-      cCompoundStrategy
-        .connect(sGovernor) // Claim governance with governor
-        .claimGovernance()
-    );
-    log("Claimed governance for CompoundStrategy");
-  }
-  return cCompoundStrategy;
-};
+//   // On Mainnet the governance transfer gets executed separately, via the
+//   // multi-sig wallet. On other networks, this migration script can claim
+//   // governance by the governor.
+//   if (!isMainnet) {
+//     await withConfirmation(
+//       cCompoundStrategy
+//         .connect(sGovernor) // Claim governance with governor
+//         .claimGovernance()
+//     );
+//     log("Claimed governance for CompoundStrategy");
+//   }
+//   return cCompoundStrategy;
+// };
 
-/**
- * Deploys a 3pool Strategy which supports USDC, USDT and DAI.
- * Deploys a proxy, the actual strategy, initializes the proxy and initializes
- */
-const deployThreePoolStrategy = async () => {
-  const assetAddresses = await getAssetAddresses(deployments);
-  const { deployerAddr, governorAddr } = await getNamedAccounts();
-  // Signers
-  const sDeployer = await ethers.provider.getSigner(deployerAddr);
-  const sGovernor = await ethers.provider.getSigner(governorAddr);
+// /**
+//  * Deploys a 3pool Strategy which supports USDC, USDT and DAI.
+//  * Deploys a proxy, the actual strategy, initializes the proxy and initializes
+//  */
+// const deployThreePoolStrategy = async () => {
+//   const assetAddresses = await getAssetAddresses(deployments);
+//   const { deployerAddr, governorAddr } = await getNamedAccounts();
+//   // Signers
+//   const sDeployer = await ethers.provider.getSigner(deployerAddr);
+//   const sGovernor = await ethers.provider.getSigner(governorAddr);
 
-  await deployWithConfirmation("ThreePoolStrategyProxy");
-  const cThreePoolStrategyProxy = await ethers.getContract(
-    "ThreePoolStrategyProxy"
-  );
+//   await deployWithConfirmation("ThreePoolStrategyProxy");
+//   const cThreePoolStrategyProxy = await ethers.getContract(
+//     "ThreePoolStrategyProxy"
+//   );
 
-  const dThreePoolStrategy = await deployWithConfirmation("ThreePoolStrategy");
-  const cThreePoolStrategy = await ethers.getContractAt(
-    "ThreePoolStrategy",
-    cThreePoolStrategyProxy.address
-  );
+//   const dThreePoolStrategy = await deployWithConfirmation("ThreePoolStrategy");
+//   const cThreePoolStrategy = await ethers.getContractAt(
+//     "ThreePoolStrategy",
+//     cThreePoolStrategyProxy.address
+//   );
 
-  await withConfirmation(
-    cThreePoolStrategyProxy["initialize(address,address,bytes)"](
-      dThreePoolStrategy.address,
-      deployerAddr,
-      []
-    )
-  );
-  log("Initialized ThreePoolStrategyProxy");
+//   await withConfirmation(
+//     cThreePoolStrategyProxy["initialize(address,address,bytes)"](
+//       dThreePoolStrategy.address,
+//       deployerAddr,
+//       []
+//     )
+//   );
+//   log("Initialized ThreePoolStrategyProxy");
 
-  // Initialize Strategies
-  const cVaultProxy = await ethers.getContract("VaultProxy");
-  await withConfirmation(
-    cThreePoolStrategy
-      .connect(sDeployer)
-      [
-        "initialize(address,address,address,address[],address[],address,address)"
-      ](
-        assetAddresses.ThreePool,
-        cVaultProxy.address,
-        assetAddresses.CRV,
-        [assetAddresses.DAI, assetAddresses.USDC, assetAddresses.USDT],
-        [
-          assetAddresses.ThreePoolToken,
-          assetAddresses.ThreePoolToken,
-          assetAddresses.ThreePoolToken,
-        ],
-        assetAddresses.ThreePoolGauge,
-        assetAddresses.CRVMinter
-      )
-  );
-  log("Initialized ThreePoolStrategy");
+//   // Initialize Strategies
+//   const cVaultProxy = await ethers.getContract("VaultProxy");
+//   await withConfirmation(
+//     cThreePoolStrategy
+//       .connect(sDeployer)
+//       [
+//         "initialize(address,address,address,address[],address[],address,address)"
+//       ](
+//         assetAddresses.ThreePool,
+//         cVaultProxy.address,
+//         assetAddresses.CRV,
+//         [assetAddresses.DAI, assetAddresses.USDC, assetAddresses.USDT],
+//         [
+//           assetAddresses.ThreePoolToken,
+//           assetAddresses.ThreePoolToken,
+//           assetAddresses.ThreePoolToken,
+//         ],
+//         assetAddresses.ThreePoolGauge,
+//         assetAddresses.CRVMinter
+//       )
+//   );
+//   log("Initialized ThreePoolStrategy");
 
-  await withConfirmation(
-    cThreePoolStrategy.connect(sDeployer).transferGovernance(governorAddr)
-  );
-  log(`ThreePoolStrategy transferGovernance(${governorAddr}) called`);
-  // On Mainnet the governance transfer gets executed separately, via the
-  // multi-sig wallet. On other networks, this migration script can claim
-  // governance by the governor.
-  if (!isMainnet) {
-    await withConfirmation(
-      cThreePoolStrategy
-        .connect(sGovernor) // Claim governance with governor
-        .claimGovernance()
-    );
-    log("Claimed governance for ThreePoolStrategy");
-  }
+//   await withConfirmation(
+//     cThreePoolStrategy.connect(sDeployer).transferGovernance(governorAddr)
+//   );
+//   log(`ThreePoolStrategy transferGovernance(${governorAddr}) called`);
+//   // On Mainnet the governance transfer gets executed separately, via the
+//   // multi-sig wallet. On other networks, this migration script can claim
+//   // governance by the governor.
+//   if (!isMainnet) {
+//     await withConfirmation(
+//       cThreePoolStrategy
+//         .connect(sGovernor) // Claim governance with governor
+//         .claimGovernance()
+//     );
+//     log("Claimed governance for ThreePoolStrategy");
+//   }
 
-  return cThreePoolStrategy;
-};
+//   return cThreePoolStrategy;
+// };
 
 /**
  * Configure Vault by adding supported assets and Strategies.
@@ -229,19 +229,7 @@ const configureVault = async () => {
     "VaultAdmin",
     (await ethers.getContract("VaultProxy")).address
   );
-  // Set up supported assets for Vault
-  // await withConfirmation(
-  //   cVault.connect(sGovernor).supportAsset(assetAddresses.DAI)
-  // );
-  // log("Added DAI asset to Vault");
-  // await withConfirmation(
-  //   cVault.connect(sGovernor).supportAsset(assetAddresses.USDT)
-  // );
-  // log("Added USDT asset to Vault");
-  // await withConfirmation(
-  //   cVault.connect(sGovernor).supportAsset(assetAddresses.USDC)
-  // );
-  // log("Added USDC asset to Vault");
+  
   await withConfirmation(
     cVault.connect(sGovernor).supportAsset(assetAddresses.CUSD)
   );
@@ -403,46 +391,46 @@ const deployFlipper = async () => {
   await withConfirmation(flipper.connect(sGovernor).claimGovernance());
 };
 
-const deployBuyback = async () => {
-  const { deployerAddr, governorAddr } = await getNamedAccounts();
-  const sDeployer = await ethers.provider.getSigner(deployerAddr);
-  const sGovernor = await ethers.provider.getSigner(governorAddr);
+// const deployBuyback = async () => {
+//   const { deployerAddr, governorAddr } = await getNamedAccounts();
+//   const sDeployer = await ethers.provider.getSigner(deployerAddr);
+//   const sGovernor = await ethers.provider.getSigner(governorAddr);
 
-  const assetAddresses = await getAssetAddresses(deployments);
-  const ousd = await ethers.getContract("OUSDProxy");
-  const vault = await ethers.getContract("VaultProxy");
+//   const assetAddresses = await getAssetAddresses(deployments);
+//   const ousd = await ethers.getContract("OUSDProxy");
+//   const vault = await ethers.getContract("VaultProxy");
 
-  await deployWithConfirmation(
-    "Buyback",
-    [
-      assetAddresses.uniswapRouter,
-      vault.address,
-      ousd.address,
-      assetAddresses.OGN,
-      assetAddresses.USDT,
-    ],
-    "BuybackConstructor"
-  );
-  const cBuyback = await ethers.getContract("Buyback");
+//   await deployWithConfirmation(
+//     "Buyback",
+//     [
+//       assetAddresses.uniswapRouter,
+//       vault.address,
+//       ousd.address,
+//       assetAddresses.OGN,
+//       assetAddresses.USDT,
+//     ],
+//     "BuybackConstructor"
+//   );
+//   const cBuyback = await ethers.getContract("Buyback");
 
-  await withConfirmation(
-    cBuyback.connect(sDeployer).transferGovernance(governorAddr)
-  );
-  log(`Buyback transferGovernance(${governorAddr} called`);
+//   await withConfirmation(
+//     cBuyback.connect(sDeployer).transferGovernance(governorAddr)
+//   );
+//   log(`Buyback transferGovernance(${governorAddr} called`);
 
-  // On Mainnet the governance transfer gets executed separately, via the
-  // multi-sig wallet. On other networks, this migration script can claim
-  // governance by the governor.
-  if (!isMainnet) {
-    await withConfirmation(
-      cBuyback
-        .connect(sGovernor) // Claim governance with governor
-        .claimGovernance()
-    );
-    log("Claimed governance for Buyback");
-  }
-  return cBuyback;
-};
+//   // On Mainnet the governance transfer gets executed separately, via the
+//   // multi-sig wallet. On other networks, this migration script can claim
+//   // governance by the governor.
+//   if (!isMainnet) {
+//     await withConfirmation(
+//       cBuyback
+//         .connect(sGovernor) // Claim governance with governor
+//         .claimGovernance()
+//     );
+//     log("Claimed governance for Buyback");
+//   }
+//   return cBuyback;
+// };
 
 const main = async () => {
   console.log("Running 001_core deployment...");
