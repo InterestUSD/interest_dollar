@@ -9,14 +9,14 @@ pragma solidity 0.5.11;
            of OUSD.
  * @author Origin Protocol Inc
  */
-
 import "./VaultStorage.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IVault } from "../interfaces/IVault.sol";
 import { IBuyback } from "../interfaces/IBuyback.sol";
 
 contract VaultCore is VaultStorage {
-    uint256 constant MAX_UINT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    uint256 constant MAX_UINT =
+        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
     /**
      * @dev Verifies that the rebasing is not paused.
@@ -49,15 +49,10 @@ contract VaultCore is VaultStorage {
         require(_amount > 0, "Amount must be greater than 0");
 
         uint256 price = IOracle(priceProvider).price(_asset);
-        // if (price > 1e8) {
-        //     price = 1e8;
-        // }
         uint256 assetDecimals = Helpers.getDecimals(_asset);
         uint256 unitAdjustedDeposit = _amount.scaleBy(int8(18 - assetDecimals));
-        uint256 priceAdjustedDeposit = _amount.mulTruncateScale(
-            price.scaleBy(int8(10)), // 18-8 because oracles have 8 decimals precision
-            10**assetDecimals
-        );
+        uint256 priceAdjustedDeposit =
+            _amount.mulTruncateScale(price, 10**assetDecimals);
 
         if (_minimumOusdAmount > 0) {
             require(
@@ -309,13 +304,11 @@ contract VaultCore is VaultStorage {
 
             // Multiply the balance by the vault buffer modifier and truncate
             // to the scale of the asset decimals
-            uint256 allocateAmount = assetBalance.mulTruncate(
-                vaultBufferModifier
-            );
+            uint256 allocateAmount =
+                assetBalance.mulTruncate(vaultBufferModifier);
 
-            address depositStrategyAddr = assetDefaultStrategies[address(
-                asset
-            )];
+            address depositStrategyAddr =
+                assetDefaultStrategies[address(asset)];
 
             if (depositStrategyAddr != address(0) && allocateAmount > 0) {
                 IStrategy strategy = IStrategy(depositStrategyAddr);
@@ -331,8 +324,8 @@ contract VaultCore is VaultStorage {
             IStrategy strategy = IStrategy(allStrategies[i]);
             address rewardTokenAddress = strategy.rewardTokenAddress();
             if (rewardTokenAddress != address(0)) {
-                uint256 liquidationThreshold = strategy
-                    .rewardLiquidationThreshold();
+                uint256 liquidationThreshold =
+                    strategy.rewardLiquidationThreshold();
                 if (liquidationThreshold == 0) {
                     // No threshold set, always harvest from strategy
                     IVault(address(this)).harvest(allStrategies[i]);
@@ -342,9 +335,8 @@ contract VaultCore is VaultStorage {
                     // on their contract so the liquidation threshold should be
                     // set to 0
                     IERC20 rewardToken = IERC20(rewardTokenAddress);
-                    uint256 rewardTokenAmount = rewardToken.balanceOf(
-                        allStrategies[i]
-                    );
+                    uint256 rewardTokenAmount =
+                        rewardToken.balanceOf(allStrategies[i]);
                     if (rewardTokenAmount >= liquidationThreshold) {
                         IVault(address(this)).harvest(allStrategies[i]);
                     }
@@ -588,10 +580,11 @@ contract VaultCore is VaultStorage {
             if (price < 1e18) {
                 price = 1e18;
             }
-            uint256 ratio = assetBalances[i]
-                .scaleBy(int8(18 - assetDecimals[i]))
-                .mul(price)
-                .div(totalBalance);
+            uint256 ratio =
+                assetBalances[i]
+                    .scaleBy(int8(18 - assetDecimals[i]))
+                    .mul(price)
+                    .div(totalBalance);
             totalOutputRatio = totalOutputRatio.add(ratio);
         }
         // Calculate final outputs
