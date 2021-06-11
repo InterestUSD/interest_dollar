@@ -3,10 +3,11 @@ pragma solidity 0.5.11;
 import { Governable } from "../governance/Governable.sol";
 
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
+import { UsingRegistry } from "../utils/UsingRegistry.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-contract Buyback is Governable {
+contract Buyback is Governable, UsingRegistry {
     using SafeERC20 for IERC20;
 
     event UniswapUpdated(address _address);
@@ -15,16 +16,14 @@ contract Buyback is Governable {
     address public uniswapAddr = 0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D;
 
     // Address of OUSD Vault
-    address constant public vaultAddr = 0xE75D77B1865Ae93c7eaa3040B038D7aA7BC02F70;
+    address public constant vaultAddr =
+        0xE75D77B1865Ae93c7eaa3040B038D7aA7BC02F70;
 
     // Swap from OUSD
     IERC20 constant ousd = IERC20(0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86);
 
     // Swap to OGN
     IERC20 constant ogn = IERC20(0x8207c1FfC5B6804F6024322CcF34F29c3541Ae26);
-
-    // USDT for Uniswap path
-    IERC20 constant usdt = IERC20(0xdAC17F958D2ee523a2206206994597C13D831ec7);
 
     /**
      * @dev Verifies that the caller is the OUSD Vault.
@@ -60,8 +59,8 @@ contract Buyback is Governable {
         // Uniswap redemption path
         address[] memory path = new address[](4);
         path[0] = address(ousd);
-        path[1] = address(usdt);
-        path[2] = IUniswapV2Router(uniswapAddr).WETH();
+        path[1] = getStableToken();
+        path[2] = getGoldToken();
         path[3] = address(ogn);
         IUniswapV2Router(uniswapAddr).swapExactTokensForTokens(
             sourceAmount,
