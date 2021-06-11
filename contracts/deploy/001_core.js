@@ -5,6 +5,8 @@ const {
   getAssetAddresses,
   // getOracleAddresses,
   isMainnet,
+  isAlfajores,
+  isFork,
 } = require("../test/helpers.js");
 const {
   log,
@@ -229,7 +231,7 @@ const configureVault = async () => {
     "VaultAdmin",
     (await ethers.getContract("VaultProxy")).address
   );
-  
+
   await withConfirmation(
     cVault.connect(sGovernor).supportAsset(assetAddresses.CUSD)
   );
@@ -257,43 +259,21 @@ const deployOracles = async () => {
   // Signers
   // const sDeployer = await ethers.provider.getSigner(deployerAddr);
 
-  // TODO: Change this to intelligently decide which router contract to deploy?
-  const oracleContract = isMainnet ? "OracleRouter" : "OracleRouterDev";
+  const isLocal = !(isMainnet || isAlfajores || isFork);
+  const oracleContract = !isLocal ? "OracleRouter" : "OracleRouterDev";
   await deployWithConfirmation("OracleRouter", [], oracleContract);
-  // const oracleRouter = await ethers.getContract("OracleRouter");
 
-  // // Register feeds
-  // // Not needed in production
-  // const oracleAddresses = await getOracleAddresses(deployments);
-  // const assetAddresses = await getAssetAddresses(deployments);
-  // withConfirmation(
-  //   oracleRouter
-  //     .connect(sDeployer)
-  //     .setFeed(assetAddresses.DAI, oracleAddresses.chainlink.DAI_USD)
-  // );
-  // withConfirmation(
-  //   oracleRouter
-  //     .connect(sDeployer)
-  //     .setFeed(assetAddresses.USDC, oracleAddresses.chainlink.USDC_USD)
-  // );
-  // withConfirmation(
-  //   oracleRouter
-  //     .connect(sDeployer)
-  //     .setFeed(assetAddresses.USDT, oracleAddresses.chainlink.USDT_USD)
-  // );
-  // withConfirmation(
-  //   oracleRouter
-  //     .connect(sDeployer)
-  //     .setFeed(assetAddresses.TUSD, oracleAddresses.chainlink.TUSD_USD)
-  // );
-  // withConfirmation(
-  //   oracleRouter
-  //     .connect(sDeployer)
-  //     .setFeed(
-  //       assetAddresses.NonStandardToken,
-  //       oracleAddresses.chainlink.NonStandardToken_USD
-  //     )
-  // );
+  if (isLocal) {
+    // set the mock values for cUSD  and cEUR
+    const assetAddresses = await getAssetAddresses(deployments);
+    const oracleRouter = await ethers.getContract("OracleRouter");
+    withConfirmation(
+      oracleRouter.setPrice(assetAddresses.CUSD, "1000100000000000000")   // 1.0001
+    );
+    withConfirmation(
+      oracleRouter.setPrice(assetAddresses.CEUR, "1200100000000000000")   // 1.2001
+    );
+  }
 };
 
 /**
