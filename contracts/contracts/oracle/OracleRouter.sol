@@ -81,7 +81,7 @@ contract OracleRouterDev {
         return assetToFeed[asset];
     }
 
-    function price(address asset) internal view returns (uint256) {
+    function price(address asset) external view returns (uint256) {
         return assetToPrice[asset];
     }
 }
