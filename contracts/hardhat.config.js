@@ -42,12 +42,12 @@ const {
   yield,
 } = require("./tasks/vault");
 
-const MAINNET_DEPLOYER = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
+const MAINNET_DEPLOYER = "0x3084F0b94d41111526f8d1e5fFf43e1752907d48";
 // Mainnet contracts are governed by the Governor contract (which derives off Timelock).
-const MAINNET_GOVERNOR = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
-const MAINNET_MULTISIG = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
+const MAINNET_GOVERNOR = "0x3084F0b94d41111526f8d1e5fFf43e1752907d48";
+const MAINNET_MULTISIG = "0x3084F0b94d41111526f8d1e5fFf43e1752907d48";
 const MAINNET_CLAIM_ADJUSTER = MAINNET_DEPLOYER;
-const MAINNET_STRATEGIST = "0x95dD1b944cD3c36b1097Ac436235da1388D784B6";
+const MAINNET_STRATEGIST = "0x3084F0b94d41111526f8d1e5fFf43e1752907d48";
 
 const mnemonic =
   "try news balcony swim primary absorb acoustic ladder lizard invest hen nominee slim rib spell sport swing industry sad unfair glide conduct exclude ship";
