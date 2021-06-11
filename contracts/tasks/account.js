@@ -43,15 +43,13 @@ async function accounts(taskArguments, hre, privateKeys) {
 }
 
 /**
- * Funds test accounts on local or fork with DAI, USDT, USDC and TUSD.
+ * Funds test accounts on local or fork with cUSD, cEUR.
  */
 async function fund(taskArguments, hre) {
   const addresses = require("../utils/addresses");
   const {
-    usdtUnits,
-    daiUnits,
-    usdcUnits,
-    tusdUnits,
+    cusdUnits,
+    ceurUnits,
     isFork,
     isLocalhost,
   } = require("../test/helpers");
@@ -60,17 +58,13 @@ async function fund(taskArguments, hre) {
     throw new Error("Task can only be used on local or fork");
   }
 
-  let usdt, dai, tusd, usdc;
+  let cusd, ceur;
   if (isFork) {
-    usdt = await hre.ethers.getContractAt(usdtAbi, addresses.mainnet.USDT);
-    dai = await hre.ethers.getContractAt(daiAbi, addresses.mainnet.DAI);
-    tusd = await hre.ethers.getContractAt(tusdAbi, addresses.mainnet.TUSD);
-    usdc = await hre.ethers.getContractAt(usdcAbi, addresses.mainnet.USDC);
+    cusd = await hre.ethers.getContractAt(cusdAbi, addresses.mainnet.CUSD);
+    ceur = await hre.ethers.getContractAt(ceurAbi, addresses.mainnet.CEUR);
   } else {
-    usdt = await hre.ethers.getContract("MockUSDT");
-    dai = await hre.ethers.getContract("MockDAI");
-    tusd = await hre.ethers.getContract("MockTUSD");
-    usdc = await hre.ethers.getContract("MockUSDC");
+    cusd = await hre.ethers.getContract("MockCUSD");
+    ceur = await hre.ethers.getContract("MockCEUR");
   }
 
   let binanceSigner;
@@ -90,54 +84,35 @@ async function fund(taskArguments, hre) {
   const accountIndex = Number(taskArguments.account) || defaultAccountIndex;
   const fundAmount = taskArguments.amount || defaultFundAmount;
 
-  console.log(`DAI: ${dai.address}`);
-  console.log(`USDC: ${usdc.address}`);
-  console.log(`USDT: ${usdt.address}`);
-  console.log(`TUSD: ${tusd.address}`);
+  console.log(`cUSD: ${cusd.address}`);
+  console.log(`cEUR: ${ceur.address}`);
 
   for (let i = accountIndex; i < accountIndex + numAccounts; i++) {
     const signer = signers[i];
     const address = signer.address;
     console.log(`Funding account ${i} at address ${address}`);
     if (isFork) {
-      await dai.connect(binanceSigner).transfer(address, daiUnits(fundAmount));
+      await cusd.connect(binanceSigner).transfer(address, cusdUnits(fundAmount));
     } else {
-      await dai.connect(signer).mint(daiUnits(fundAmount));
+      await cusd.connect(signer).mint(cusdUnits(fundAmount));
     }
-    console.log(`  Funded with ${fundAmount} DAI`);
+    console.log(`  Funded with ${fundAmount} cUSD`);
     if (isFork) {
-      await usdc
+      await ceur
         .connect(binanceSigner)
-        .transfer(address, usdcUnits(fundAmount));
+        .transfer(address, ceurUnits(fundAmount));
     } else {
-      await usdc.connect(signer).mint(usdcUnits(fundAmount));
+      await ceur.connect(signer).mint(ceurUnits(fundAmount));
     }
-    console.log(`  Funded with ${fundAmount} USDC`);
-    if (isFork) {
-      await usdt
-        .connect(binanceSigner)
-        .transfer(address, usdtUnits(fundAmount));
-    } else {
-      await usdt.connect(signer).mint(usdtUnits(fundAmount));
-    }
-    console.log(`  Funded with ${fundAmount} USDT`);
-    if (isFork) {
-      await tusd
-        .connect(binanceSigner)
-        .transfer(address, tusdUnits(fundAmount));
-    } else {
-      await tusd.connect(signer).mint(tusdUnits(fundAmount));
-    }
-    console.log(`  Funded with ${fundAmount} TUSD`);
-  }
+    console.log(`  Funded with ${fundAmount} cEUR`);
 }
 
 /**
- * Mints OUSD using USDT on local or fork.
+ * Mints OUSD using cUSD on local or fork.
  */
 async function mint(taskArguments, hre) {
   const addresses = require("../utils/addresses");
-  const { usdtUnits, isFork, isLocalhost } = require("../test/helpers");
+  const { cusdUnits, isFork, isLocalhost } = require("../test/helpers");
 
   if (!isFork && !isLocalhost) {
     throw new Error("Task can only be used on local or fork");
@@ -149,11 +124,11 @@ async function mint(taskArguments, hre) {
   const vaultProxy = await ethers.getContract("VaultProxy");
   const vault = await ethers.getContractAt("IVault", vaultProxy.address);
 
-  let usdt;
+  let cusd;
   if (isFork) {
-    usdt = await hre.ethers.getContractAt(usdtAbi, addresses.mainnet.USDT);
+    cusd = await hre.ethers.getContractAt(cusdAbi, addresses.mainnet.CUSD);
   } else {
-    usdt = await hre.ethers.getContract("MockUSDT");
+    cusd = await hre.ethers.getContract("MockCUSD");
   }
 
   const numAccounts = Number(taskArguments.num) || defaultNumAccounts;
@@ -168,21 +143,21 @@ async function mint(taskArguments, hre) {
       `Minting ${mintAmount} OUSD for account ${i} at address ${address}`
     );
 
-    // Ensure the account has sufficient USDT balance to cover the mint.
-    const usdtBalance = await usdt.balanceOf(address);
-    if (usdtBalance.lt(usdtUnits(mintAmount))) {
+    // Ensure the account has sufficient cUSD balance to cover the mint.
+    const cusdBalance = await cusd.balanceOf(address);
+    if (cusdBalance.lt(cusdUnits(mintAmount))) {
       throw new Error(
-        `Account USDT balance insufficient to mint the requested amount`
+        `Account cUSD balance insufficient to mint the requested amount`
       );
     }
 
     // Mint.
-    await usdt
+    await cusd
       .connect(signer)
-      .approve(vault.address, usdtUnits(mintAmount), { gasLimit: 1000000 });
+      .approve(vault.address, cusdUnits(mintAmount), { gasLimit: 1000000 });
     await vault
       .connect(signer)
-      .mint(usdt.address, usdtUnits(mintAmount), 0, { gasLimit: 2000000 });
+      .mint(cusd.address, cusdUnits(mintAmount), 0, { gasLimit: 2000000 });
 
     // Show new account's balance.
     const ousdBalance = await ousd.balanceOf(address);
@@ -201,9 +176,8 @@ async function redeem(taskArguments, hre) {
   const {
     ousdUnits,
     ousdUnitsFormat,
-    daiUnitsFormat,
-    usdcUnitsFormat,
-    usdtUnitsFormat,
+    cusdUnitsFormat,
+    ceurUnitsFormat,
     isFork,
     isLocalhost,
   } = require("../test/helpers");
@@ -218,15 +192,13 @@ async function redeem(taskArguments, hre) {
   const vaultProxy = await ethers.getContract("VaultProxy");
   const vault = await ethers.getContractAt("IVault", vaultProxy.address);
 
-  let dai, usdc, usdt;
+  let cusd, ceur;
   if (isFork) {
-    dai = await hre.ethers.getContractAt(usdtAbi, addresses.mainnet.DAI);
-    usdc = await hre.ethers.getContractAt(usdtAbi, addresses.mainnet.USDC);
-    usdt = await hre.ethers.getContractAt(usdtAbi, addresses.mainnet.USDT);
+    cusd = await hre.ethers.getContractAt(cusdAbi, addresses.mainnet.CUSD);
+    ceur = await hre.ethers.getContractAt(ceurAbi, addresses.mainnet.CEUR);
   } else {
-    dai = await hre.ethers.getContract("MockDAI");
-    usdc = await hre.ethers.getContract("MockUSDC");
-    usdt = await hre.ethers.getContract("MockUSDT");
+    cusd = await hre.ethers.getContract("MockCUSD");
+    ceur = await hre.ethers.getContract("MockCEUR");
   }
 
   const numAccounts = Number(taskArguments.num) || defaultNumAccounts;
@@ -243,13 +215,12 @@ async function redeem(taskArguments, hre) {
 
     // Show the current balances.
     let ousdBalance = await ousd.balanceOf(address);
-    let daiBalance = await dai.balanceOf(address);
-    let usdcBalance = await usdc.balanceOf(address);
-    let usdtBalance = await usdt.balanceOf(address);
+    let cusdBalance = await cusd.balanceOf(address);
+    let ceurBalance = await ceur.balanceOf(address);
+
     console.log("OUSD balance=", ousdUnitsFormat(ousdBalance, 18));
-    console.log("DAI balance=", daiUnitsFormat(daiBalance, 18));
-    console.log("USDC balance=", usdcUnitsFormat(usdcBalance, 6));
-    console.log("USDT balance=", usdtUnitsFormat(usdtBalance, 6));
+    console.log("cUSD balance=", cusdUnitsFormat(cusdBalance, 18));
+    console.log("cEUR balance=", ceurUnitsFormat(ceurBalance, 18));
 
     // Redeem.
     await vault
@@ -258,13 +229,11 @@ async function redeem(taskArguments, hre) {
 
     // Show the new balances.
     ousdBalance = await ousd.balanceOf(address);
-    daiBalance = await dai.balanceOf(address);
-    usdcBalance = await usdc.balanceOf(address);
-    usdtBalance = await usdt.balanceOf(address);
+    cusdBalance = await cusd.balanceOf(address);
+    ceurBalance = await ceur.balanceOf(address);
     console.log("New OUSD balance=", ousdUnitsFormat(ousdBalance, 18));
-    console.log("New DAI balance=", daiUnitsFormat(daiBalance, 18));
-    console.log("New USDC balance=", usdcUnitsFormat(usdcBalance, 18));
-    console.log("New USDT balance=", usdtUnitsFormat(usdtBalance, 18));
+    console.log("New cUSD balance=", cusdUnitsFormat(cusdBalance, 18));
+    console.log("New cEUR balance=", ceurUnitsFormat(ceurBalance, 18));
   }
 }
 

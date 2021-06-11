@@ -65,35 +65,23 @@ function ousdUnitsFormat(amount) {
   return formatUnits(amount, 18);
 }
 
-function usdtUnits(amount) {
-  return parseUnits(amount, 6);
-}
-
-function usdtUnitsFormat(amount) {
-  return formatUnits(amount, 6);
-}
-
-function usdcUnits(amount) {
-  return parseUnits(amount, 6);
-}
-
-function usdcUnitsFormat(amount) {
-  return formatUnits(amount, 6);
-}
-
-function tusdUnits(amount) {
+function ceurUnits(amount) {
   return parseUnits(amount, 18);
 }
 
-function daiUnits(amount) {
-  return parseUnits(amount, 18);
-}
-
-function daiUnitsFormat(amount) {
+function ceurUnitsFormat(amount) {
   return formatUnits(amount, 18);
 }
 
-function ethUnits(amount) {
+function cusdUnits(amount) {
+  return parseUnits(amount, 18);
+}
+
+function cusdUnitsFormat(amount) {
+  return formatUnits(amount, 18);
+}
+
+function goldUnits(amount) {
   return parseUnits(amount, 18);
 }
 
@@ -336,30 +324,24 @@ async function proposeAndExecute(fixture, governorArgsArray, description) {
 
 module.exports = {
   ousdUnits,
-  usdtUnits,
-  usdcUnits,
-  tusdUnits,
-  daiUnits,
+  cusdUnits,
+  ceurUnits,
   ognUnits,
-  ethUnits,
+  goldUnits,
   oracleUnits,
   units,
-  daiUnitsFormat,
-  ousdUnitsFormat,
-  usdcUnitsFormat,
-  usdtUnitsFormat,
+  cusdUnitsFormat,
+  ceurUnitsFormat,
   humanBalance,
   expectApproxSupply,
   advanceTime,
   isMainnet,
-  // isAlfajores,
   isAlfajores,
   isFork,
   isTest,
   isSmokeTest,
   isLocalhost,
   isMainnetOrFork,
-  // isMainnetOrAlfajoresOrFork,
   isMainnetOrAlfajoresOrFork,
   loadFixture,
   getOracleAddress,
