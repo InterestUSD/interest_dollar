@@ -41,7 +41,7 @@ const trustee = async (hre) => {
 
   // Proposal for the governor to do the upgrades.
   const propDescription = "Trustee deploy and config";
-  const trusteeAddress = "0xF14BBdf064E3F67f51cd9BD646aE3716aD938FDC"; // Strategist multi-sig
+  const trusteeAddress = "0x3084F0b94d41111526f8d1e5fFf43e1752907d48"; // Strategist multi-sig
   const trusteeFeeBps = 1000; // 1000 bps = 10%
   const propArgs = await proposeArgs([
     {
@@ -108,7 +108,7 @@ const main = async (hre) => {
 };
 
 main.id = deployName;
-main.dependencies = ["012_upgrades"];
+main.dependencies = ["core"];
 main.skip = () => !(isMainnet || isAlfajores || isFork) || isSmokeTest;
 
 module.exports = main;

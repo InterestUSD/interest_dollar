@@ -92,7 +92,9 @@ async function fund(taskArguments, hre) {
     const address = signer.address;
     console.log(`Funding account ${i} at address ${address}`);
     if (isFork) {
-      await cusd.connect(binanceSigner).transfer(address, cusdUnits(fundAmount));
+      await cusd
+        .connect(binanceSigner)
+        .transfer(address, cusdUnits(fundAmount));
     } else {
       await cusd.connect(signer).mint(cusdUnits(fundAmount));
     }
@@ -105,6 +107,7 @@ async function fund(taskArguments, hre) {
       await ceur.connect(signer).mint(ceurUnits(fundAmount));
     }
     console.log(`  Funded with ${fundAmount} cEUR`);
+  }
 }
 
 /**

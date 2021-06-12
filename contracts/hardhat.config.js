@@ -28,10 +28,10 @@ const {
 const {
   isAdjusterLocked,
   fundCompAccountsWithEth,
-  claimOGN,
+  // claimOGN,
   claimOUSD,
   checkOUSDBalances,
-  supplyStakingContractWithOGN,
+  // supplyStakingContractWithOGN,
 } = require("./tasks/compensation");
 const {
   allocate,
@@ -138,14 +138,14 @@ task(
   "checkOUSDBalances",
   "Check ousd balances of contract and accounts"
 ).setAction(checkOUSDBalances);
-task(
-  "supplyStakingWithOGN",
-  "Supplies a great amount of ogn to staking contract"
-).setAction(supplyStakingContractWithOGN);
-task(
-  "claimOGN",
-  "Claims the OGN part of the compensation plan for all eligible users"
-).setAction(claimOGN);
+// task(
+//   "supplyStakingWithOGN",
+//   "Supplies a great amount of ogn to staking contract"
+// ).setAction(supplyStakingContractWithOGN);
+// task(
+//   "claimOGN",
+//   "Claims the OGN part of the compensation plan for all eligible users"
+// ).setAction(claimOGN);
 
 // Smoke tests
 task(
