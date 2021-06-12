@@ -268,10 +268,10 @@ const deployOracles = async () => {
     const assetAddresses = await getAssetAddresses(deployments);
     const oracleRouter = await ethers.getContract("OracleRouter");
     withConfirmation(
-      oracleRouter.setPrice(assetAddresses.CUSD, "1000100000000000000")   // 1.0001
+      oracleRouter.setPrice(assetAddresses.CUSD, "1000100000000000000") // 1.0001
     );
     withConfirmation(
-      oracleRouter.setPrice(assetAddresses.CEUR, "1200100000000000000")   // 1.2001
+      oracleRouter.setPrice(assetAddresses.CEUR, "1200100000000000000") // 1.2001
     );
   }
 };

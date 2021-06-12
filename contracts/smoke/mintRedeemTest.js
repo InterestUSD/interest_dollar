@@ -1,16 +1,15 @@
 const { fund, mint } = require("../tasks/account");
 const {
-  usdtUnits,
+  cusdUnits,
+  ceurUnits,
   ousdUnits,
-  usdcUnits,
-  daiUnits,
   ousdUnitsFormat,
   isWithinTolerance,
 } = require("../test/helpers");
 const addresses = require("../utils/addresses");
 const erc20Abi = require("../test/abi/erc20.json");
 
-let utils, BigNumber, usdt, dai, usdc, ousd, vault, signer, signer2;
+let utils, BigNumber, cusd, ceur, ousd, vault, signer, signer2;
 
 async function fundAccount4(hre) {
   await fund(
@@ -22,16 +21,12 @@ async function fundAccount4(hre) {
   );
 }
 
-const getUsdtBalance = async () => {
-  return await usdt.connect(signer).balanceOf(signer.address);
+const getcusdBalance = async () => {
+  return await cusd.connect(signer).balanceOf(signer.address);
 };
 
-const getDaiBalance = async () => {
-  return await dai.connect(signer).balanceOf(signer.address);
-};
-
-const getUsdcBalance = async () => {
-  return await usdc.connect(signer).balanceOf(signer.address);
+const getceurBalance = async () => {
+  return await ceur.connect(signer).balanceOf(signer.address);
 };
 
 const getOusdBalance = async (signer) => {
@@ -51,16 +46,13 @@ const assertExpectedOusd = (bigNumber, bigNumberExpected, tolerance = 0.03) => {
 };
 
 const assertExpectedStablecoins = (
-  usdtBn,
-  daiBn,
-  usdcBn,
+  cusdBn,
+  ceurBn,
   unitsExpected,
   tolerance = 0.03
 ) => {
   // adjust decimals of all stablecoins to 18 so they are easier to compare
-  const adjustedUsdt = usdtBn.mul(BigNumber.from("1000000000000"));
-  const adjustedUsdc = usdcBn.mul(BigNumber.from("1000000000000"));
-  const allStablecoins = adjustedUsdt.add(adjustedUsdc).add(daiBn);
+  const allStablecoins = ceurBn.add(cusdBn);
   const stableCoinsExpected = utils.parseUnits(unitsExpected, 18);
 
   if (!isWithinTolerance(allStablecoins, stableCoinsExpected, 0.03)) {
@@ -78,9 +70,8 @@ async function setup(hre) {
   utils = hre.ethers.utils;
   BigNumber = hre.ethers.BigNumber;
   ousd = await hre.ethers.getContractAt("OUSD", addresses.mainnet.OUSDProxy);
-  usdt = await hre.ethers.getContractAt(erc20Abi, addresses.mainnet.USDT);
-  dai = await hre.ethers.getContractAt(erc20Abi, addresses.mainnet.DAI);
-  usdc = await hre.ethers.getContractAt(erc20Abi, addresses.mainnet.USDC);
+  cusd = await hre.ethers.getContractAt(erc20Abi, addresses.mainnet.CUSD);
+  ceur = await hre.ethers.getContractAt(erc20Abi, addresses.mainnet.CEUR);
   const vaultProxy = await hre.ethers.getContract("VaultProxy");
   vault = await ethers.getContractAt("IVault", vaultProxy.address);
   signer = (await hre.ethers.getSigners())[4];
@@ -93,24 +84,24 @@ async function beforeDeploy(hre) {
   // fund stablecoins to the 4th account in signers
   await setup(hre);
 
-  const usdtBeforeMint = await getUsdtBalance();
+  const cusdBeforeMint = await getcusdBalance();
   const ousdBeforeMint = await getOusdBalance(signer);
-  const usdtToMint = "1100";
+  const cusdToMint = "1100";
   await mint(
     {
       num: 1,
-      amount: usdtToMint,
+      amount: cusdToMint,
     },
     hre
   );
 
-  const usdtAfterMint = await getUsdtBalance();
+  const cusdAfterMint = await getcusdBalance();
   const ousdAfterMint = await getOusdBalance(signer);
 
-  const expectedUsdt = usdtBeforeMint.sub(usdtUnits(usdtToMint));
-  if (!usdtAfterMint.eq(expectedUsdt)) {
+  const expectedCusd = cusdBeforeMint.sub(cusdUnits(cusdToMint));
+  if (!cusdAfterMint.eq(expectedCusd)) {
     throw new Error(
-      `Incorrect usdt value. Got ${usdtAfterMint.toString()} expected: ${expectedUsdt.toString()}`
+      `Incorrect cusd value. Got ${cusdAfterMint.toString()} expected: ${expectedCusd.toString()}`
     );
   }
 
@@ -147,26 +138,23 @@ const testMint = async (hre, beforeDeployData) => {
 };
 
 const testRedeem = async (ousdAfterMint) => {
-  const usdtBeforeRedeem = await getUsdtBalance();
-  const daiBeforeRedeem = await getDaiBalance();
-  const usdcBeforeRedeem = await getUsdcBalance();
+  const cusdBeforeRedeem = await getcusdBalance();
+  const ceurBeforeRedeem = await getceurBalance();
 
   const unitsToRedeem = "800";
   const ousdToRedeem = ousdUnits(unitsToRedeem);
   await vault.connect(signer).redeem(ousdToRedeem, ousdUnits("770"));
 
   const ousdAfterRedeem = await getOusdBalance(signer);
-  const usdtAfterRedeem = await getUsdtBalance();
-  const daiAfterRedeem = await getDaiBalance();
-  const usdcAfterRedeem = await getUsdcBalance();
+  const cusdAfterRedeem = await getcusdBalance();
+  const ceurAfterRedeem = await getceurBalance();
 
   const expectedOusd = ousdAfterMint.sub(ousdToRedeem);
   assertExpectedOusd(ousdAfterRedeem, expectedOusd, 0.0);
 
   assertExpectedStablecoins(
-    usdtAfterRedeem.sub(usdtBeforeRedeem),
-    daiAfterRedeem.sub(daiBeforeRedeem),
-    usdcAfterRedeem.sub(usdcBeforeRedeem),
+    cusdAfterRedeem.sub(cusdBeforeRedeem),
+    ceurAfterRedeem.sub(ceurBeforeRedeem),
     "800"
   );
 };
@@ -197,26 +185,19 @@ const testTransfer = async () => {
 
 const testMultipleMint = async () => {
   const amountToMint = "100";
-  await usdt
+  await ceur
     .connect(signer)
-    .approve(vault.address, usdtUnits(amountToMint), { gasLimit: 1000000 });
-  await usdc
+    .approve(vault.address, ceurUnits(amountToMint), { gasLimit: 1000000 });
+  await cusd
     .connect(signer)
-    .approve(vault.address, usdcUnits(amountToMint), { gasLimit: 1000000 });
-  await dai
-    .connect(signer)
-    .approve(vault.address, daiUnits(amountToMint), { gasLimit: 1000000 });
+    .approve(vault.address, cusdUnits(amountToMint), { gasLimit: 1000000 });
 
   const ousdBalanceBeforeMint = await getOusdBalance(signer);
   await vault
     .connect(signer)
     .mintMultiple(
-      [usdt.address, usdc.address, dai.address],
-      [
-        usdtUnits(amountToMint),
-        usdcUnits(amountToMint),
-        daiUnits(amountToMint),
-      ],
+      [ceur.address, cusd.address],
+      [ceurUnits(amountToMint), cusdUnits(amountToMint)],
       291,
       { gasLimit: 2000000 }
     );
