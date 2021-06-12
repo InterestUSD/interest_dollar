@@ -50,15 +50,15 @@ async function decimalsFor(contract) {
 }
 
 async function units(amount, contract) {
-  return parseUnits(amount, await decimalsFor(contract));
+  return parseUnits(amount.toString(), await decimalsFor(contract));
 }
 
 function ognUnits(amount) {
-  return parseUnits(amount, 18);
+  return parseUnits(amount.toString(), 18);
 }
 
 function ousdUnits(amount) {
-  return parseUnits(amount, 18);
+  return parseUnits(amount.toString(), 18);
 }
 
 function ousdUnitsFormat(amount) {
@@ -66,7 +66,7 @@ function ousdUnitsFormat(amount) {
 }
 
 function ceurUnits(amount) {
-  return parseUnits(amount, 18);
+  return parseUnits(amount.toString(), 18);
 }
 
 function ceurUnitsFormat(amount) {
@@ -74,7 +74,7 @@ function ceurUnitsFormat(amount) {
 }
 
 function cusdUnits(amount) {
-  return parseUnits(amount, 18);
+  return parseUnits(amount.toString(), 18);
 }
 
 function cusdUnitsFormat(amount) {
@@ -82,11 +82,11 @@ function cusdUnitsFormat(amount) {
 }
 
 function goldUnits(amount) {
-  return parseUnits(amount, 18);
+  return parseUnits(amount.toString(), 18);
 }
 
 function oracleUnits(amount) {
-  return parseUnits(amount, 6);
+  return parseUnits(amount.toString(), 18);
 }
 
 async function expectApproxSupply(contract, expected, message) {
@@ -256,9 +256,9 @@ const getAssetAddresses = async (deployments) => {
       mCEUR: (await deployments.get("MockMCEUR")).address,
       AAVE: (await deployments.get("MockAave")).address,
       AAVE_ADDRESS_PROVIDER: (await deployments.get("MockAave")).address,
-      OGN: isAlfajores
-        ? addresses.alfajores.OGN
-        : (await deployments.get("MockOGN")).address,
+      // OGN: isAlfajores
+      //   ? addresses.alfajores.OGN
+      //   : (await deployments.get("MockOGN")).address,
       uniswapRouter: (await deployments.get("MockUniswapRouter")).address,
     };
   }
@@ -330,6 +330,7 @@ module.exports = {
   goldUnits,
   oracleUnits,
   units,
+  ousdUnitsFormat,
   cusdUnitsFormat,
   ceurUnitsFormat,
   humanBalance,
