@@ -345,9 +345,6 @@ contract VaultCore is VaultStorage {
                 }
             }
         }
-
-        // Trigger OGN Buyback
-        IBuyback(trusteeAddress).swap();
     }
 
     /**
