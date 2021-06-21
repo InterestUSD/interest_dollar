@@ -6,13 +6,37 @@ pragma solidity 0.5.11;
  * @author Origin Protocol Inc
  */
 import "./IAave.sol";
-import {
-    IERC20,
-    InitializableAbstractStrategy
-} from "../utils/InitializableAbstractStrategy.sol";
+import { IERC20, InitializableAbstractStrategy } from "../utils/InitializableAbstractStrategy.sol";
+import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
+import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 
 contract AaveStrategy is InitializableAbstractStrategy {
     uint16 constant referralCode = 92;
+    address public uniswapRouterV2 = 0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121;
+    // must call setMooStakingAddress() after initialise() to set proper address
+    address public mooStaking = 0x0000000000000000000000000000000000000000;
+
+    function setUniswapAddress(address _uni) external {
+        uniswapRouterV2 = _uni;
+    }
+
+    function setMooStakingAddress(address _staking) external {
+        mooStaking = _staking;
+    }
+
+    /**
+     * @dev Collect accumulated COMP and send to Vault.
+     */
+    function collectRewardToken() external onlyVault nonReentrant {
+        // Claim MOO from Staking contract
+        IStakingRewards staking = IStakingRewards(mooStaking);
+        staking.getReward();
+        // Transfer MOO to Vault
+        IERC20 rewardToken = IERC20(rewardTokenAddress);
+        uint256 balance = rewardToken.balanceOf(address(this));
+        emit RewardTokenCollected(vaultAddress, balance);
+        rewardToken.safeTransfer(vaultAddress, balance);
+    }
 
     /**
      * @dev Deposit asset into Aave
@@ -39,6 +63,10 @@ contract AaveStrategy is InitializableAbstractStrategy {
         IAaveAToken aToken = _getATokenFor(_asset);
         emit Deposit(_asset, address(aToken), _amount);
         _getLendingPool().deposit(_asset, _amount, referralCode);
+
+        // XXX: - check if asset is one of cUSD or cEUR
+        //      - add liquidity through v2 router
+        //      - stake LP tokens
     }
 
     /**
@@ -72,6 +100,11 @@ contract AaveStrategy is InitializableAbstractStrategy {
         emit Withdrawal(_asset, address(aToken), _amount);
         aToken.redeem(_amount);
         IERC20(_asset).safeTransfer(_recipient, _amount);
+
+        // XXX: - check if mcUSD/mcEUR already available
+        //      - if not, then unstake all LP tokens
+        //      - remove all liquidity
+        //      - redeem _amount of mcUSD/mcEUR
     }
 
     /**
@@ -164,7 +197,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
      */
     function _getLendingPool() internal view returns (IAaveLendingPool) {
         address lendingPool = ILendingPoolAddressesProvider(platformAddress)
-            .getLendingPool();
+        .getLendingPool();
         require(lendingPool != address(0), "Lending pool does not exist");
         return IAaveLendingPool(lendingPool);
     }
@@ -177,8 +210,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
     function _getLendingPoolCore() internal view returns (address payable) {
         address payable lendingPoolCore = ILendingPoolAddressesProvider(
             platformAddress
-        )
-            .getLendingPoolCore();
+        ).getLendingPoolCore();
         require(
             lendingPoolCore != address(uint160(address(0))),
             "Lending pool core does not exist"
