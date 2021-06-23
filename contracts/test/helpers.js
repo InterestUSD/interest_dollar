@@ -204,6 +204,8 @@ const getOracleAddresses = async (deployments) => {
 const getAssetAddresses = async (deployments) => {
   if (isMainnetOrFork) {
     return {
+      // setting MOO address to 0x0 till MOO is not launched
+      MOO: addresses.zero,
       CUSD: addresses.mainnet.CUSD,
       CEUR: addresses.mainnet.CEUR,
       // USDT: addresses.mainnet.USDT,
@@ -232,6 +234,7 @@ const getAssetAddresses = async (deployments) => {
     };
   } else {
     return {
+      MOO: (await deployments.get("MockMOO")).address,
       CUSD: (await deployments.get("MockCUSD")).address,
       CEUR: (await deployments.get("MockCEUR")).address,
       // USDT: (await deployments.get("MockUSDT")).address,
