@@ -8,20 +8,61 @@ pragma solidity 0.5.11;
 import "./IAave.sol";
 import { IERC20, InitializableAbstractStrategy } from "../utils/InitializableAbstractStrategy.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
+import { IUniswapV2Factory } from "../interfaces/uniswap/IUniswapV2Factory.sol";
+import { IUniswapV2Pair } from "../interfaces/uniswap/IUniswapV2Pair.sol";
+import { IUniswapV2ERC20 } from "../interfaces/uniswap/IUniswapV2ERC20.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
+import { IOracle } from "../interfaces/IOracle.sol";
+import { IVault } from "../interfaces/IVault.sol";
 
 contract AaveStrategy is InitializableAbstractStrategy {
     uint16 constant referralCode = 92;
     address public uniswapRouterV2 = 0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121;
-    // must call setMooStakingAddress() after initialise() to set proper address
-    address public mooStaking = 0x0000000000000000000000000000000000000000;
+    // must call setStakingAddress() after initialise() to set proper address
+    address public stakingAddress = 0x0000000000000000000000000000000000000000;
+    mapping(address => address) public rewardsLpPair;
+    mapping(address => address) public lpTokens;
 
-    function setUniswapAddress(address _uni) external {
+    /**
+     * @dev Set UniswapV2 Router address.
+     */
+    function setUniswapAddress(address _uni) external onlyGovernor {
         uniswapRouterV2 = _uni;
     }
 
-    function setMooStakingAddress(address _staking) external {
-        mooStaking = _staking;
+    /**
+     * @dev Set the staking contract address.
+     */
+    function setStakingAddress(address _staking) external onlyGovernor {
+        stakingAddress = _staking;
+    }
+
+    /**
+     * @dev Set the LP token pairs.
+     * Pair tokens for which corresponding ATokens pair exists
+     */
+    function setRewardLpPair(address _token1, address _token2)
+        external
+        onlyGovernor
+    {
+        IUniswapV2Factory factory = IUniswapV2Factory(
+            IUniswapV2Router(uniswapRouterV2).factory()
+        );
+
+        // Get the LP token address for pair
+        address lpToken = factory.getPair(
+            address(_getATokenFor(_token1)),
+            address(_getATokenFor(_token2))
+        );
+
+        // safe approve LP Tokens for staking contract
+        IUniswapV2ERC20(lpToken).approve(stakingAddress, 0);
+        IUniswapV2ERC20(lpToken).approve(stakingAddress, uint256(-1));
+
+        rewardsLpPair[_token1] = _token2;
+        rewardsLpPair[_token2] = _token1;
+        lpTokens[_token1] = lpToken;
+        lpTokens[_token2] = lpToken;
     }
 
     /**
@@ -29,7 +70,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
      */
     function collectRewardToken() external onlyVault nonReentrant {
         // Claim MOO from Staking contract
-        IStakingRewards staking = IStakingRewards(mooStaking);
+        IStakingRewards staking = IStakingRewards(stakingAddress);
         staking.getReward();
         // Transfer MOO to Vault
         IERC20 rewardToken = IERC20(rewardTokenAddress);
@@ -63,10 +104,6 @@ contract AaveStrategy is InitializableAbstractStrategy {
         IAaveAToken aToken = _getATokenFor(_asset);
         emit Deposit(_asset, address(aToken), _amount);
         _getLendingPool().deposit(_asset, _amount, referralCode);
-
-        // XXX: - check if asset is one of cUSD or cEUR
-        //      - add liquidity through v2 router
-        //      - stake LP tokens
     }
 
     /**
@@ -95,16 +132,10 @@ contract AaveStrategy is InitializableAbstractStrategy {
     ) external onlyVault nonReentrant {
         require(_amount > 0, "Must withdraw something");
         require(_recipient != address(0), "Must specify recipient");
-
         IAaveAToken aToken = _getATokenFor(_asset);
         emit Withdrawal(_asset, address(aToken), _amount);
         aToken.redeem(_amount);
         IERC20(_asset).safeTransfer(_recipient, _amount);
-
-        // XXX: - check if mcUSD/mcEUR already available
-        //      - if not, then unstake all LP tokens
-        //      - remove all liquidity
-        //      - redeem _amount of mcUSD/mcEUR
     }
 
     /**
