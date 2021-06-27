@@ -65,6 +65,18 @@ contract AaveStrategy is InitializableAbstractStrategy {
         lpTokens[_token2] = lpToken;
     }
 
+    function _stakeLPTokens(address _asset) internal {
+        IStakingRewards(stakingAddress).stake(
+            IUniswapV2ERC20(lpTokens[_asset]).balanceOf(address(this))
+        );
+    }
+
+    function _unstakeLPTokens(address _asset) internal {
+        IStakingRewards staking = IStakingRewards(stakingAddress);
+        uint256 balance = staking.balanceOf(address(this));
+        staking.withdraw(balance);
+    }
+
     /**
      * @dev Collect accumulated COMP and send to Vault.
      */
