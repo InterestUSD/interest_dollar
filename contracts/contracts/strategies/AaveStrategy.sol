@@ -65,6 +65,63 @@ contract AaveStrategy is InitializableAbstractStrategy {
         lpTokens[_token2] = lpToken;
     }
 
+    function _provideLiquidity(address _asset) internal {
+        address _assetPair = rewardsLpPair[_asset];
+        IVault vault = IVault(vaultAddress);
+        IOracle oracle = IOracle(vault.priceProvider());
+        // calculate asset pair quote
+        uint256 _price1 = oracle.price(_asset);
+        uint256 _price2 = oracle.price(_assetPair);
+        uint256 price = _price1.mul(1 ether).div(_price2);
+        uint256 priceInv = _price2.mul(1 ether).div(_price1);
+
+        IAaveAToken aToken1 = _getATokenFor(_asset);
+        IAaveAToken aToken2 = _getATokenFor(_assetPair);
+
+        uint256 aToken1Desired = aToken1.balanceOf(address(this));
+        uint256 aToken2Desired = aToken1
+        .balanceOf(address(this))
+        .mul(price)
+        .div(1 ether);
+        if (aToken2.balanceOf(address(this)) < aToken2Desired) {
+            aToken2Desired = aToken2.balanceOf(address(this));
+            aToken1Desired = aToken2.balanceOf(address(this)).mul(priceInv).div(
+                1 ether
+            );
+        }
+
+        IUniswapV2Router router = IUniswapV2Router(uniswapRouterV2);
+        // add liquidity to ATokens Pool
+        router.addLiquidity(
+            address(aToken1),
+            address(aToken2),
+            aToken1Desired,
+            aToken2Desired,
+            0,
+            0,
+            address(this),
+            now.add(1800)
+        );
+    }
+
+    function _removeLiquidity(address _asset) internal {
+        address _assetPair = rewardsLpPair[_asset];
+        IUniswapV2ERC20 lpToken = IUniswapV2ERC20(lpTokens[_asset]);
+        IAaveAToken aToken1 = _getATokenFor(_asset);
+        IAaveAToken aToken2 = _getATokenFor(_assetPair);
+
+        IUniswapV2Router router = IUniswapV2Router(uniswapRouterV2);
+        router.removeLiquidity(
+            address(aToken1),
+            address(aToken2),
+            lpToken.balanceOf(address(this)),
+            0,
+            0,
+            address(this),
+            now.add(1800)
+        );
+    }
+
     function _stakeLPTokens(address _asset) internal {
         IStakingRewards(stakingAddress).stake(
             IUniswapV2ERC20(lpTokens[_asset]).balanceOf(address(this))
