@@ -173,6 +173,11 @@ contract AaveStrategy is InitializableAbstractStrategy {
         IAaveAToken aToken = _getATokenFor(_asset);
         emit Deposit(_asset, address(aToken), _amount);
         _getLendingPool().deposit(_asset, _amount, referralCode);
+
+        if (stakingAddress != address(0)) {
+            _provideLiquidity(_asset);
+            _stakeLPTokens(_asset);
+        }
     }
 
     /**
@@ -201,7 +206,17 @@ contract AaveStrategy is InitializableAbstractStrategy {
     ) external onlyVault nonReentrant {
         require(_amount > 0, "Must withdraw something");
         require(_recipient != address(0), "Must specify recipient");
+
         IAaveAToken aToken = _getATokenFor(_asset);
+
+        if (
+            stakingAddress != address(0) &&
+            aToken.balanceOf(address(this)) <= _amount
+        ) {
+            _unstakeLPTokens(_asset);
+            _removeLiquidity(_asset);
+        }
+
         emit Withdrawal(_asset, address(aToken), _amount);
         aToken.redeem(_amount);
         IERC20(_asset).safeTransfer(_recipient, _amount);
@@ -212,6 +227,10 @@ contract AaveStrategy is InitializableAbstractStrategy {
      */
     function withdrawAll() external onlyVaultOrGovernor nonReentrant {
         for (uint256 i = 0; i < assetsMapped.length; i++) {
+            if (stakingAddress != address(0)) {
+                _unstakeLPTokens(assetsMapped[i]);
+                _removeLiquidity(assetsMapped[i]);
+            }
             // Redeem entire balance of aToken
             IAaveAToken aToken = _getATokenFor(assetsMapped[i]);
             uint256 balance = aToken.balanceOf(address(this));
