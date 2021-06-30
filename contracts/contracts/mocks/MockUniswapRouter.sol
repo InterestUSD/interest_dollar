@@ -54,4 +54,20 @@ contract MockUniswapRouter is IUniswapV2Router {
     {
         // this is needed to make this contract whole else it'd be just virtual
     }
+
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to,
+        uint256 deadline
+    ) external returns (uint256 amountA, uint256 amountB) {
+        // this is needed to make this contract whole else it'd be just virtual
+    }
+
+    function factory() external pure returns (address) {
+        return address(0);
+    }
 }
