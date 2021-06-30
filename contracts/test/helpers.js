@@ -234,6 +234,7 @@ const getAssetAddresses = async (deployments) => {
     };
   } else {
     return {
+      MOO_LP: (await deployments.get("MockMCUSDMEURLPToken")).address,
       MOO: (await deployments.get("MockMOO")).address,
       CUSD: (await deployments.get("MockCUSD")).address,
       CEUR: (await deployments.get("MockCEUR")).address,

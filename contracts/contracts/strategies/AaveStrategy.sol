@@ -9,7 +9,6 @@ import "./IAave.sol";
 import { IERC20, InitializableAbstractStrategy } from "../utils/InitializableAbstractStrategy.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
 import { IUniswapV2Factory } from "../interfaces/uniswap/IUniswapV2Factory.sol";
-import { IUniswapV2Pair } from "../interfaces/uniswap/IUniswapV2Pair.sol";
 import { IUniswapV2ERC20 } from "../interfaces/uniswap/IUniswapV2ERC20.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 import { IOracle } from "../interfaces/IOracle.sol";

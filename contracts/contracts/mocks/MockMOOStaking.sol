@@ -9,7 +9,7 @@ import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 import { Helpers } from "../utils/Helpers.sol";
 import { StableMath } from "../utils/StableMath.sol";
 
-contract MockStakingRewards is IStakingRewards {
+contract MockMOOStaking is IStakingRewards {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
@@ -27,7 +27,6 @@ contract MockStakingRewards is IStakingRewards {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
-        address _owner,
         address _rewardsToken,
         address _stakingToken
     ) public {
