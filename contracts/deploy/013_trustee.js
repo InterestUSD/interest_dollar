@@ -73,23 +73,17 @@ const trustee = async (hre) => {
     log("Proposal executed.");
   } else {
     await withConfirmation(
-      cVaultProxy
-        .connect(sGovernor)
-        .upgradeTo(dVaultCore.address, await getTxOpts(gasLimit))
+      cVaultProxy.connect(sGovernor).upgradeTo(dVaultCore.address)
     );
     log("Upgraded VaultCore to new implementation");
 
     await withConfirmation(
-      cvaultAdmin
-        .connect(sGovernor)
-        .setTrusteeAddress(trusteeAddress, await getTxOpts(gasLimit))
+      cvaultAdmin.connect(sGovernor).setTrusteeAddress(trusteeAddress)
     );
     log("Trustee address set");
 
     await withConfirmation(
-      cvaultAdmin
-        .connect(sGovernor)
-        .setTrusteeFeeBps(trusteeFeeBps, await getTxOpts(gasLimit))
+      cvaultAdmin.connect(sGovernor).setTrusteeFeeBps(trusteeFeeBps)
     );
     log("Trustee fee bps set");
   }
@@ -108,7 +102,7 @@ const main = async (hre) => {
 };
 
 main.id = deployName;
-main.dependencies = ["core"];
+main.dependencies = ["002_upgrade_vault"];
 main.skip = () => !(isMainnet || isAlfajores || isFork) || isSmokeTest;
 
 module.exports = main;

@@ -95,6 +95,7 @@ const main = async (hre) => {
 };
 
 main.id = deployName;
+main.dependencies = ["013_trustee"];
 main.skip = () => !(isMainnet || isAlfajores || isFork) || isSmokeTest;
 
 module.exports = main;

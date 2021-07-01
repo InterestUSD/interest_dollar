@@ -237,4 +237,39 @@ Storage slots layout for OracleRouter saved to ./storageLayout/alfajores/OracleR
 Storage slots layout for Vault saved to ./storageLayout/alfajores/Vault.json 
 Storage slots layout for VaultAdmin saved to ./storageLayout/alfajores/VaultAdmin.json 
 Storage slots layout for VaultCore saved to ./storageLayout/alfajores/VaultCore.json 
+
+
+
+
+Running 013_trustee deployment...
+Running 013_trustee deployment...
+[storage-slots] Contract VaultCore is safe for upgrade
+INFO: Deployed VaultCore Address: 0x3ee028a1331Fa8873D845351C408B00FB7b2cD3B Gas Used: 3094103
+INFO: Upgraded VaultCore to new implementation
+INFO: Trustee address set
+INFO: Trustee fee bps set
+013_trustee deploy done.
+Running 015_flipper deployment...
+Running 015_flipper deployment...
+INFO: Using governor 0x81c443B57E8A6078e1833Fb912b9117b4BacCda6 and strategist 0x95dD1b944cD3c36b1097Ac436235da1388D784B6
+Previous storage layout for Flipper not found. Treating Flipper as a new contract
+INFO: Deployed Flipper Address: 0x4D1d55df96E110ddB67994F8336aE0236c1dC215 Gas Used: 1004665
+INFO: Called transferGovernance(0x81c443B57E8A6078e1833Fb912b9117b4BacCda6) on Flipper contract at 0x4D1d55df96E110ddB67994F8336aE0236c1dC215
+INFO: Claimed governance for 0x81c443B57E8A6078e1833Fb912b9117b4BacCda6
+015_flipper deploy done.
+Running 016_vault_upgrade deployment...
+[storage-slots] Contract VaultCore is safe for upgrade
+INFO: Deployed VaultCore Address: 0xBc7c40eC8c1ee79e732EbC41655497bfD440bc83 Gas Used: 3094103
+Deployed VaultCore
+[storage-slots] Contract VaultAdmin is safe for upgrade
+INFO: Deployed VaultAdmin Address: 0xf07Ea7e83b0B37578117325C5Ac8582d8Cd592F2 Gas Used: 2668054
+Deployed VaultAdmin
+Submitting proposal for Vault Core and Admin upgrade...
+Submitted proposal 1
+Queueing proposal...
+Waiting for TimeLock. Sleeping for 61 seconds...
+Proposal executed
+Proposal executed. VaultCore now points to 0xBc7c40eC8c1ee79e732EbC41655497bfD440bc83
+Proposal executed. VaultAdmin now points to 0xf07Ea7e83b0B37578117325C5Ac8582d8Cd592F2
+016_vault_upgrade complete
 ```
