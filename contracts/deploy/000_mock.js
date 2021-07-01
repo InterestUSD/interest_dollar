@@ -15,10 +15,12 @@ const deployMocks = async ({
 
   // Deploy mock coins (assets)
   const assetContracts = [
+    "MockMOO",
     "MockCUSD",
     "MockCEUR",
     "MockNonStandardToken",
     "MockAave",
+    "MockMCUSDMEURLPToken"
   ];
   for (const contract of assetContracts) {
     await deploy(contract, { from: deployerAddr });
@@ -79,7 +81,9 @@ const deployMocks = async ({
   // const usdt = await ethers.getContract("MockUSDT");
   const cusd = await ethers.getContract("MockCUSD");
   const ceur = await ethers.getContract("MockCEUR");
-
+  const moo = await ethers.getContract("MockMOO");
+  const mooLp = await ethers.getContract("MockMCUSDMEURLPToken");
+  
   // Deploy mock aTokens (Aave)
   // MockAave is the mock lendingPool
   const lendingPool = await ethers.getContract("MockAave");
@@ -133,6 +137,12 @@ const deployMocks = async ({
   // Deploy mock Uniswap router
   await deploy("MockUniswapRouter", {
     from: deployerAddr,
+  });
+
+  // Deploy mock MOO Staking contract
+  await deploy("MockMOOStaking", {
+    from: deployerAddr,
+    args: [moo.address, mooLp.address],
   });
 
   // // Deploy 3pool mocks

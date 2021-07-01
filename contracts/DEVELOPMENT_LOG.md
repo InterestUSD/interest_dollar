@@ -272,4 +272,10 @@ Proposal executed
 Proposal executed. VaultCore now points to 0xBc7c40eC8c1ee79e732EbC41655497bfD440bc83
 Proposal executed. VaultAdmin now points to 0xf07Ea7e83b0B37578117325C5Ac8582d8Cd592F2
 016_vault_upgrade complete
+
+Running 000_mock deployment...
+Deployer address 0x95dD1b944cD3c36b1097Ac436235da1388D784B6
+Governor address 0x81c443B57E8A6078e1833Fb912b9117b4BacCda6
+000_mock deploy done.
+Done in 62.60s.
 ```
