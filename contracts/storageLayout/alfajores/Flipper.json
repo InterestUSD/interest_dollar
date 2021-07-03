@@ -1,0 +1,21 @@
+{
+  "storage": [
+    {
+      "contract": "Flipper",
+      "label": "cusd",
+      "type": "t_contract(IERC20)1292",
+      "src": "contracts/flipper/Flipper.sol:20"
+    },
+    {
+      "contract": "Flipper",
+      "label": "ceur",
+      "type": "t_contract(IERC20)1292",
+      "src": "contracts/flipper/Flipper.sol:21"
+    }
+  ],
+  "types": {
+    "t_contract(IERC20)1292": {
+      "label": "contract IERC20"
+    }
+  }
+}

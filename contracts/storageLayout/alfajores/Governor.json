@@ -33,7 +33,7 @@
     {
       "contract": "Governor",
       "label": "proposals",
-      "type": "t_mapping(t_uint256,t_struct(Proposal)4036_storage)",
+      "type": "t_mapping(t_uint256,t_struct(Proposal)4018_storage)",
       "src": "contracts/governance/Governor.sol:31"
     }
   ],
@@ -41,10 +41,10 @@
     "t_uint256": {
       "label": "uint256"
     },
-    "t_mapping(t_uint256,t_struct(Proposal)4036_storage)": {
+    "t_mapping(t_uint256,t_struct(Proposal)4018_storage)": {
       "label": "mapping(uint256 => struct Governor.Proposal)"
     },
-    "t_struct(Proposal)4036_storage": {
+    "t_struct(Proposal)4018_storage": {
       "label": "struct Governor.Proposal",
       "members": [
         {

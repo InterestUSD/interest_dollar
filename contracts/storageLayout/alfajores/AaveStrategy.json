@@ -53,6 +53,30 @@
       "label": "rewardLiquidationThreshold",
       "type": "t_uint256",
       "src": "contracts/utils/InitializableAbstractStrategy.sol:35"
+    },
+    {
+      "contract": "AaveStrategy",
+      "label": "uniswapRouterV2",
+      "type": "t_address",
+      "src": "contracts/strategies/AaveStrategy.sol:19"
+    },
+    {
+      "contract": "AaveStrategy",
+      "label": "stakingAddress",
+      "type": "t_address",
+      "src": "contracts/strategies/AaveStrategy.sol:21"
+    },
+    {
+      "contract": "AaveStrategy",
+      "label": "rewardsLpPair",
+      "type": "t_mapping(t_address,t_address)",
+      "src": "contracts/strategies/AaveStrategy.sol:22"
+    },
+    {
+      "contract": "AaveStrategy",
+      "label": "lpTokens",
+      "type": "t_mapping(t_address,t_address)",
+      "src": "contracts/strategies/AaveStrategy.sol:23"
     }
   ],
   "types": {

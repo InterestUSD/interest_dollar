@@ -15,7 +15,7 @@
     {
       "contract": "FlipperDev",
       "label": "ousd",
-      "type": "t_contract(OUSD)15293",
+      "type": "t_contract(OUSD)16310",
       "src": "contracts/flipper/FlipperDev.sol:22"
     }
   ],
@@ -23,7 +23,7 @@
     "t_contract(IERC20)1292": {
       "label": "contract IERC20"
     },
-    "t_contract(OUSD)15293": {
+    "t_contract(OUSD)16310": {
       "label": "contract OUSD"
     }
   }
