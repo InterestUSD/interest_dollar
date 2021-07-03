@@ -20,7 +20,7 @@ const deployMocks = async ({
     "MockCEUR",
     "MockNonStandardToken",
     "MockAave",
-    "MockMCUSDMEURLPToken"
+    "MockMCUSDMEURLPToken",
   ];
   for (const contract of assetContracts) {
     await deploy(contract, { from: deployerAddr });
@@ -83,7 +83,7 @@ const deployMocks = async ({
   const ceur = await ethers.getContract("MockCEUR");
   const moo = await ethers.getContract("MockMOO");
   const mooLp = await ethers.getContract("MockMCUSDMEURLPToken");
-  
+
   // Deploy mock aTokens (Aave)
   // MockAave is the mock lendingPool
   const lendingPool = await ethers.getContract("MockAave");
