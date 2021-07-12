@@ -53,9 +53,9 @@ async function units(amount, contract) {
   return parseUnits(amount.toString(), await decimalsFor(contract));
 }
 
-function ognUnits(amount) {
-  return parseUnits(amount.toString(), 18);
-}
+// function ognUnits(amount) {
+//   return parseUnits(amount.toString(), 18);
+// }
 
 function ousdUnits(amount) {
   return parseUnits(amount.toString(), 18);
@@ -208,28 +208,11 @@ const getAssetAddresses = async (deployments) => {
       MOO: addresses.zero,
       CUSD: addresses.mainnet.CUSD,
       CEUR: addresses.mainnet.CEUR,
-      // USDT: addresses.mainnet.USDT,
-      // USDC: addresses.mainnet.USDC,
-      // TUSD: addresses.mainnet.TUSD,
-      // DAI: addresses.mainnet.DAI,
-      // cDAI: addresses.mainnet.cDAI,
-      // cUSDC: addresses.mainnet.cUSDC,
-      // cUSDT: addresses.mainnet.cUSDT,
-      // WETH: addresses.mainnet.WETH,
-      // COMP: addresses.mainnet.COMP,
-      // ThreePool: addresses.mainnet.ThreePool,
-      // ThreePoolToken: addresses.mainnet.ThreePoolToken,
-      // ThreePoolGauge: addresses.mainnet.ThreePoolGauge,
-      // CRV: addresses.mainnet.CRV,
-      // CRVMinter: addresses.mainnet.CRVMinter,
       mCUSD: addresses.mainnet.mCUSD,
       mCEUR: addresses.mainnet.mCEUR,
-      // aDAI: addresses.mainnet.aDAI,
-      // aUSDC: addresses.mainnet.aUSDC,
-      // aUSDT: addresses.mainnet.aUSDT,
       AAVE: addresses.mainnet.Aave,
       AAVE_ADDRESS_PROVIDER: addresses.mainnet.AAVE_ADDRESS_PROVIDER,
-      OGN: addresses.mainnet.OGN,
+      // OGN: addresses.mainnet.OGN,
       uniswapRouter: addresses.mainnet.uniswapRouter,
     };
   } else {
@@ -238,24 +221,7 @@ const getAssetAddresses = async (deployments) => {
       MOO: (await deployments.get("MockMOO")).address,
       CUSD: (await deployments.get("MockCUSD")).address,
       CEUR: (await deployments.get("MockCEUR")).address,
-      // USDT: (await deployments.get("MockUSDT")).address,
-      // USDC: (await deployments.get("MockUSDC")).address,
-      // TUSD: (await deployments.get("MockTUSD")).address,
-      // DAI: (await deployments.get("MockDAI")).address,
-      // cDAI: (await deployments.get("MockCDAI")).address,
-      // cUSDC: (await deployments.get("MockCUSDC")).address,
-      // cUSDT: (await deployments.get("MockCUSDT")).address,
       NonStandardToken: (await deployments.get("MockNonStandardToken")).address,
-      // WETH: (await deployments.get("MockWETH")).address,
-      // COMP: (await deployments.get("MockCOMP")).address,
-      // ThreePool: (await deployments.get("MockCurvePool")).address,
-      // ThreePoolToken: (await deployments.get("Mock3CRV")).address,
-      // ThreePoolGauge: (await deployments.get("MockCurveGauge")).address,
-      // CRV: (await deployments.get("MockCRV")).address,
-      // CRVMinter: (await deployments.get("MockCRVMinter")).address,
-      // aDAI: (await deployments.get("MockADAI")).address,
-      // aUSDC: (await deployments.get("MockAUSDC")).address,
-      // aUSDT: (await deployments.get("MockAUSDT")).address,
       mCUSD: (await deployments.get("MockMCUSD")).address,
       mCEUR: (await deployments.get("MockMCEUR")).address,
       AAVE: (await deployments.get("MockAave")).address,
@@ -330,7 +296,7 @@ module.exports = {
   ousdUnits,
   cusdUnits,
   ceurUnits,
-  ognUnits,
+  // ognUnits,
   goldUnits,
   oracleUnits,
   units,
