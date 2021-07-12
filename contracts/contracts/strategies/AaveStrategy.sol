@@ -16,11 +16,12 @@ import { IVault } from "../interfaces/IVault.sol";
 
 contract AaveStrategy is InitializableAbstractStrategy {
     uint16 constant referralCode = 92;
-    address public uniswapRouterV2 = 0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121;
-    // must call setStakingAddress() after initialise() to set proper address
-    address public stakingAddress = 0x0000000000000000000000000000000000000000;
-    mapping(address => address) public rewardsLpPair;
-    mapping(address => address) public lpTokens;
+    address uniswapAddr = IVault(vaultAddress).uniswapAddr();
+    address ubeStakingAddress = address(0);
+    address rewardPoolAddress;
+    address secondaryRewardTokenAddress = address(0);
+    // Note: this is a mapping of native asset to native asset (like cUSD-cEUR), not ATokens
+    mapping(address => address) rewardLiquidityPair;
 
     /**
      * @dev Set UniswapV2 Router address.
@@ -33,30 +34,26 @@ contract AaveStrategy is InitializableAbstractStrategy {
      * @dev Set the staking contract address.
      */
     function setStakingAddress(address _staking) external onlyGovernor {
-        stakingAddress = _staking;
+        ubeStakingAddress = _staking;
     }
 
     /**
-     * @dev Set the LP token pairs.
-     * Pair tokens for which corresponding ATokens pair exists
+     * @dev Set the reward Uniswap Pool address
+     * Stable tokens for which corresponding ATokens pair exists
      */
-    function setRewardLpPair(address _token1, address _token2)
+    function setRewardPoolAddress(address _token1, address _token2)
         external
         onlyGovernor
     {
-        IUniswapV2Factory factory = IUniswapV2Factory(
-            IUniswapV2Router(uniswapRouterV2).factory()
-        );
-
-        // Get the LP token address for pair
-        address lpToken = factory.getPair(
+        // Get the Pool address for pair
+        address lpPair = IUniswapV2Router(uniswapAddr).pairFor(
             address(_getATokenFor(_token1)),
             address(_getATokenFor(_token2))
         );
 
         // safe approve LP Tokens for staking contract
-        IUniswapV2ERC20(lpToken).approve(stakingAddress, 0);
-        IUniswapV2ERC20(lpToken).approve(stakingAddress, uint256(-1));
+        IUniswapV2ERC20(lpPair).approve(ubeStakingAddress, 0);
+        IUniswapV2ERC20(lpPair).approve(ubeStakingAddress, uint256(-1));
 
         rewardsLpPair[_token1] = _token2;
         rewardsLpPair[_token2] = _token1;
@@ -89,7 +86,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
             );
         }
 
-        IUniswapV2Router router = IUniswapV2Router(uniswapRouterV2);
+        IUniswapV2Router router = IUniswapV2Router(uniswapAddr);
         // add liquidity to ATokens Pool
         router.addLiquidity(
             address(aToken1),
@@ -104,12 +101,12 @@ contract AaveStrategy is InitializableAbstractStrategy {
     }
 
     function _removeLiquidity(address _asset) internal {
-        address _assetPair = rewardsLpPair[_asset];
-        IUniswapV2ERC20 lpToken = IUniswapV2ERC20(lpTokens[_asset]);
+        address _assetPair = rewardLiquidityPair[_asset];
+        IUniswapV2ERC20 lpToken = IUniswapV2ERC20(rewardPoolAddress);
         IAaveAToken aToken1 = _getATokenFor(_asset);
         IAaveAToken aToken2 = _getATokenFor(_assetPair);
 
-        IUniswapV2Router router = IUniswapV2Router(uniswapRouterV2);
+        IUniswapV2Router router = IUniswapV2Router(uniswapAddr);
         router.removeLiquidity(
             address(aToken1),
             address(aToken2),
@@ -122,13 +119,13 @@ contract AaveStrategy is InitializableAbstractStrategy {
     }
 
     function _stakeLPTokens(address _asset) internal {
-        IStakingRewards(stakingAddress).stake(
-            IUniswapV2ERC20(lpTokens[_asset]).balanceOf(address(this))
+        IStakingRewards(ubeStakingAddress).stake(
+            IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
         );
     }
 
     function _unstakeLPTokens(address _asset) internal {
-        IStakingRewards staking = IStakingRewards(stakingAddress);
+        IStakingRewards staking = IStakingRewards(ubeStakingAddress);
         uint256 balance = staking.balanceOf(address(this));
         staking.withdraw(balance);
     }
@@ -173,7 +170,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
         emit Deposit(_asset, address(aToken), _amount);
         _getLendingPool().deposit(_asset, _amount, referralCode);
 
-        if (stakingAddress != address(0)) {
+        if (ubeStakingAddress != address(0)) {
             _provideLiquidity(_asset);
             _stakeLPTokens(_asset);
         }
@@ -209,7 +206,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
         IAaveAToken aToken = _getATokenFor(_asset);
 
         if (
-            stakingAddress != address(0) &&
+            ubeStakingAddress != address(0) &&
             aToken.balanceOf(address(this)) <= _amount
         ) {
             _unstakeLPTokens(_asset);
@@ -226,7 +223,7 @@ contract AaveStrategy is InitializableAbstractStrategy {
      */
     function withdrawAll() external onlyVaultOrGovernor nonReentrant {
         for (uint256 i = 0; i < assetsMapped.length; i++) {
-            if (stakingAddress != address(0)) {
+            if (ubeStakingAddress != address(0)) {
                 _unstakeLPTokens(assetsMapped[i]);
                 _removeLiquidity(assetsMapped[i]);
             }
