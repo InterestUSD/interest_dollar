@@ -13,8 +13,9 @@ import { IUniswapV2ERC20 } from "../interfaces/uniswap/IUniswapV2ERC20.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IVault } from "../interfaces/IVault.sol";
+import { UsingRegistry } from "../utils/UsingRegistry.sol";
 
-contract AaveStrategy is InitializableAbstractStrategy {
+contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     uint16 constant referralCode = 92;
     address uniswapAddr = IVault(vaultAddress).uniswapAddr();
     address ubeStakingAddress = address(0);
@@ -24,10 +25,14 @@ contract AaveStrategy is InitializableAbstractStrategy {
     mapping(address => address) rewardLiquidityPair;
 
     /**
-     * @dev Set UniswapV2 Router address.
+     * @dev Set the secondary reward token address in case staking contract
+     * reward dual reward token
      */
-    function setUniswapAddress(address _uni) external onlyGovernor {
-        uniswapRouterV2 = _uni;
+    function setSecondaryRewardTokenAddress(address _token)
+        external
+        onlyGovernor
+    {
+        secondaryRewardTokenAddress = _token;
     }
 
     /**
@@ -55,14 +60,69 @@ contract AaveStrategy is InitializableAbstractStrategy {
         IUniswapV2ERC20(lpPair).approve(ubeStakingAddress, 0);
         IUniswapV2ERC20(lpPair).approve(ubeStakingAddress, uint256(-1));
 
-        rewardsLpPair[_token1] = _token2;
-        rewardsLpPair[_token2] = _token1;
-        lpTokens[_token1] = lpToken;
-        lpTokens[_token2] = lpToken;
+        rewardLiquidityPair[_token1] = _token2;
+        rewardLiquidityPair[_token2] = _token1;
+
+        rewardPoolAddress = lpPair;
+    }
+
+    /**
+     * Initializer for setting up strategy internal state. This overrides the
+     * InitializableAbstractStrategy initializer as Aave/Moola strategies don't fit
+     * well within that abstraction.
+     * @param _platformAddress Address of the Aave/Moola lending pool
+     * @param _vaultAddress Address of the vault
+     * @param _rewardTokenAddress Address of UBE
+     * @param _assets Addresses of supported assets. MUST be passed in the same
+     *                order as returned by coins on the pool contract, i.e.
+     *                cUSD, cEUR.
+     * @param _pTokens Platform Token corresponding addresses
+     * @param _ubeStakingAddress Address of Ubeswap LP Tokens Staking contract
+     * @param _liquidityToken1Address Address of native asset for first AToken for reward LP Pool, i.e cUSD
+     * @param _liquidityToken2Address Address of native asset for second AToken for reward LP Pool, i.e cEUR
+     * @param _secondaryRewardTokenAddress Address of secondary reward token if any, else set this to 0x0
+     */
+    function initialize(
+        address _platformAddress, // Aave/Moola address
+        address _vaultAddress,
+        address _rewardTokenAddress, // UBE
+        address[] calldata _assets,
+        address[] calldata _pTokens,
+        address _ubeStakingAddress,
+        address _liquidityToken1Address, // cUSD
+        address _liquidityToken2Address, // cEUR
+        address _secondaryRewardTokenAddress // MOO
+    ) external onlyGovernor initializer {
+        ubeStakingAddress = _ubeStakingAddress;
+        secondaryRewardTokenAddress = secondaryRewardTokenAddress;
+
+        // Set the Pool address for AToken pair
+        rewardPoolAddress = IUniswapV2Router(uniswapAddr).pairFor(
+            address(_getATokenFor(_liquidityToken1Address)),
+            address(_getATokenFor(_liquidityToken2Address))
+        );
+
+        // safe approve LP Tokens for staking contract
+        IUniswapV2ERC20(rewardPoolAddress).approve(ubeStakingAddress, 0);
+        IUniswapV2ERC20(rewardPoolAddress).approve(
+            ubeStakingAddress,
+            uint256(-1)
+        );
+
+        rewardLiquidityPair[_liquidityToken1Address] = _liquidityToken2Address;
+        rewardLiquidityPair[_liquidityToken2Address] = _liquidityToken1Address;
+
+        InitializableAbstractStrategy._initialize(
+            _platformAddress,
+            _vaultAddress,
+            _rewardTokenAddress,
+            _assets,
+            _pTokens
+        );
     }
 
     function _provideLiquidity(address _asset) internal {
-        address _assetPair = rewardsLpPair[_asset];
+        address _assetPair = rewardLiquidityPair[_asset];
         IVault vault = IVault(vaultAddress);
         IOracle oracle = IOracle(vault.priceProvider());
         // calculate asset pair quote
@@ -93,8 +153,8 @@ contract AaveStrategy is InitializableAbstractStrategy {
             address(aToken2),
             aToken1Desired,
             aToken2Desired,
-            0,
-            0,
+            uint256(0),
+            uint256(0),
             address(this),
             now.add(1800)
         );
@@ -111,8 +171,8 @@ contract AaveStrategy is InitializableAbstractStrategy {
             address(aToken1),
             address(aToken2),
             lpToken.balanceOf(address(this)),
-            0,
-            0,
+            uint256(0),
+            uint256(0),
             address(this),
             now.add(1800)
         );
@@ -131,13 +191,39 @@ contract AaveStrategy is InitializableAbstractStrategy {
     }
 
     /**
-     * @dev Collect accumulated COMP and send to Vault.
+     * @dev Collect accumulated reward token and send to Vault.
+     * If there is a secondary reward token, swap it for primary reward token also
      */
     function collectRewardToken() external onlyVault nonReentrant {
-        // Claim MOO from Staking contract
-        IStakingRewards staking = IStakingRewards(stakingAddress);
+        // Claim rewards from staking contract
+        IStakingRewards staking = IStakingRewards(ubeStakingAddress);
         staking.getReward();
-        // Transfer MOO to Vault
+
+        if (
+            secondaryRewardTokenAddress != address(0) &&
+            IERC20(secondaryRewardTokenAddress).balanceOf(address(this)) >= 0
+        ) {
+            IERC20 secondaryToken = IERC20(secondaryRewardTokenAddress);
+            // Give Uniswap full amount allowance
+            secondaryToken.safeApprove(uniswapAddr, 0);
+            secondaryToken.safeApprove(uniswapAddr, uint256(-1));
+
+            // Uniswap redemption path
+            address[] memory path = new address[](3);
+            path[0] = secondaryRewardTokenAddress;
+            path[1] = getGoldToken(); // CELO
+            path[2] = rewardTokenAddress;
+
+            IUniswapV2Router(uniswapAddr).swapExactTokensForTokens(
+                secondaryToken.balanceOf(address(this)),
+                uint256(0),
+                path,
+                address(this),
+                now.add(1800)
+            );
+        }
+
+        // Transfer primary rewardToken to Vault
         IERC20 rewardToken = IERC20(rewardTokenAddress);
         uint256 balance = rewardToken.balanceOf(address(this));
         emit RewardTokenCollected(vaultAddress, balance);
