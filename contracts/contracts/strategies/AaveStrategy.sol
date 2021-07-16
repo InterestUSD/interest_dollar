@@ -8,7 +8,6 @@ pragma solidity 0.5.11;
 import "./IAave.sol";
 import { IERC20, InitializableAbstractStrategy } from "../utils/InitializableAbstractStrategy.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
-import { IUniswapV2Factory } from "../interfaces/uniswap/IUniswapV2Factory.sol";
 import { IUniswapV2ERC20 } from "../interfaces/uniswap/IUniswapV2ERC20.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
@@ -23,6 +22,13 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     address secondaryRewardTokenAddress = address(0);
     // Note: this is a mapping of native asset to native asset (like cUSD-cEUR), not ATokens
     mapping(address => address) rewardLiquidityPair;
+
+    /**
+     * @dev Set the UniswapV2 Router Address.
+     */
+    function setUniswapAddress(address _router) external onlyGovernor {
+        uniswapAddr = _router;
+    }
 
     /**
      * @dev Set the secondary reward token address in case staking contract
@@ -94,7 +100,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         address _secondaryRewardTokenAddress // MOO
     ) external onlyGovernor initializer {
         ubeStakingAddress = _ubeStakingAddress;
-        secondaryRewardTokenAddress = secondaryRewardTokenAddress;
+        secondaryRewardTokenAddress = _secondaryRewardTokenAddress;
 
         // Set the Pool address for AToken pair
         rewardPoolAddress = IUniswapV2Router(uniswapAddr).pairFor(
