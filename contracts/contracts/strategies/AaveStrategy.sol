@@ -142,14 +142,14 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
 
         uint256 aToken1Desired = aToken1.balanceOf(address(this));
         uint256 aToken2Desired = aToken1
-        .balanceOf(address(this))
-        .mul(price)
-        .div(1 ether);
+            .balanceOf(address(this))
+            .mul(price)
+            .div(1 ether);
         if (aToken2.balanceOf(address(this)) < aToken2Desired) {
             aToken2Desired = aToken2.balanceOf(address(this));
             aToken1Desired = aToken2.balanceOf(address(this)).mul(priceInv).div(
-                1 ether
-            );
+                    1 ether
+                );
         }
 
         IUniswapV2Router router = IUniswapV2Router(uniswapAddr);
@@ -182,6 +182,27 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             address(this),
             now.add(1800)
         );
+    }
+
+    /**
+     * Calculate the amount of token pair for given amount of LP Tokens
+     * @param _asset Address of Pair Token0
+     * @param liquidity Amount of LP Tokens
+     */
+    function _checkLPBalance(address _asset, uint256 liquidity)
+        internal
+        view
+        returns (uint256 amount)
+    {
+        require(
+            rewardLiquidityPair[_asset] != address(0),
+            "AaveStrategy: Assets not part of LP Pair"
+        );
+
+        uint256 balance = IERC20(_asset).balanceOf(rewardPoolAddress);
+        uint256 _totalSupply = IUniswapV2ERC20(rewardPoolAddress).totalSupply();
+
+        amount = liquidity.mul(balance) / _totalSupply;
     }
 
     function _stakeLPTokens(address _asset) internal {
@@ -347,6 +368,13 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         // Balance is always with token aToken decimals
         IAaveAToken aToken = _getATokenFor(_asset);
         balance = aToken.balanceOf(address(this));
+
+        uint256 amountLP = _checkLPBalance(
+            _asset,
+            IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
+        );
+
+        balance.add(amountLP);
     }
 
     /**
@@ -404,7 +432,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
      */
     function _getLendingPool() internal view returns (IAaveLendingPool) {
         address lendingPool = ILendingPoolAddressesProvider(platformAddress)
-        .getLendingPool();
+            .getLendingPool();
         require(lendingPool != address(0), "Lending pool does not exist");
         return IAaveLendingPool(lendingPool);
     }
