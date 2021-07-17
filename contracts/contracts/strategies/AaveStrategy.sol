@@ -205,13 +205,13 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         amount = liquidity.mul(balance) / _totalSupply;
     }
 
-    function _stakeLPTokens(address _asset) internal {
+    function _stakeLPTokens() internal {
         IStakingRewards(ubeStakingAddress).stake(
             IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
         );
     }
 
-    function _unstakeLPTokens(address _asset) internal {
+    function _unstakeLPTokens() internal {
         IStakingRewards staking = IStakingRewards(ubeStakingAddress);
         uint256 balance = staking.balanceOf(address(this));
         staking.withdraw(balance);
@@ -285,7 +285,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
 
         if (ubeStakingAddress != address(0)) {
             _provideLiquidity(_asset);
-            _stakeLPTokens(_asset);
+            _stakeLPTokens();
         }
     }
 
@@ -322,7 +322,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             ubeStakingAddress != address(0) &&
             aToken.balanceOf(address(this)) <= _amount
         ) {
-            _unstakeLPTokens(_asset);
+            _unstakeLPTokens();
             _removeLiquidity(_asset);
         }
 
@@ -337,7 +337,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     function withdrawAll() external onlyVaultOrGovernor nonReentrant {
         for (uint256 i = 0; i < assetsMapped.length; i++) {
             if (ubeStakingAddress != address(0)) {
-                _unstakeLPTokens(assetsMapped[i]);
+                _unstakeLPTokens();
                 _removeLiquidity(assetsMapped[i]);
             }
             // Redeem entire balance of aToken
