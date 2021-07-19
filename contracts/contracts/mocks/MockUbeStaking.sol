@@ -9,13 +9,14 @@ import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 import { Helpers } from "../utils/Helpers.sol";
 import { StableMath } from "../utils/StableMath.sol";
 
-contract MockMOOStaking is IStakingRewards {
+contract MockUbeStaking is IStakingRewards {
     using SafeMath for uint256;
     using SafeERC20 for IERC20;
 
     /* ========== STATE VARIABLES ========== */
 
-    IERC20 public rewardsToken;
+    IERC20 public rewardsToken0;
+    IERC20 public rewardsToken1;
     IERC20 public stakingToken;
     uint256 public rewardPerToken = 1;
 
@@ -27,10 +28,12 @@ contract MockMOOStaking is IStakingRewards {
     /* ========== CONSTRUCTOR ========== */
 
     constructor(
-        address _rewardsToken,
+        address _rewardsToken0,
+        address _rewardsToken1,
         address _stakingToken
     ) public {
-        rewardsToken = IERC20(_rewardsToken);
+        rewardsToken0 = IERC20(_rewardsToken0);
+        rewardsToken1 = IERC20(_rewardsToken1);
         stakingToken = IERC20(_stakingToken);
     }
 
@@ -38,10 +41,6 @@ contract MockMOOStaking is IStakingRewards {
 
     function balanceOf(address account) external view returns (uint256) {
         return _balances[account];
-    }
-
-    function earned(address account) public view returns (uint256) {
-        return _balances[account].mul(rewardPerToken).div(1e18);
     }
 
     /* ========== MUTATIVE FUNCTIONS ========== */
@@ -55,7 +54,7 @@ contract MockMOOStaking is IStakingRewards {
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
     }
 
-    function withdraw(uint256 amount) public{
+    function withdraw(uint256 amount) public {
         require(amount > 0, "Cannot withdraw 0");
         _totalSupply = _totalSupply.sub(amount);
         _balances[msg.sender] = _balances[msg.sender].sub(amount);
@@ -66,12 +65,8 @@ contract MockMOOStaking is IStakingRewards {
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
             rewards[msg.sender] = 0;
-            rewardsToken.safeTransfer(msg.sender, reward);
+            rewardsToken0.safeTransfer(msg.sender, reward);
+            rewardsToken1.safeTransfer(msg.sender, reward);
         }
-    }
-
-    function exit() external {
-        withdraw(_balances[msg.sender]);
-        getReward();
     }
 }

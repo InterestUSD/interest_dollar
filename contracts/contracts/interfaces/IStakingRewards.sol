@@ -2,9 +2,6 @@ pragma solidity 0.5.11;
 
 interface IStakingRewards {
     // Views
-
-    function earned(address account) external view returns (uint256);
-
     function balanceOf(address account) external view returns (uint256);
 
     // Mutative
@@ -14,6 +11,4 @@ interface IStakingRewards {
     function withdraw(uint256 amount) external;
 
     function getReward() external;
-
-    function exit() external;
 }
