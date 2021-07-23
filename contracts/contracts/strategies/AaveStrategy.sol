@@ -15,13 +15,13 @@ import { IVault } from "../interfaces/IVault.sol";
 import { UsingRegistry } from "../utils/UsingRegistry.sol";
 
 contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
-    uint16 constant referralCode = 92;
-    address uniswapAddr = IVault(vaultAddress).uniswapAddr();
-    address ubeStakingAddress = address(0);
-    address rewardPoolAddress;
-    address secondaryRewardTokenAddress = address(0);
+    uint16 private referralCode;
+    address private uniswapAddr;
+    address private ubeStakingAddress;
+    address private rewardPoolAddress;
+    address private secondaryRewardTokenAddress;
     // Note: this is a mapping of native asset to native asset (like cUSD-cEUR), not ATokens
-    mapping(address => address) rewardLiquidityPair;
+    mapping(address => address) private rewardLiquidityPair;
 
     /**
      * @dev Set the UniswapV2 Router Address.
@@ -78,7 +78,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
      * well within that abstraction.
      * @param _platformAddress Address of the Aave/Moola lending pool
      * @param _vaultAddress Address of the vault
-     * @param _rewardTokenAddress Address of UBE
+     * @param _rewardTokenAddress Address of MOO
      * @param _assets Addresses of supported assets. MUST be passed in the same
      *                order as returned by coins on the pool contract, i.e.
      *                cUSD, cEUR.
@@ -91,13 +91,13 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     function initialize(
         address _platformAddress, // Aave/Moola address
         address _vaultAddress,
-        address _rewardTokenAddress, // UBE
+        address _rewardTokenAddress, // MOO
         address[] calldata _assets,
         address[] calldata _pTokens,
         address _ubeStakingAddress,
         address _liquidityToken1Address, // cUSD
         address _liquidityToken2Address, // cEUR
-        address _secondaryRewardTokenAddress // MOO
+        address _secondaryRewardTokenAddress // UBE
     ) external onlyGovernor initializer {
         ubeStakingAddress = _ubeStakingAddress;
         secondaryRewardTokenAddress = _secondaryRewardTokenAddress;
@@ -117,6 +117,12 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
 
         rewardLiquidityPair[_liquidityToken1Address] = _liquidityToken2Address;
         rewardLiquidityPair[_liquidityToken2Address] = _liquidityToken1Address;
+
+        // set uniswap addr
+        uniswapAddr = IVault(vaultAddress).uniswapAddr();
+
+        // set referal code
+        referralCode = 0;
 
         InitializableAbstractStrategy._initialize(
             _platformAddress,
