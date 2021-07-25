@@ -204,21 +204,19 @@ const getOracleAddresses = async (deployments) => {
 const getAssetAddresses = async (deployments) => {
   if (isMainnetOrFork) {
     return {
-      // setting MOO address to 0x0 till MOO is not launched
-      MOO: addresses.zero,
       CUSD: addresses.mainnet.CUSD,
       CEUR: addresses.mainnet.CEUR,
       mCUSD: addresses.mainnet.mCUSD,
       mCEUR: addresses.mainnet.mCEUR,
       AAVE: addresses.mainnet.Aave,
       AAVE_ADDRESS_PROVIDER: addresses.mainnet.AAVE_ADDRESS_PROVIDER,
-      // OGN: addresses.mainnet.OGN,
+      UBE: addresses.mainnet.UBE,
       uniswapRouter: addresses.mainnet.uniswapRouter,
+      MOO: addresses.mainnet.MOO,
+      UBEStaking: addresses.zero,
     };
   } else {
     return {
-      MOO_LP: (await deployments.get("MockMCUSDMEURLPToken")).address,
-      MOO: (await deployments.get("MockMOO")).address,
       CUSD: (await deployments.get("MockCUSD")).address,
       CEUR: (await deployments.get("MockCEUR")).address,
       NonStandardToken: (await deployments.get("MockNonStandardToken")).address,
@@ -229,7 +227,11 @@ const getAssetAddresses = async (deployments) => {
       // OGN: isAlfajores
       //   ? addresses.alfajores.OGN
       //   : (await deployments.get("MockOGN")).address,
+      UBE: (await deployments.get("MockUBE")).address,
       uniswapRouter: (await deployments.get("MockUniswapRouter")).address,
+      MOO: (await deployments.get("MockMOO")).address,
+      MOO_LP: (await deployments.get("MockMCUSDMEURLPToken")).address,
+      UBEStaking: (await deployments.get("MockUbeStaking")).address,
     };
   }
 };
