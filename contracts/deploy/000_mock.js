@@ -1,5 +1,5 @@
 const { parseUnits } = require("ethers").utils;
-const { isMainnetOrAlfajoresOrFork } = require("../test/helpers");
+const { isMainnetOrFork } = require("../test/helpers");
 
 const deployMocks = async ({
   getNamedAccounts,
@@ -16,13 +16,14 @@ const deployMocks = async ({
   // Deploy mock coins (assets)
   const assetContracts = [
     "MockMOO",
+    "MockUBE",
     "MockCUSD",
     "MockCEUR",
     "MockNonStandardToken",
     "MockAave",
-    "MockMCUSDMEURLPToken",
   ];
   for (const contract of assetContracts) {
+    // console.log(`Deploying: ${contract}`);
     await deploy(contract, { from: deployerAddr });
   }
 
@@ -34,7 +35,7 @@ const deployMocks = async ({
   const cusd = await ethers.getContract("MockCUSD");
   const ceur = await ethers.getContract("MockCEUR");
   const moo = await ethers.getContract("MockMOO");
-  const mooLp = await ethers.getContract("MockMCUSDMEURLPToken");
+  const ube = await ethers.getContract("MockUBE");
 
   // Deploy mock aTokens (Aave)
   // MockAave is the mock lendingPool
@@ -64,10 +65,20 @@ const deployMocks = async ({
     from: deployerAddr,
   });
 
-  // Deploy mock MOO Staking contract
-  await deploy("MockMOOStaking", {
+  const mcusd = await ethers.getContract("MockMCUSD");
+  const mceur = await ethers.getContract("MockMCEUR");
+
+  await deploy("MockMCUSDMEURLPToken", {
     from: deployerAddr,
-    args: [moo.address, mooLp.address],
+    args: [mcusd.address, mceur.address, 0, 0],
+  });
+
+  const mooLp = await ethers.getContract("MockMCUSDMEURLPToken");
+
+  // Deploy mock Ube Staking contract
+  await deploy("MockUbeStaking", {
+    from: deployerAddr,
+    args: [ube.address, moo.address, mooLp.address],
   });
 
   await deploy("MockNonRebasing", {
@@ -86,6 +97,6 @@ const deployMocks = async ({
 
 deployMocks.id = "000_mock";
 deployMocks.tags = ["mocks"];
-deployMocks.skip = () => isMainnetOrAlfajoresOrFork;
+deployMocks.skip = () => isMainnetOrFork;
 
 module.exports = deployMocks;
