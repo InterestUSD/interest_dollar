@@ -99,6 +99,20 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         address _liquidityToken2Address, // cEUR
         address _secondaryRewardTokenAddress // UBE
     ) external onlyGovernor initializer {
+        InitializableAbstractStrategy._initialize(
+            _platformAddress,
+            _vaultAddress,
+            _rewardTokenAddress,
+            _assets,
+            _pTokens
+        );
+
+        // set uniswap addr
+        uniswapAddr = IVault(vaultAddress).uniswapAddr();
+
+        // set referal code
+        referralCode = 0;
+
         ubeStakingAddress = _ubeStakingAddress;
         secondaryRewardTokenAddress = _secondaryRewardTokenAddress;
 
@@ -117,20 +131,6 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
 
         rewardLiquidityPair[_liquidityToken1Address] = _liquidityToken2Address;
         rewardLiquidityPair[_liquidityToken2Address] = _liquidityToken1Address;
-
-        // set uniswap addr
-        uniswapAddr = IVault(vaultAddress).uniswapAddr();
-
-        // set referal code
-        referralCode = 0;
-
-        InitializableAbstractStrategy._initialize(
-            _platformAddress,
-            _vaultAddress,
-            _rewardTokenAddress,
-            _assets,
-            _pTokens
-        );
     }
 
     function _provideLiquidity(address _asset) internal {
