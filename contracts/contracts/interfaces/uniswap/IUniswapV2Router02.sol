@@ -38,5 +38,8 @@ interface IUniswapV2Router {
 
     function factory() external pure returns (address);
 
-    function pairFor(address tokenA, address tokenB) external view returns (address);
+    function pairFor(address tokenA, address tokenB)
+        external
+        view
+        returns (address);
 }

@@ -15,8 +15,7 @@ import { IVault } from "../interfaces/IVault.sol";
 import { IBuyback } from "../interfaces/IBuyback.sol";
 
 contract VaultCore is VaultStorage {
-    uint256 constant MAX_UINT =
-        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    uint256 constant MAX_UINT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
     /**
      * @dev Verifies that the rebasing is not paused.
@@ -307,9 +306,9 @@ contract VaultCore is VaultStorage {
                 vaultBufferModifier
             );
 
-            address depositStrategyAddr = assetDefaultStrategies[
-                address(asset)
-            ];
+            address depositStrategyAddr = assetDefaultStrategies[address(
+                asset
+            )];
 
             if (depositStrategyAddr != address(0) && allocateAmount > 0) {
                 IStrategy strategy = IStrategy(depositStrategyAddr);
@@ -326,7 +325,7 @@ contract VaultCore is VaultStorage {
             address rewardTokenAddress = strategy.rewardTokenAddress();
             if (rewardTokenAddress != address(0)) {
                 uint256 liquidationThreshold = strategy
-                .rewardLiquidationThreshold();
+                    .rewardLiquidationThreshold();
                 if (liquidationThreshold == 0) {
                     // No threshold set, always harvest from strategy
                     IVault(address(this)).harvest(allStrategies[i]);
@@ -580,9 +579,9 @@ contract VaultCore is VaultStorage {
                 price = 1e18;
             }
             uint256 ratio = assetBalances[i]
-            .scaleBy(int8(18 - assetDecimals[i]))
-            .mul(price)
-            .div(totalBalance);
+                .scaleBy(int8(18 - assetDecimals[i]))
+                .mul(price)
+                .div(totalBalance);
             totalOutputRatio = totalOutputRatio.add(ratio);
         }
         // Calculate final outputs
@@ -661,13 +660,13 @@ contract VaultCore is VaultStorage {
             returndatacopy(0, 0, returndatasize)
 
             switch result
-            // delegatecall returns 0 on error.
-            case 0 {
-                revert(0, returndatasize)
-            }
-            default {
-                return(0, returndatasize)
-            }
+                // delegatecall returns 0 on error.
+                case 0 {
+                    revert(0, returndatasize)
+                }
+                default {
+                    return(0, returndatasize)
+                }
         }
     }
 }

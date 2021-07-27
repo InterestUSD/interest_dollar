@@ -181,9 +181,8 @@ contract VaultAdmin is VaultStorage, UsingRegistry {
         }
 
         if (strategyIndex < allStrategies.length) {
-            allStrategies[strategyIndex] = allStrategies[
-                allStrategies.length - 1
-            ];
+            allStrategies[strategyIndex] = allStrategies[allStrategies.length -
+                1];
             allStrategies.pop();
 
             // Withdraw all assets
@@ -356,8 +355,9 @@ contract VaultAdmin is VaultStorage, UsingRegistry {
 
             if (uniswapAddr != address(0)) {
                 IERC20 rewardToken = IERC20(strategy.rewardTokenAddress());
-                uint256 rewardTokenAmount =
-                    rewardToken.balanceOf(address(this));
+                uint256 rewardTokenAmount = rewardToken.balanceOf(
+                    address(this)
+                );
                 if (rewardTokenAmount > 0) {
                     // Give Uniswap full amount allowance
                     rewardToken.safeApprove(uniswapAddr, 0);
@@ -367,7 +367,7 @@ contract VaultAdmin is VaultStorage, UsingRegistry {
                     address[] memory path = new address[](3);
                     path[0] = strategy.rewardTokenAddress();
                     // path[1] = IUniswapV2Router(uniswapAddr).WETH();
-                    path[1] = getGoldToken();  // CELO
+                    path[1] = getGoldToken(); // CELO
                     path[2] = allAssets[0]; // cUSD
 
                     return

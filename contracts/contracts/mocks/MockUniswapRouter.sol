@@ -8,7 +8,9 @@ import { Helpers } from "../utils/Helpers.sol";
 import { StableMath } from "../utils/StableMath.sol";
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { IMintableERC20 } from "./MintableERC20.sol";
-import { ERC20Burnable } from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import {
+    ERC20Burnable
+} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
 contract MockUniswapRouter is IUniswapV2Router {
     using StableMath for uint256;

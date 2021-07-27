@@ -6,7 +6,10 @@ pragma solidity 0.5.11;
  * @author Origin Protocol Inc
  */
 import "./IAave.sol";
-import { IERC20, InitializableAbstractStrategy } from "../utils/InitializableAbstractStrategy.sol";
+import {
+    IERC20,
+    InitializableAbstractStrategy
+} from "../utils/InitializableAbstractStrategy.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
 import { IUniswapV2ERC20 } from "../interfaces/uniswap/IUniswapV2ERC20.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
@@ -154,8 +157,8 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         if (aToken2.balanceOf(address(this)) < aToken2Desired) {
             aToken2Desired = aToken2.balanceOf(address(this));
             aToken1Desired = aToken2.balanceOf(address(this)).mul(priceInv).div(
-                    1 ether
-                );
+                1 ether
+            );
         }
 
         IUniswapV2Router router = IUniswapV2Router(uniswapAddr);
@@ -451,7 +454,8 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     function _getLendingPoolCore() internal view returns (address payable) {
         address payable lendingPoolCore = ILendingPoolAddressesProvider(
             platformAddress
-        ).getLendingPoolCore();
+        )
+            .getLendingPoolCore();
         require(
             lendingPoolCore != address(uint160(address(0))),
             "Lending pool core does not exist"

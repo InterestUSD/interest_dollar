@@ -18,7 +18,7 @@ addresses.mainnet.Binance = "0xF02D85c9b70b8141DC30bE5011cb3C1Aa4B4382e";
 addresses.mainnet.CUSD = "0x765DE816845861e75A25fCA122bb6898B8B1282a";
 addresses.mainnet.CEUR = "0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73";
 addresses.mainnet.UBE = "0x00be915b9dcf56a3cbe739d9b9c202ca692409ec";
-addresses.mainnet.MOO = "0x17700282592D6917F6A73D0bF8AcCf4D578c131e"
+addresses.mainnet.MOO = "0x17700282592D6917F6A73D0bF8AcCf4D578c131e";
 
 // AAVE/Moola
 addresses.mainnet.AAVE_ADDRESS_PROVIDER =

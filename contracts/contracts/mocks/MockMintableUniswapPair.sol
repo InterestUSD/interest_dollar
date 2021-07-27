@@ -2,7 +2,9 @@ pragma solidity 0.5.11;
 
 import "./MintableERC20.sol";
 import "./MockUniswapPair.sol";
-import { ERC20Burnable } from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import {
+    ERC20Burnable
+} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
 contract MockMintableUniswapPair is
     MockUniswapPair,

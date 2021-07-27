@@ -117,9 +117,7 @@ const configureVault = async () => {
   log(" - Set Vault buffer: 0.02%");
 
   // Set Redeem fee BPS
-  await withConfirmation(
-    cVault.connect(sGovernor).setRedeemFeeBps(50),
-  );
+  await withConfirmation(cVault.connect(sGovernor).setRedeemFeeBps(50));
   log(" - Set Redeem free bps: 50");
 
   await withConfirmation(
