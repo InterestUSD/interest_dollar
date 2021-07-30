@@ -16,6 +16,9 @@ const defaultMintAmount = 1000;
 // By default, redeem 1k worth of OUSD for each test account.
 const defaultRedeemAmount = 1000;
 
+// By default, cUSD will be used
+const defaultStableToken = "cusd";
+
 /**
  * Prints test accounts.
  */
@@ -127,40 +130,44 @@ async function mint(taskArguments, hre) {
   const vaultProxy = await ethers.getContract("VaultProxy");
   const vault = await ethers.getContractAt("IVault", vaultProxy.address);
 
-  let cusd;
+  let cusd, ceur;
   if (isFork) {
     cusd = await hre.ethers.getContractAt(cusdAbi, addresses.mainnet.CUSD);
+    ceur = await hre.ethers.getContractAt(ceurAbi, addresses.mainnet.CEUR);
   } else {
     cusd = await hre.ethers.getContract("MockCUSD");
+    ceur = await hre.ethers.getContract("MockCEUR");
   }
 
   const numAccounts = Number(taskArguments.num) || defaultNumAccounts;
   const accountIndex = Number(taskArguments.index) || defaultAccountIndex;
   const mintAmount = taskArguments.amount || defaultMintAmount;
+  const stableToken = taskArguments.stable || defaultStableToken;
 
   const signers = await hre.ethers.getSigners();
   for (let i = accountIndex; i < accountIndex + numAccounts; i++) {
     const signer = signers[i];
     const address = signer.address;
+    const stable = stableToken === "ceur" ? ceur : cusd;
     console.log(
-      `Minting ${mintAmount} OUSD for account ${i} at address ${address}`
+      `Minting OUSD with ${mintAmount} ${stableToken} for account ${i} at address ${address}`
     );
 
     // Ensure the account has sufficient cUSD balance to cover the mint.
-    const cusdBalance = await cusd.balanceOf(address);
-    if (cusdBalance.lt(cusdUnits(mintAmount))) {
+    const stableBalance = await stable.balanceOf(address);
+    if (stableBalance.lt(cusdUnits(mintAmount))) {
       throw new Error(
-        `Account cUSD balance insufficient to mint the requested amount`
+        `Account ${stableToken} balance (${stableBalance}) insufficient to mint the requested amount`
       );
     }
 
     // Mint.
-    await cusd
+    await stable
       .connect(signer)
       .approve(vault.address, cusdUnits(mintAmount), { gasLimit: 1000000 });
     await vault
       .connect(signer)
-      .mint(cusd.address, cusdUnits(mintAmount), 0, { gasLimit: 2000000 });
+      .mint(stable.address, cusdUnits(mintAmount), 0, { gasLimit: 2000000 });
 
     // Show new account's balance.
     const ousdBalance = await ousd.balanceOf(address);
