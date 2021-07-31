@@ -42,6 +42,7 @@ contract VaultStorage is Initializable, Governable {
     event AllocateThresholdUpdated(uint256 _threshold);
     event RebaseThresholdUpdated(uint256 _threshold);
     event UniswapUpdated(address _address);
+    event CeloGoldUpdated(address _address);
     event StrategistUpdated(address _address);
     event MaxSupplyDiffChanged(uint256 maxSupplyDiff);
     event YieldDistribution(address _to, uint256 _yield, uint256 _fee);
@@ -87,6 +88,9 @@ contract VaultStorage is Initializable, Governable {
 
     // Address of Uniswap
     address public uniswapAddr = address(0);
+
+    // Address of CELO (CELO Gold)
+    address public celoGoldAddr = address(0);
 
     // Address of the Strategist
     address public strategistAddr = address(0);

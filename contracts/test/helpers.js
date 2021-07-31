@@ -204,6 +204,7 @@ const getOracleAddresses = async (deployments) => {
 const getAssetAddresses = async (deployments) => {
   if (isMainnetOrFork) {
     return {
+      CELO: addresses.mainnet.CELO,
       CUSD: addresses.mainnet.CUSD,
       CEUR: addresses.mainnet.CEUR,
       mCUSD: addresses.mainnet.mCUSD,
@@ -217,6 +218,7 @@ const getAssetAddresses = async (deployments) => {
     };
   } else {
     return {
+      CELO: (await deployments.get("MockCELO")).address,
       CUSD: (await deployments.get("MockCUSD")).address,
       CEUR: (await deployments.get("MockCEUR")).address,
       NonStandardToken: (await deployments.get("MockNonStandardToken")).address,

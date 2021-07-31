@@ -45,6 +45,10 @@ interface IVault {
 
     function uniswapAddr() external view returns (address);
 
+    function setCeloGoldAddr(address _address) external;
+
+    function celoGoldAddr() external view returns (address);
+
     function setMaxSupplyDiff(uint256 _maxSupplyDiff) external;
 
     function maxSupplyDiff() external view returns (uint256);

@@ -9,9 +9,8 @@ pragma solidity 0.5.11;
 import "./VaultStorage.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
-import { UsingRegistry } from "../utils/UsingRegistry.sol";
 
-contract VaultAdmin is VaultStorage, UsingRegistry {
+contract VaultAdmin is VaultStorage {
     /**
      * @dev Verifies that the caller is the Vault, Governor, or Strategist.
      */
@@ -103,6 +102,16 @@ contract VaultAdmin is VaultStorage, UsingRegistry {
     }
 
     /**
+     * @dev Set address of Celo Gold for performing liquidation of strategy reward
+     * tokens
+     * @param _address Address of CELO token
+     */
+    function setCeloGoldAddr(address _address) external onlyGovernor {
+        celoGoldAddr = _address;
+        emit CeloGoldUpdated(_address);
+    }
+
+    /**
      * @dev Set address of Strategist
      * @param _address Address of Strategist
      */
@@ -181,8 +190,9 @@ contract VaultAdmin is VaultStorage, UsingRegistry {
         }
 
         if (strategyIndex < allStrategies.length) {
-            allStrategies[strategyIndex] = allStrategies[allStrategies.length -
-                1];
+            allStrategies[strategyIndex] = allStrategies[
+                allStrategies.length - 1
+            ];
             allStrategies.pop();
 
             // Withdraw all assets
@@ -367,7 +377,7 @@ contract VaultAdmin is VaultStorage, UsingRegistry {
                     address[] memory path = new address[](3);
                     path[0] = strategy.rewardTokenAddress();
                     // path[1] = IUniswapV2Router(uniswapAddr).WETH();
-                    path[1] = getGoldToken(); // CELO
+                    path[1] = celoGoldAddr; // CELO
                     path[2] = allAssets[0]; // cUSD
 
                     return

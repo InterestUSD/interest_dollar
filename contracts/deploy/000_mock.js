@@ -17,6 +17,7 @@ const deployMocks = async ({
   const assetContracts = [
     "MockMOO",
     "MockUBE",
+    "MockCELO",
     "MockCUSD",
     "MockCEUR",
     "MockNonStandardToken",
