@@ -54,6 +54,7 @@ contracts/deployments/ganache_*
 contracts/deployments/fork_*
 contracts/coverage/
 contracts/coverage.json
+contracts/_test.sh
 contracts/build/
 dapp/network.json
 dapp/ganache-network.json
