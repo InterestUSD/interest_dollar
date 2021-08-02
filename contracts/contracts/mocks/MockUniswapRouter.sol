@@ -1,5 +1,6 @@
 pragma solidity 0.5.11;
 
+// import "hardhat/console.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
@@ -8,9 +9,7 @@ import { Helpers } from "../utils/Helpers.sol";
 import { StableMath } from "../utils/StableMath.sol";
 import { SafeMath } from "@openzeppelin/contracts/math/SafeMath.sol";
 import { IMintableERC20 } from "./MintableERC20.sol";
-import {
-    ERC20Burnable
-} from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
+import { ERC20Burnable } from "@openzeppelin/contracts/token/ERC20/ERC20Burnable.sol";
 
 contract MockUniswapRouter is IUniswapV2Router {
     using StableMath for uint256;
@@ -58,6 +57,13 @@ contract MockUniswapRouter is IUniswapV2Router {
         IMintableERC20(_tok1).mint(amount);
         IERC20(_tok1).transfer(to, amount);
 
+        // console.log(
+        //     "MockUniswapRouter::swapExactTokensForTokens: amount=%s, amountIn=%s",
+        //     amount,
+        //     amountIn
+        // );
+
+        amounts = new uint256[](2);
         amounts[0] = amount;
         amounts[1] = amount;
     }
@@ -80,19 +86,25 @@ contract MockUniswapRouter is IUniswapV2Router {
         )
     {
         (address _tok0, address _tok1) = sortTokens(tokenA, tokenB);
-        require(_tok0 != tok0, "MockUniswapV2Router: Different tokens");
-        require(_tok1 != tok1, "MockUniswapV2Router: Different tokens");
+        require(_tok0 == tok0, "MockUniswapV2Router: Different tokens");
+        require(_tok1 == tok1, "MockUniswapV2Router: Different tokens");
 
         (amountA, amountB) = tokenA == tok0
             ? (amountADesired, amountBDesired)
             : (amountBDesired, amountADesired);
 
-        IERC20(tok0).transferFrom(msg.sender, address(this), amountA);
-        IERC20(tok1).transferFrom(msg.sender, address(this), amountB);
+        IERC20(tok0).transferFrom(msg.sender, pairToken, amountA);
+        IERC20(tok1).transferFrom(msg.sender, pairToken, amountB);
 
         liquidity = amountA.add(amountB);
         IMintableERC20(pairToken).mint(liquidity);
         IERC20(pairToken).transfer(to, liquidity);
+
+        // console.log(
+        //     "MockUniswapRouter::addLiquidity:  amountADesired=%s, amountBDesired=%s",
+        //     amountADesired,
+        //     amountBDesired
+        // );
     }
 
     function removeLiquidity(
@@ -105,12 +117,12 @@ contract MockUniswapRouter is IUniswapV2Router {
         uint256 deadline
     ) external returns (uint256 amountA, uint256 amountB) {
         (address _tok0, address _tok1) = sortTokens(tokenA, tokenB);
-        require(_tok0 != tok0, "MockUniswapV2Router: Different tokens");
-        require(_tok1 != tok1, "MockUniswapV2Router: Different tokens");
+        require(_tok0 == tok0, "MockUniswapV2Router: Different tokens");
+        require(_tok1 == tok1, "MockUniswapV2Router: Different tokens");
 
         uint256 _totalSupply = IERC20(pairToken).totalSupply();
-        uint256 balance0 = IERC20(tok0).balanceOf(address(this));
-        uint256 balance1 = IERC20(tok1).balanceOf(address(this));
+        uint256 balance0 = IERC20(tok0).balanceOf(pairToken);
+        uint256 balance1 = IERC20(tok1).balanceOf(pairToken);
 
         IERC20(pairToken).transferFrom(msg.sender, address(this), liquidity);
         ERC20Burnable(pairToken).burn(liquidity);
@@ -118,8 +130,8 @@ contract MockUniswapRouter is IUniswapV2Router {
         amountA = liquidity.mul(balance0) / _totalSupply;
         amountB = liquidity.mul(balance1) / _totalSupply;
 
-        IERC20(tok0).transfer(to, amountA);
-        IERC20(tok1).transfer(to, amountB);
+        IERC20(tok0).transferFrom(pairToken, to, amountA);
+        IERC20(tok1).transferFrom(pairToken, to, amountB);
     }
 
     function factory() external pure returns (address) {

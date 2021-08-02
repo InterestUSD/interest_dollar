@@ -68,10 +68,11 @@ const deployMocks = async ({
 
   const mcusd = await ethers.getContract("MockMCUSD");
   const mceur = await ethers.getContract("MockMCEUR");
+  const uniswapRouter = await ethers.getContract("MockUniswapRouter");
 
   await deploy("MockMCUSDMEURLPToken", {
     from: deployerAddr,
-    args: [mcusd.address, mceur.address, 0, 0],
+    args: [mcusd.address, mceur.address, uniswapRouter.address],
   });
 
   const mooLp = await ethers.getContract("MockMCUSDMEURLPToken");
