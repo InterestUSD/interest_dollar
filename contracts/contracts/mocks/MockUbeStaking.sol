@@ -8,6 +8,7 @@ import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
 import { Helpers } from "../utils/Helpers.sol";
 import { StableMath } from "../utils/StableMath.sol";
+import { IMintableERC20 } from "./MintableERC20.sol";
 
 contract MockUbeStaking is IStakingRewards {
     using SafeMath for uint256;
@@ -50,7 +51,7 @@ contract MockUbeStaking is IStakingRewards {
         require(amount > 0, "Cannot stake 0");
         _totalSupply = _totalSupply.add(amount);
         _balances[msg.sender] = _balances[msg.sender].add(amount);
-        rewards[msg.sender] = rewards[msg.sender] + amount;
+        rewards[msg.sender] = rewards[msg.sender].add(amount.div(100));
         stakingToken.safeTransferFrom(msg.sender, address(this), amount);
     }
 
@@ -64,7 +65,9 @@ contract MockUbeStaking is IStakingRewards {
     function getReward() public {
         uint256 reward = rewards[msg.sender];
         if (reward > 0) {
-            rewards[msg.sender] = 0;
+            rewards[msg.sender] = rewards[msg.sender].div(2);
+            IMintableERC20(address(rewardsToken0)).mint(reward);
+            IMintableERC20(address(rewardsToken1)).mint(reward);
             rewardsToken0.safeTransfer(msg.sender, reward);
             rewardsToken1.safeTransfer(msg.sender, reward);
         }
