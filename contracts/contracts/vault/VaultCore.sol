@@ -386,6 +386,25 @@ contract VaultCore is VaultStorage {
     }
 
     /**
+     * @dev Determine value of asset in cUSD (1e18) using price
+     *      from oracle.
+     * @return uint256 value in cUSD (1e18)
+     */
+    function _assetValueFromOracle(address _asset, uint256 amount)
+        internal
+        view
+        returns (uint256 value)
+    {
+        uint256 assetDecimals = Helpers.getDecimals(_asset);
+        uint256 price = IOracle(priceProvider).price(_asset);
+        uint256 priceAdjustedBalance = amount.mulTruncateScale(
+            price,
+            10**assetDecimals
+        );
+        return priceAdjustedBalance;
+    }
+
+    /**
      * @dev Determine the total value of assets held by the vault and its
      *         strategies.
      * @return uint256 value Total value in USD (1e18)
@@ -405,15 +424,18 @@ contract VaultCore is VaultStorage {
 
     /**
      * @dev Internal to calculate total value of all assets held in Vault.
-     * @return uint256 Total value in ETH (1e18)
+     * @return uint256 Total value in ETH (1e18) decimals
      */
     function _totalValueInVault() internal view returns (uint256 value) {
         for (uint256 y = 0; y < allAssets.length; y++) {
             IERC20 asset = IERC20(allAssets[y]);
-            uint256 assetDecimals = Helpers.getDecimals(allAssets[y]);
             uint256 balance = asset.balanceOf(address(this));
-            if (balance > 0) {
-                value = value.add(balance.scaleBy(int8(18 - assetDecimals)));
+            uint256 priceAdjustedBalance = _assetValueFromOracle(
+                allAssets[y],
+                balance
+            );
+            if (priceAdjustedBalance > 0) {
+                value = value.add(priceAdjustedBalance);
             }
         }
     }
@@ -440,13 +462,14 @@ contract VaultCore is VaultStorage {
     {
         IStrategy strategy = IStrategy(_strategyAddr);
         for (uint256 y = 0; y < allAssets.length; y++) {
-            uint256 assetDecimals = Helpers.getDecimals(allAssets[y]);
             if (strategy.supportsAsset(allAssets[y])) {
                 uint256 balance = strategy.checkBalance(allAssets[y]);
-                if (balance > 0) {
-                    value = value.add(
-                        balance.scaleBy(int8(18 - assetDecimals))
-                    );
+                uint256 priceAdjustedBalance = _assetValueFromOracle(
+                    allAssets[y],
+                    balance
+                );
+                if (priceAdjustedBalance > 0) {
+                    value = value.add(priceAdjustedBalance);
                 }
             }
         }
