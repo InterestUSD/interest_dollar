@@ -142,6 +142,22 @@ const configureVault = async () => {
   );
   log(` - Approve AaveStrategy(${aaveStrategyAddr})`);
 
+  // set default strategy for cUSD
+  await withConfirmation(
+    cVault
+      .connect(sGovernor)
+      .setAssetDefaultStrategy(assetAddresses.CUSD, aaveStrategyAddr)
+  );
+  log(` - Set AaveStrategy(${aaveStrategyAddr}) as default for cUSD deposits`);
+
+  // set default strategy for cEUR
+  await withConfirmation(
+    cVault
+      .connect(sGovernor)
+      .setAssetDefaultStrategy(assetAddresses.CEUR, aaveStrategyAddr)
+  );
+  log(` - Set AaveStrategy(${aaveStrategyAddr}) as default for cEUR deposits`);
+
   // Unpause deposits
   await withConfirmation(cVault.connect(sGovernor).unpauseCapital());
   log(" - Unpaused deposits on Vault");
