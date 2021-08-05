@@ -9,13 +9,15 @@ pragma solidity 0.5.11;
            of OUSD.
  * @author Origin Protocol Inc
  */
+// import "hardhat/console.sol";
 import "./VaultStorage.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IVault } from "../interfaces/IVault.sol";
 import { IBuyback } from "../interfaces/IBuyback.sol";
 
 contract VaultCore is VaultStorage {
-    uint256 constant MAX_UINT = 0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
+    uint256 constant MAX_UINT =
+        0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff;
 
     /**
      * @dev Verifies that the rebasing is not paused.
@@ -306,9 +308,9 @@ contract VaultCore is VaultStorage {
                 vaultBufferModifier
             );
 
-            address depositStrategyAddr = assetDefaultStrategies[address(
-                asset
-            )];
+            address depositStrategyAddr = assetDefaultStrategies[
+                address(asset)
+            ];
 
             if (depositStrategyAddr != address(0) && allocateAmount > 0) {
                 IStrategy strategy = IStrategy(depositStrategyAddr);
@@ -576,16 +578,30 @@ contract VaultCore is VaultStorage {
         uint256 totalOutputRatio = 0;
         outputs = new uint256[](assetCount);
 
+        // console.log(
+        //     "VaultCore::_calculateRedeemOutputs: assetPrices[0]=%s, assetPrices[1]=%s",
+        //     assetPrices[0],
+        //     assetPrices[1]
+        // );
+
         // Calculate redeem fee
         if (redeemFeeBps > 0) {
             uint256 redeemFee = _amount.mul(redeemFeeBps).div(10000);
             _amount = _amount.sub(redeemFee);
         }
 
+        // console.log("VaultCore::_calculateRedeemOutputs: _amount=%s", _amount);
+
         // Calculate assets balances and decimals once,
         // for a large gas savings.
         for (uint256 i = 0; i < allAssets.length; i++) {
             uint256 balance = _checkBalance(allAssets[i]);
+            // console.log(
+            //     "VaultCore::_calculateRedeemOutputs: _checkBalance(%s)=%s",
+            //     allAssets[i],
+            //     balance
+            // );
+
             uint256 decimals = Helpers.getDecimals(allAssets[i]);
             assetBalances[i] = balance;
             assetDecimals[i] = decimals;
@@ -593,6 +609,13 @@ contract VaultCore is VaultStorage {
                 balance.scaleBy(int8(18 - decimals))
             );
         }
+
+        // console.log(
+        //     "VaultCore::_calculateRedeemOutputs: assetBalances[0]=%s, assetBalances[1]=%s",
+        //     assetBalances[0],
+        //     assetBalances[1]
+        // );
+
         // Calculate totalOutputRatio
         for (uint256 i = 0; i < allAssets.length; i++) {
             uint256 price = assetPrices[i];
@@ -607,6 +630,12 @@ contract VaultCore is VaultStorage {
                 .div(totalBalance);
             totalOutputRatio = totalOutputRatio.add(ratio);
         }
+
+        // console.log(
+        //     "VaultCore::_calculateRedeemOutputs: totalOutputRatio=%s",
+        //     totalOutputRatio
+        // );
+
         // Calculate final outputs
         uint256 factor = _amount.divPrecisely(totalOutputRatio);
         for (uint256 i = 0; i < allAssets.length; i++) {
@@ -683,13 +712,13 @@ contract VaultCore is VaultStorage {
             returndatacopy(0, 0, returndatasize)
 
             switch result
-                // delegatecall returns 0 on error.
-                case 0 {
-                    revert(0, returndatasize)
-                }
-                default {
-                    return(0, returndatasize)
-                }
+            // delegatecall returns 0 on error.
+            case 0 {
+                revert(0, returndatasize)
+            }
+            default {
+                return(0, returndatasize)
+            }
         }
     }
 }
