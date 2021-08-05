@@ -132,6 +132,15 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             uint256(-1)
         );
 
+        // safe approve LP Tokens for ubeswap router
+        IUniswapV2ERC20(rewardPoolAddress).approve(uniswapAddr, 0);
+        IUniswapV2ERC20(rewardPoolAddress).approve(uniswapAddr, uint256(-1));
+
+        // safe approve ATokens for providing uniswap liquidity
+        for (uint256 i = 0; i < _pTokens.length; i++) {
+            IERC20(_pTokens[i]).approve(uniswapAddr, uint256(-1));
+        }
+
         rewardLiquidityPair[_liquidityToken1Address] = _liquidityToken2Address;
         rewardLiquidityPair[_liquidityToken2Address] = _liquidityToken1Address;
     }
