@@ -6,10 +6,7 @@ pragma solidity 0.5.11;
  * @author Origin Protocol Inc
  */
 import "./IAave.sol";
-import {
-    IERC20,
-    InitializableAbstractStrategy
-} from "../utils/InitializableAbstractStrategy.sol";
+import { IERC20, InitializableAbstractStrategy } from "../utils/InitializableAbstractStrategy.sol";
 import { IUniswapV2Router } from "../interfaces/uniswap/IUniswapV2Router02.sol";
 import { IUniswapV2ERC20 } from "../interfaces/uniswap/IUniswapV2ERC20.sol";
 import { IStakingRewards } from "../interfaces/IStakingRewards.sol";
@@ -158,6 +155,12 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         IAaveAToken aToken1 = _getATokenFor(_asset);
         IAaveAToken aToken2 = _getATokenFor(_assetPair);
 
+        // if no tokens to provide liquidity, simply return
+        if (
+            aToken1.balanceOf(address(this)) == uint256(0) ||
+            aToken2.balanceOf(address(this)) == uint256(0)
+        ) return;
+
         uint256 aToken1Desired = aToken1.balanceOf(address(this));
         uint256 aToken2Desired = aToken1
             .balanceOf(address(this))
@@ -166,8 +169,8 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         if (aToken2.balanceOf(address(this)) < aToken2Desired) {
             aToken2Desired = aToken2.balanceOf(address(this));
             aToken1Desired = aToken2.balanceOf(address(this)).mul(priceInv).div(
-                1 ether
-            );
+                    1 ether
+                );
         }
 
         IUniswapV2Router router = IUniswapV2Router(uniswapAddr);
@@ -191,15 +194,19 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         IAaveAToken aToken2 = _getATokenFor(_assetPair);
 
         IUniswapV2Router router = IUniswapV2Router(uniswapAddr);
-        router.removeLiquidity(
-            address(aToken1),
-            address(aToken2),
-            lpToken.balanceOf(address(this)),
-            uint256(0),
-            uint256(0),
-            address(this),
-            now.add(1800)
-        );
+        uint256 liquidity = lpToken.balanceOf(address(this));
+
+        if (liquidity != uint256(0)) {
+            router.removeLiquidity(
+                address(aToken1),
+                address(aToken2),
+                liquidity,
+                uint256(0),
+                uint256(0),
+                address(this),
+                now.add(1800)
+            );
+        }
     }
 
     /**
@@ -217,22 +224,36 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             "AaveStrategy: Assets not part of LP Pair"
         );
 
-        uint256 balance = IERC20(_asset).balanceOf(rewardPoolAddress);
+        require(
+            liquidity != uint256(0),
+            "AaveStrategy::_checkLPBalance: liquidity should be greater than 0"
+        );
+
+        address aTokenAddr = assetToPToken[_asset];
+        uint256 balance = IERC20(aTokenAddr).balanceOf(rewardPoolAddress);
         uint256 _totalSupply = IUniswapV2ERC20(rewardPoolAddress).totalSupply();
 
-        amount = liquidity.mul(balance) / _totalSupply;
+        // Just to be sure, incase totalSupply is zero
+        if (_totalSupply != uint256(0)) {
+            amount = liquidity.mul(balance) / _totalSupply;
+        }
     }
 
     function _stakeLPTokens() internal {
-        IStakingRewards(ubeStakingAddress).stake(
-            IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
+        uint256 lpAmount = IUniswapV2ERC20(rewardPoolAddress).balanceOf(
+            address(this)
         );
+        if (lpAmount != uint256(0)) {
+            IStakingRewards(ubeStakingAddress).stake(lpAmount);
+        }
     }
 
     function _unstakeLPTokens() internal {
         IStakingRewards staking = IStakingRewards(ubeStakingAddress);
         uint256 balance = staking.balanceOf(address(this));
-        staking.withdraw(balance);
+        if (balance != uint256(0)) {
+            staking.withdraw(balance);
+        }
     }
 
     /**
@@ -246,7 +267,8 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
 
         if (
             secondaryRewardTokenAddress != address(0) &&
-            IERC20(secondaryRewardTokenAddress).balanceOf(address(this)) >= 0
+            IERC20(secondaryRewardTokenAddress).balanceOf(address(this)) !=
+            uint256(0)
         ) {
             IERC20 secondaryToken = IERC20(secondaryRewardTokenAddress);
             // Give Uniswap full amount allowance
@@ -256,7 +278,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             // Uniswap redemption path
             address[] memory path = new address[](3);
             path[0] = secondaryRewardTokenAddress;
-            path[1] = getGoldToken(); // CELO
+            path[1] = IVault(vaultAddress).celoGoldAddr(); // CELO
             path[2] = rewardTokenAddress;
 
             IUniswapV2Router(uniswapAddr).swapExactTokensForTokens(
@@ -387,12 +409,23 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         IAaveAToken aToken = _getATokenFor(_asset);
         balance = aToken.balanceOf(address(this));
 
-        uint256 amountLP = _checkLPBalance(
-            _asset,
-            IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
-        );
+        if (ubeStakingAddress != address(0)) {
+            // If some LP Tokens are left, not staked
+            uint256 lpBalance = IStakingRewards(ubeStakingAddress).balanceOf(
+                address(this)
+            );
+            // LP Tokens staked in staking contract
+            lpBalance.add(
+                IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
+            );
 
-        balance.add(amountLP);
+            if (lpBalance != uint256(0)) {
+                uint256 amountLP = _checkLPBalance(_asset, lpBalance);
+                // NOTE: for some unkonwn reasons, add() is not working here
+                // balance.add(amountLP);
+                balance += amountLP;
+            }
+        }
     }
 
     /**
@@ -463,8 +496,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     function _getLendingPoolCore() internal view returns (address payable) {
         address payable lendingPoolCore = ILendingPoolAddressesProvider(
             platformAddress
-        )
-            .getLendingPoolCore();
+        ).getLendingPoolCore();
         require(
             lendingPoolCore != address(uint160(address(0))),
             "Lending pool core does not exist"
