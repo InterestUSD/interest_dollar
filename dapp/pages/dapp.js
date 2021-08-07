@@ -2,7 +2,6 @@ import React from 'react'
 import { fbt } from 'fbt-runtime'
 
 const Dapp = ({ locale, onLocale }) => {
-  const pools = useStoreState(PoolStore, s => s.pools)  
 
   return <>
     {fbt('Redirecting...', 'Redirecting...')}
