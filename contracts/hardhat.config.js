@@ -198,6 +198,9 @@ module.exports = {
       chainId: 31337,
       accounts: {
         mnemonic,
+        accountsBalance: "10000000000000000000000",
+        count: 20,
+        path: derivationPath,
       },
     },
     localhost: {
