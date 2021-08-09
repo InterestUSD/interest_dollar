@@ -1,9 +1,6 @@
 const networkInfo = {
-  1: 'Mainnet',
-  3: 'Ropsten',
-  4: 'Rinkeby',
-  5: 'Goerli',
-  42: 'Kovan',
+  42220: 'Mainnet',
+  44787: 'Alfajores',
   31337: 'Localhost',
 }
 
@@ -14,24 +11,23 @@ export function isCorrectNetwork(chainId) {
   }
 
   if (process.env.NODE_ENV === 'production') {
-    return chainId === 1
+    return chainId === 42220
   } else if (process.env.NODE_ENV === 'development') {
-    return chainId === 1 || chainId === 31337
+    return chainId === 42220 || chainId === 31337
   }
 }
 
 export function getEtherscanHost(web3React) {
   const chainIdToEtherscan = {
-    1: 'https://etherscan.io',
-    3: 'https://ropsten.etherscan.io',
-    4: 'https://rinkeby.etherscan.io',
+    42220: 'https://explorer.celo.org',
+    44787: 'https://alfajores-blockscout.celo-testnet.org',
   }
 
   if (chainIdToEtherscan[web3React.chainId]) {
     return chainIdToEtherscan[web3React.chainId]
   } else {
     // by default just return mainNet url
-    return chainIdToEtherscan[1]
+    return chainIdToEtherscan[42220]
   }
 }
 
@@ -73,7 +69,14 @@ export function trackOUSDInMetaMask(ousdAddress) {
  * https://docs.google.com/spreadsheets/d/1bunkxBxfkAVz9C14vAFH8CZ53rImDNHTXp94AOEjpq0/edit#gid=1608902436
  */
 export function providersNotAutoDetectingOUSD() {
-  return ['metamask', 'trust', 'alphawallet', 'mist', 'parity']
+  return [
+    'metamask',
+    'trust',
+    'alphawallet',
+    'mist',
+    'parity',
+    'celoextensionwallet',
+  ]
 }
 
 export function providerName() {
@@ -85,6 +88,8 @@ export function providerName() {
 
   if (ethereum.isMetaMask) {
     return 'metamask'
+  } else if (window.celo) {
+    return 'celoextensionwallet'
   } else if (ethereum.isImToken) {
     return 'imtoken'
   } else if (typeof window.__CIPHER__ !== 'undefined') {
