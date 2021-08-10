@@ -15,8 +15,6 @@ import { getDocsLink } from 'utils/getDocsLink'
 import LanguageOptions from 'components/LanguageOptions'
 import LanguageSelected from 'components/LanguageSelected'
 import LocaleDropdown from 'components/LocaleDropdown'
-import OusdDropdown from 'components/earn/OusdDropdown'
-import OgnDropdown from 'components/earn/OgnDropdown'
 import ContractStore from 'stores/ContractStore'
 
 import Languages from '../constants/Languages'
@@ -29,40 +27,15 @@ const DappLinks = ({ dapp, page }) => {
     <>
       {dapp && (
         <div className="d-flex align-items-center justify-content-center dapp-navigation mr-auto">
-          {(process.env.ENABLE_LIQUIDITY_MINING === 'true' ||
-            process.env.ENABLE_STAKING === 'true') && (
-            <Link href="/mint">
-              <a
-                className={`d-flex align-items-center ml-md-0 ${
-                  page === 'mint' ? 'selected' : ''
-                }`}
-              >
-                {fbt('Mint OUSD', 'Mint OUSD')}
-              </a>
-            </Link>
-          )}
-          {process.env.ENABLE_LIQUIDITY_MINING === 'true' && (
-            <Link href="/earn">
-              <a
-                className={`d-flex align-items-center ${
-                  page === 'earn' || page === 'pool-details' ? 'selected' : ''
-                }`}
-              >
-                {fbt('Earn OGN', 'Earn OGN')}
-              </a>
-            </Link>
-          )}
-          {process.env.ENABLE_STAKING === 'true' && (
-            <Link href="/stake">
-              <a
-                className={`d-flex align-items-center ${
-                  page === 'stake' ? 'selected' : ''
-                }`}
-              >
-                {fbt('Stake OGN', 'Stake OGN')}
-              </a>
-            </Link>
-          )}
+          <Link href="/mint">
+            <a
+              className={`d-flex align-items-center ml-md-0 ${
+                page === 'mint' ? 'selected' : ''
+              }`}
+            >
+              {fbt('Mint OUSD', 'Mint OUSD')}
+            </a>
+          </Link>
         </div>
       )}
       <style jsx>{`
@@ -317,8 +290,8 @@ const Nav = ({ dapp, isMobile, locale, onLocale, page }) => {
                   dapp={dapp}
                   className={dapp ? '' : 'ml-2'}
                 />
-                {dapp && <OgnDropdown />}
-                {dapp && <OusdDropdown />}
+                {/* {dapp && <OgnDropdown />}
+                {dapp && <OusdDropdown />} */}
               </div>
               <GetOUSD
                 style={{ marginTop: 40 }}
@@ -349,7 +322,7 @@ const Nav = ({ dapp, isMobile, locale, onLocale, page }) => {
               </div>
             </div>
             <a
-              href="https://docs.ousd.com/security-and-risks/risks"
+              href="#"
               target="_blank"
               rel="noopener noreferrer"
               className="col-12 col-md-3 d-flex px-0 learn-more justify-content-center justify-content-md-end align-items-center"

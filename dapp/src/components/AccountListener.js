@@ -5,14 +5,11 @@ import { useWeb3React } from '@web3-react/core'
 import _ from 'lodash'
 
 import AccountStore from 'stores/AccountStore'
-import PoolStore from 'stores/PoolStore'
-import StakeStore from 'stores/StakeStore'
 import { usePrevious } from 'utils/hooks'
 import { isCorrectNetwork } from 'utils/web3'
 import { useStoreState } from 'pullstate'
 import { setupContracts } from 'utils/contracts'
 import { login } from 'utils/account'
-import { decorateContractStakeInfoWithTxHashes } from 'utils/stake'
 import { mergeDeep } from 'utils/utils'
 import { displayCurrency } from 'utils/math'
 
@@ -28,8 +25,6 @@ const AccountListener = (props) => {
     refetchUserData,
     refetchStakingData,
   } = useStoreState(AccountStore, (s) => s)
-  const durations = useStoreState(StakeStore, (s) => s.durations)
-  const rates = useStoreState(StakeStore, (s) => s.rates)
   const prevRefetchStakingData = usePrevious(refetchStakingData)
   const prevRefetchUserData = usePrevious(refetchUserData)
   const isDevelopment = process.env.NODE_ENV === 'development'
@@ -42,25 +37,14 @@ const AccountListener = (props) => {
         s.allowances = {}
         s.balances = {}
       })
-      PoolStore.update((s) => {
-        s.claimable_ogn = null
-        s.lp_tokens = null
-        s.lp_token_allowance = null
-        s.staked_lp_tokens = null
-        s.your_weekly_rate = null
-      })
-      StakeStore.update((s) => {
-        s.stakes = null
-        s.airDropStakeClaimed = false
-      })
     }
   }, [active, prevActive, account, prevAccount])
 
-  const loadData = async (contracts, { onlyStaking } = {}) => {
+  const loadData = async (contracts) => {
     if (!account) {
       return
     }
-    if (!contracts.ogn.provider) {
+    if (!contracts.ousd.provider) {
       console.warn('Contract provider not yet set')
       return
     }
@@ -72,49 +56,28 @@ const AccountListener = (props) => {
       return
     }
 
-    const {
-      usdt,
-      dai,
-      usdc,
-      ousd,
-      vault,
-      ogn,
-      uniV2OusdUsdt,
-      liquidityOusdUsdt,
-      ognStaking,
-      ognStakingView,
-    } = contracts
+    const { ceur, cusd, ousd, vault } = contracts
 
     const loadbalancesDev = async () => {
       try {
-        const [
-          ousdBalance,
-          usdtBalance,
-          daiBalance,
-          usdcBalance,
-          ognBalance,
-        ] = await Promise.all([
+        const [ousdBalance, ceurBalance, cusdBalance] = await Promise.all([
           /* IMPORTANT (!) production uses a different method to load balances. Any changes here need to
            * also happen in production version of this function.
            */
           displayCurrency(await ousd.balanceOf(account), ousd),
-          displayCurrency(await usdt.balanceOf(account), usdt),
-          displayCurrency(await dai.balanceOf(account), dai),
-          displayCurrency(await usdc.balanceOf(account), usdc),
-          displayCurrency(await ogn.balanceOf(account), ogn),
+          displayCurrency(await ceur.balanceOf(account), ceur),
+          displayCurrency(await cusd.balanceOf(account), cusd),
         ])
 
         AccountStore.update((s) => {
           s.balances = {
-            usdt: usdtBalance,
-            dai: daiBalance,
-            usdc: usdcBalance,
+            ceur: ceurBalance,
+            cusd: cusdBalance,
             ousd: ousdBalance,
-            ogn: ognBalance,
           }
         })
       } catch (e) {
-        console.error(
+        console.trace(
           'AccountListener.js error - can not load account balances: ',
           e
         )
@@ -126,10 +89,7 @@ const AccountListener = (props) => {
       const data = {
         jsonrpc: '2.0',
         method: 'alchemy_getTokenBalances',
-        params: [
-          account,
-          [ousd.address, usdt.address, dai.address, usdc.address, ogn.address],
-        ],
+        params: [account, [ousd.address, ceur.address, cusd.address]],
         id: jsonCallId.toString(),
       }
       jsonCallId++
@@ -149,10 +109,8 @@ const AccountListener = (props) => {
 
         const allContractData = [
           { name: 'ousd', decimals: 18, contract: ousd },
-          { name: 'usdt', decimals: 6, contract: usdt },
-          { name: 'dai', decimals: 18, contract: dai },
-          { name: 'usdc', decimals: 6, contract: usdc },
-          { name: 'ogn', decimals: 18, contract: ogn },
+          { name: 'ceur', decimals: 18, contract: ceur },
+          { name: 'cusd', decimals: 18, contract: cusd },
         ]
 
         allContractData.forEach((contractData) => {
@@ -190,202 +148,11 @@ const AccountListener = (props) => {
     const loadBalances = async () => {
       if (!account) return
 
-      if (isProduction) {
-        await loadBalancesProd()
-      } else {
-        await loadbalancesDev()
-      }
-    }
-
-    const loadPoolRelatedAccountData = async () => {
-      if (!account) return
-      if (process.env.ENABLE_LIQUIDITY_MINING !== 'true') return
-
-      const pools = PoolStore.currentState.pools
-      const initializedPools = pools.filter((pool) => pool.contract)
-
-      if (pools.length !== initializedPools.length) {
-        console.warn(
-          'When loading account pool data not all pools have yet initialized'
-        )
-      }
-
-      // contract needs to be populated?
-
-      // await poolContract.userInfo(account)
-      // await displayCurrency(userInfo.amount, lpContract)
-      try {
-        const additionalPoolData = await Promise.all(
-          pools.map(async (pool) => {
-            const { lpContract, contract, pool_deposits_bn } = pool
-            const additionalData = {
-              name: pool.name,
-              coin_one: {},
-              coin_two: {},
-            }
-
-            if (isDevelopment) {
-              const token1Contract =
-                contracts[pool.coin_one.contract_variable_name]
-              const token2Contract =
-                contracts[pool.coin_two.contract_variable_name]
-
-              const [
-                coin1Allowance,
-                coin2Allowance,
-                coin1Balance,
-                coin2Balance,
-              ] = await Promise.all([
-                displayCurrency(
-                  await token1Contract.allowance(account, lpContract.address),
-                  token1Contract
-                ),
-                displayCurrency(
-                  await token2Contract.allowance(account, lpContract.address),
-                  token2Contract
-                ),
-                displayCurrency(
-                  await token1Contract.balanceOf(account),
-                  token1Contract
-                ),
-                displayCurrency(
-                  await token2Contract.balanceOf(account),
-                  token2Contract
-                ),
-              ])
-
-              additionalData.coin_one.allowance = coin1Allowance
-              additionalData.coin_two.allowance = coin2Allowance
-              additionalData.coin_one.balance = coin1Balance
-              additionalData.coin_two.balance = coin2Balance
-              additionalData.coin_one.contract = token1Contract
-              additionalData.coin_two.contract = token2Contract
-            }
-
-            const [
-              userInfo,
-              unclaimedOgn,
-              lp_tokens,
-              lp_token_allowance,
-              rewardPerBlockBn,
-              userReward,
-              poolDepositsBn,
-            ] = await Promise.all([
-              await contract.userInfo(account),
-              displayCurrency(await contract.pendingRewards(account), ogn),
-              displayCurrency(await lpContract.balanceOf(account), lpContract),
-              displayCurrency(
-                await lpContract.allowance(account, contract.address),
-                lpContract
-              ),
-              await contract.rewardPerBlock(),
-              displayCurrency(await contract.pendingRewards(account), ogn),
-              await lpContract.balanceOf(contract.address),
-            ])
-
-            const userTokensStaked = await displayCurrency(
-              userInfo.amount,
-              lpContract
-            )
-
-            additionalData.claimable_ogn = unclaimedOgn
-            additionalData.lp_tokens = lp_tokens
-            additionalData.lp_token_allowance = lp_token_allowance
-            additionalData.staked_lp_tokens = userTokensStaked
-            additionalData.pool_deposits = await displayCurrency(
-              poolDepositsBn,
-              lpContract
-            )
-            additionalData.reward_per_block = await displayCurrency(
-              rewardPerBlockBn,
-              ogn
-            )
-
-            const userTokensStakedNumber = Number(userTokensStaked)
-            /* userTokensStaked / total pool deposits = the share of the pool a user owns
-             * Multiplied by rewards per block times number of blocks in a week
-             */
-            additionalData.your_weekly_rate =
-              userTokensStakedNumber === 0 || poolDepositsBn.isZero()
-                ? 0
-                : await displayCurrency(
-                    userInfo.amount
-                      /* in dev environment sometimes users can have more tokens staked than total pool token staked.
-                       * that happens when user balance updates before the pool balance.
-                       */
-                      .div(poolDepositsBn)
-                      .mul(rewardPerBlockBn)
-                      .mul(BigNumber.from(6500 * 7)), // blocks in a day times 7 days in a week
-                    ogn
-                  )
-            return additionalData
-          })
-        )
-
-        const enrichedPools = PoolStore.currentState.pools.map((pool) => {
-          const additionalData = additionalPoolData.filter(
-            (apool) => apool.name === pool.name
-          )[0]
-          const merged = {
-            ...pool,
-            ...additionalData,
-            coin_one: {
-              ...pool.coin_one,
-              ...additionalData.coin_one,
-            },
-            coin_two: {
-              ...pool.coin_two,
-              ...additionalData.coin_two,
-            },
-          }
-
-          return merged
-        })
-        //console.log('Enriched pools', enrichedPools)
-        PoolStore.update((s) => {
-          s.pools = enrichedPools
-        })
-      } catch (e) {
-        console.error(
-          'AccountListener.js error - can not load account specific data for pools',
-          e
-        )
-      }
-    }
-
-    const loadStakingRelatedData = async () => {
-      if (!account) return
-
-      try {
-        /* OgnStakingView is used here instead of ognStaking because the first uses the jsonRpcProvider and
-         * the latter the wallet one. Sometime these are not completely in sync and while the first one might
-         * report a transaction already mined, the second one not yet.
-         *
-         * We use jsonRpcProvider to wait for transactions to be mined, so using the samne provider to fetch the
-         * staking data solves the out of sync problem.
-         */
-        const [stakes, airDropStakeClaimed] = await Promise.all([
-          ognStakingView.getAllStakes(account),
-          ognStakingView.airDroppedStakeClaimed(
-            account,
-            AIR_DROPPED_STAKE_TYPE
-          ),
-        ])
-
-        const decoratedStakes = stakes
-          ? decorateContractStakeInfoWithTxHashes(stakes)
-          : []
-
-        StakeStore.update((s) => {
-          s.stakes = decoratedStakes
-          s.airDropStakeClaimed = airDropStakeClaimed
-        })
-      } catch (e) {
-        console.error(
-          'AccountListener.js error - can not load staking related data: ',
-          e
-        )
-      }
+      // if (isProduction) {
+      //   await loadBalancesProd()
+      // } else {
+      await loadbalancesDev()
+      // }
     }
 
     const loadAllowances = async () => {
@@ -393,22 +160,19 @@ const AccountListener = (props) => {
 
       try {
         const [
-          usdtAllowance,
-          daiAllowance,
-          usdcAllowance,
+          ceurAllowance,
+          cusdAllowance,
           ousdAllowance,
         ] = await Promise.all([
-          displayCurrency(await usdt.allowance(account, vault.address), usdt),
-          displayCurrency(await dai.allowance(account, vault.address), dai),
-          displayCurrency(await usdc.allowance(account, vault.address), usdc),
+          displayCurrency(await ceur.allowance(account, vault.address), ceur),
+          displayCurrency(await cusd.allowance(account, vault.address), cusd),
           displayCurrency(await ousd.allowance(account, vault.address), ousd),
         ])
 
         AccountStore.update((s) => {
           s.allowances = {
-            usdt: usdtAllowance,
-            dai: daiAllowance,
-            usdc: usdcAllowance,
+            ceur: ceurAllowance,
+            cusd: cusdAllowance,
             ousd: ousdAllowance,
           }
         })
@@ -420,17 +184,7 @@ const AccountListener = (props) => {
       }
     }
 
-    if (onlyStaking) {
-      await loadStakingRelatedData()
-    } else {
-      await Promise.all([
-        loadBalances(),
-        loadAllowances(),
-        // TODO maybe do this if only in the LM part of the dapp since it is very heavy
-        loadPoolRelatedAccountData(),
-        loadStakingRelatedData(),
-      ])
-    }
+    await Promise.all([loadBalances(), loadAllowances()])
   }
 
   useEffect(() => {
@@ -488,7 +242,7 @@ const AccountListener = (props) => {
       (contracts && isCorrectNetwork(chainId),
       refetchStakingData && !prevRefetchStakingData)
     ) {
-      loadData(contracts, { onlyStaking: true })
+      loadData(contracts)
     }
     AccountStore.update((s) => {
       s.refetchStakingData = false

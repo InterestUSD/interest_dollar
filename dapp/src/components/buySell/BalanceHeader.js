@@ -10,7 +10,6 @@ import ContractStore from 'stores/ContractStore'
 import { formatCurrency } from 'utils/math'
 import { animateValue } from 'utils/animation'
 import { usePrevious } from 'utils/hooks'
-import useCompensation from 'hooks/useCompensation'
 import DisclaimerTooltip from 'components/buySell/DisclaimerTooltip'
 import useExpectedYield from 'utils/useExpectedYield'
 import withRpcProvider from 'hoc/withRpcProvider'
@@ -36,15 +35,6 @@ const BalanceHeader = ({
     (s) => s.addOusdModalState
   )
   const { animatedExpectedIncrease } = useExpectedYield()
-  const {
-    ousdClaimed,
-    ognClaimed,
-    ognCompensationAmount,
-    remainingOUSDCompensation,
-  } = useCompensation()
-  const compensationClaimable =
-    (ognCompensationAmount > 0 && ognClaimed === false) ||
-    (remainingOUSDCompensation > 0 && ousdClaimed === false)
 
   const handleRebase = async () => {
     try {
@@ -121,7 +111,7 @@ const BalanceHeader = ({
                   : '--.--'}
               </div>
               <a
-                href="https://analytics.ousd.com/apr"
+                href="#"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="detail"
@@ -149,22 +139,6 @@ const BalanceHeader = ({
                 </>
               ) : (
                 '--.----'
-              )}
-              {compensationClaimable && (
-                <Link href="/compensation">
-                  <a className="claimable-compensation">
-                    <div className="arrow"></div>
-                    <div className="yellow-box d-flex justify-content-between">
-                      <div className="compensation">
-                        {fbt(
-                          'Claim your compensation',
-                          'Claim your compensation call to action'
-                        )}
-                      </div>
-                      <div>&gt;</div>
-                    </div>
-                  </a>
-                </Link>
               )}
             </div>
             <div className="expected-increase d-flex flex-sm-row flex-column align-items-md-center align-items-start justify-content-center">

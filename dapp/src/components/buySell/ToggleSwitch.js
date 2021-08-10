@@ -96,15 +96,11 @@ const ToggleSwitch = ({ coin, onToggle, balance }) => {
           left: 17px;
         }
 
-        .coin-toggle.active .background.dai {
+        .coin-toggle.active .background.cusd {
           background-color: #ffce45;
         }
 
-        .coin-toggle.active .background.usdc {
-          background-color: #2775ca;
-        }
-
-        .coin-toggle.active .background.usdt {
+        .coin-toggle.active .background.ceur {
           background-color: #53ae94;
         }
       `}</style>

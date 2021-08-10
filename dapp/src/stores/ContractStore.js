@@ -4,15 +4,11 @@ const ContractStore = new Store({
   contracts: null,
   apy: null,
   ousdExchangeRates: {
-    dai: {
+    cusd: {
       mint: 1,
       redeem: 1,
     },
-    usdt: {
-      mint: 1,
-      redeem: 1,
-    },
-    usdc: {
+    ceur: {
       mint: 1,
       redeem: 1,
     },

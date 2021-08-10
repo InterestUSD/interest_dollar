@@ -64,9 +64,8 @@ const SidePanelTransactionMessage = ({
   const coinDataPresent =
     transaction.data &&
     transaction.data.ousd !== undefined &&
-    transaction.data.dai !== undefined &&
-    transaction.data.usdt !== undefined &&
-    transaction.data.usdc !== undefined
+    transaction.data.cusd !== undefined &&
+    transaction.data.ceur !== undefined
   const redeemDataAvailable = isRedeemTransaction && coinDataPresent
   const mintDataAvailable = isMintTransaction && coinDataPresent
 
@@ -402,37 +401,26 @@ const SidePanelTransactionMessage = ({
                   )}
                   {mintDataAvailable && (
                     <>
-                      {parseFloat(transaction.data.usdt) > 0 && (
+                      {parseFloat(transaction.data.ceur) > 0 && (
                         <div>
                           {formatCurrencyConditional(
-                            transaction.data.usdt,
+                            transaction.data.ceur,
                             100,
                             2,
                             0
                           )}{' '}
-                          USDT
+                          cEUR
                         </div>
                       )}
-                      {parseFloat(transaction.data.dai) > 0 && (
+                      {parseFloat(transaction.data.cusd) > 0 && (
                         <div>
                           {formatCurrencyConditional(
-                            transaction.data.dai,
+                            transaction.data.cusd,
                             100,
                             2,
                             0
                           )}{' '}
-                          DAI
-                        </div>
-                      )}
-                      {parseFloat(transaction.data.usdc) > 0 && (
-                        <div>
-                          {formatCurrencyConditional(
-                            transaction.data.usdc,
-                            100,
-                            2,
-                            0
-                          )}{' '}
-                          USDC
+                          cUSD
                         </div>
                       )}
                     </>
@@ -444,37 +432,26 @@ const SidePanelTransactionMessage = ({
                 <div className="expand-box right d-flex flex-column align-items-center justify-content-center">
                   {redeemDataAvailable && (
                     <>
-                      {parseFloat(transaction.data.usdt) > 0 && (
+                      {parseFloat(transaction.data.ceur) > 0 && (
                         <div>
                           {formatCurrencyConditional(
-                            transaction.data.usdt,
+                            transaction.data.ceur,
                             100,
                             2,
                             0
                           )}{' '}
-                          USDT
+                          cEUR
                         </div>
                       )}
-                      {parseFloat(transaction.data.dai) > 0 && (
+                      {parseFloat(transaction.data.cusd) > 0 && (
                         <div>
                           {formatCurrencyConditional(
-                            transaction.data.dai,
+                            transaction.data.cusd,
                             100,
                             2,
                             0
                           )}{' '}
-                          DAI
-                        </div>
-                      )}
-                      {parseFloat(transaction.data.usdc) > 0 && (
-                        <div>
-                          {formatCurrencyConditional(
-                            transaction.data.usdc,
-                            100,
-                            2,
-                            0
-                          )}{' '}
-                          USDC
+                          cUSD
                         </div>
                       )}
                     </>

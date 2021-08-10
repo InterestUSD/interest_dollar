@@ -13,7 +13,7 @@ const SidePanelWelcomeMessage = () => {
   )
   const balances = useStoreState(AccountStore, (s) => s.balances)
 
-  const ousdToBuy = ['dai', 'usdt', 'usdc']
+  const ousdToBuy = ['cusd', 'ceur']
     .map((coin) => balances[coin] * ousdExchangeRates[coin].mint)
     .reduce((a, b) => a + b)
 
@@ -31,12 +31,10 @@ const SidePanelWelcomeMessage = () => {
               'You can buy up to ~' +
                 fbt.param('ousd-coin', formatCurrency(ousdToBuy, 2)) +
                 ' OUSD with the ' +
-                fbt.param('usdt-coin', formatCurrency(balances['usdt'], 0)) +
-                ' USDT, ' +
-                fbt.param('usdc-coin', formatCurrency(balances['usdc'], 0)) +
-                ' USDC, and ' +
-                fbt.param('dai-coin', formatCurrency(balances['dai'], 0)) +
-                ' DAI in your wallet.',
+                fbt.param('ceur-coin', formatCurrency(balances['ceur'], 0)) +
+                ' cEUR, ' +
+                fbt.param('cusd-coin', formatCurrency(balances['cusd'], 0)) +
+                ' cUSD in your wallet.',
               'welcome-message-buying-power'
             )}
         </div>

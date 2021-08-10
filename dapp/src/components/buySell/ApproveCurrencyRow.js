@@ -23,18 +23,16 @@ const ApproveCurrencyRow = ({
   const [stage, setStage] = useState(isApproved ? 'done' : 'approve')
   const [contract, setContract] = useState(null)
   const connectorIcon = useStoreState(AccountStore, (s) => s.connectorIcon)
-  const { vault, usdt, dai, usdc } = useStoreState(
+  const { vault, cusd, ceur } = useStoreState(
     ContractStore,
     (s) => s.contracts || {}
   )
 
   useEffect(() => {
-    if (coin === 'dai') {
-      setContract(dai)
-    } else if (coin === 'usdt') {
-      setContract(usdt)
-    } else if (coin === 'usdc') {
-      setContract(usdc)
+    if (coin === 'cusd') {
+      setContract(cusd)
+    } else if (coin === 'ceur') {
+      setContract(ceur)
     }
   }, [])
 

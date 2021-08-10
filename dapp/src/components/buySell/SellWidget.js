@@ -66,9 +66,8 @@ const SellWidget = ({
   const latestCalculateSplits = useRef(null)
   const {
     vault: vaultContract,
-    usdt: usdtContract,
-    dai: daiContract,
-    usdc: usdcContract,
+    ceur: ceurContract,
+    cusd: cusdContract,
     ousd: ousdContract,
   } = useStoreState(ContractStore, (s) => s.contracts || {})
 
@@ -335,12 +334,10 @@ const SellWidget = ({
   const sortSplitCurrencies = (currencies) => {
     return currencies.sort((coin) => {
       switch (coin) {
-        case 'usdt':
+        case 'ceur':
           return -1
-        case 'dai':
+        case 'cusd':
           return 0
-        case 'usdc':
-          return 1
       }
     })
   }
