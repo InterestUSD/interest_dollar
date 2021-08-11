@@ -1,11 +1,8 @@
 export const currencies = {
-  usdt: {
-    localStorageSettingKey: 'usdt-manual-setting',
+  cusd: {
+    localStorageSettingKey: 'cusd-manual-setting',
   },
-  dai: {
-    localStorageSettingKey: 'dai-manual-setting',
-  },
-  usdc: {
-    localStorageSettingKey: 'usdc-manual-setting',
+  ceur: {
+    localStorageSettingKey: 'ceur-manual-setting',
   },
 }
