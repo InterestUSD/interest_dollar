@@ -18,7 +18,7 @@ const CoinWithdrawBox = ({
    * represent dollar value of a stablecoin for the mentioned reason the price can not go
    * below 1.
    */
-  exchangeRate = Math.max(exchangeRate, 1.0)
+  // exchangeRate = Math.max(exchangeRate, 1.0)
 
   useEffect(() => {
     if (!amount) {

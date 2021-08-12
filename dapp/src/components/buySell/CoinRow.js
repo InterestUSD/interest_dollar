@@ -36,7 +36,7 @@ const CoinRow = ({
     formatCurrency(balance)
   )
 
-  exchangeRate = Math.min(exchangeRate, 1)
+  // exchangeRate = Math.min(exchangeRate, 1)
 
   const [total, setTotal] = useState(truncateDecimals(balance * exchangeRate))
   const [active, setActive] = useState(false)
