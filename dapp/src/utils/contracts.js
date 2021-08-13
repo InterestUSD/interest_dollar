@@ -130,12 +130,12 @@ export async function setupContracts(account, library, chainId) {
       // if (response.ok) {
       //   const json = await response.json()
       //   const apy = aprToApy(parseFloat(json.apr), 7)
-        // ContractStore.update((s) => {
-        //   s.apy = apy
-        // })
+      // ContractStore.update((s) => {
+      //   s.apy = apy
+      // })
       // }
       ContractStore.update((s) => {
-        s.apy = "N/A"
+        s.apy = 'N/A'
       })
     } catch (err) {
       console.error('Failed to fetch APY', err)
