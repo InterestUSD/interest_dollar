@@ -56,36 +56,28 @@ const BuySellWidget = ({
   const [priceToleranceOpen, setPriceToleranceOpen] = useState(false)
   const [tab, setTab] = useState('buy')
   const [resetStableCoins, setResetStableCoins] = useState(false)
-  const [daiOusd, setDaiOusd] = useState(0)
-  const [usdtOusd, setUsdtOusd] = useState(0)
-  const [usdcOusd, setUsdcOusd] = useState(0)
-  const [daiActive, setDaiActive] = useState(false)
-  const [usdtActive, setUsdtActive] = useState(false)
-  const [usdcActive, setUsdcActive] = useState(false)
+  const [cusdOusd, setCusdOusd] = useState(0)
+  const [ceurOusd, setCeurOusd] = useState(0)
+  const [cusdActive, setCusdActive] = useState(false)
+  const [ceurActive, setCeurActive] = useState(false)
   const [buyErrorToDisplay, setBuyErrorToDisplay] = useState(false)
-  const [dai, setDai] = useState(0)
-  const [usdt, setUsdt] = useState(0)
-  const [usdc, setUsdc] = useState(0)
+  const [cusd, setCusd] = useState(0)
+  const [ceur, setCeur] = useState(0)
   const [showApproveModal, _setShowApproveModal] = useState(false)
   const [currenciesNeedingApproval, setCurrenciesNeedingApproval] = useState([])
   const {
     vault: vaultContract,
-    usdt: usdtContract,
-    dai: daiContract,
-    usdc: usdcContract,
+    ceur: ceurContract,
+    cusd: cusdContract,
     ousd: ousdContract,
   } = useStoreState(ContractStore, (s) => s.contracts || {})
   const [buyFormErrors, setBuyFormErrors] = useState({})
   const [buyFormWarnings, setBuyFormWarnings] = useState({})
   const totalStablecoins =
-    parseFloat(balances['dai']) +
-    parseFloat(balances['usdt']) +
-    parseFloat(balances['usdc'])
+    parseFloat(balances['cusd']) + parseFloat(balances['ceur'])
   const stableCoinsLoaded =
-    typeof balances['dai'] === 'string' &&
-    typeof balances['usdt'] === 'string' &&
-    typeof balances['usdc'] === 'string'
-  const totalOUSD = daiOusd + usdcOusd + usdtOusd
+    typeof balances['cusd'] === 'string' && typeof balances['ceur'] === 'string'
+  const totalOUSD = cusdOusd + ceurOusd
   const {
     setPriceToleranceValue,
     priceToleranceValue,
@@ -97,7 +89,7 @@ const BuySellWidget = ({
   const buyFormHasErrors = Object.values(buyFormErrors).length > 0
   const buyFormHasWarnings = Object.values(buyFormWarnings).length > 0
   const connectorIcon = useStoreState(AccountStore, (s) => s.connectorIcon)
-  const downsized = [daiOusd, usdtOusd, usdcOusd].some((num) => num > 999999)
+  const downsized = [cusdOusd, ceurOusd].some((num) => num > 999999)
   const addOusdModalState = useStoreState(
     AccountStore,
     (s) => s.addOusdModalState
@@ -109,18 +101,15 @@ const BuySellWidget = ({
   // check if form should display any errors
   useEffect(() => {
     const newFormErrors = {}
-    if (parseFloat(dai) > parseFloat(truncateDecimals(balances['dai']))) {
-      newFormErrors.dai = 'not_have_enough'
+    if (parseFloat(cusd) > parseFloat(truncateDecimals(balances['cusd']))) {
+      newFormErrors.cusd = 'not_have_enough'
     }
-    if (parseFloat(usdt) > parseFloat(truncateDecimals(balances['usdt']))) {
-      newFormErrors.usdt = 'not_have_enough'
-    }
-    if (parseFloat(usdc) > parseFloat(truncateDecimals(balances['usdc']))) {
-      newFormErrors.usdc = 'not_have_enough'
+    if (parseFloat(ceur) > parseFloat(truncateDecimals(balances['ceur']))) {
+      newFormErrors.ceur = 'not_have_enough'
     }
 
     setBuyFormErrors(newFormErrors)
-  }, [dai, usdt, usdc, pendingMintTransactions])
+  }, [cusd, ceur, pendingMintTransactions])
 
   // check if form should display any warnings
   useEffect(() => {
@@ -130,43 +119,35 @@ const BuySellWidget = ({
         .reduce(
           (a, b) => {
             return {
-              dai: parseFloat(a.dai) + parseFloat(b.dai),
-              usdt: parseFloat(a.usdt) + parseFloat(b.usdt),
-              usdc: parseFloat(a.usdc) + parseFloat(b.usdc),
+              cusd: parseFloat(a.cusd) + parseFloat(b.cusd),
+              ceur: parseFloat(a.ceur) + parseFloat(b.ceur),
             }
           },
           {
-            dai: 0,
-            usdt: 0,
-            usdc: 0,
+            cusd: 0,
+            ceur: 0,
           }
         )
 
       const newFormWarnings = {}
       if (
-        parseFloat(dai) >
-        parseFloat(balances['dai']) - parseFloat(allPendingCoins.dai)
+        parseFloat(cusd) >
+        parseFloat(balances['cusd']) - parseFloat(allPendingCoins.cusd)
       ) {
-        newFormWarnings.dai = 'not_have_enough'
+        newFormWarnings.cusd = 'not_have_enough'
       }
       if (
-        parseFloat(usdt) >
-        parseFloat(balances['usdt']) - parseFloat(allPendingCoins.usdt)
+        parseFloat(ceur) >
+        parseFloat(balances['ceur']) - parseFloat(allPendingCoins.ceur)
       ) {
-        newFormWarnings.usdt = 'not_have_enough'
-      }
-      if (
-        parseFloat(usdc) >
-        parseFloat(balances['usdc']) - parseFloat(allPendingCoins.usdc)
-      ) {
-        newFormWarnings.usdc = 'not_have_enough'
+        newFormWarnings.ceur = 'not_have_enough'
       }
 
       setBuyFormWarnings(newFormWarnings)
     } else {
       setBuyFormWarnings({})
     }
-  }, [dai, usdt, usdc, pendingMintTransactions])
+  }, [cusd, ceur, pendingMintTransactions])
 
   const errorMap = [
     {
@@ -217,18 +198,13 @@ const BuySellWidget = ({
     const returnObject = {}
     const coins = [
       {
-        name: 'usdt',
-        amount: usdt,
-        decimals: 6,
+        name: 'ceur',
+        amount: ceur,
+        decimals: 18,
       },
       {
-        name: 'usdc',
-        amount: usdc,
-        decimals: 6,
-      },
-      {
-        name: 'dai',
-        amount: dai,
+        name: 'cusd',
+        amount: cusd,
         decimals: 18,
       },
     ]
@@ -272,11 +248,9 @@ const BuySellWidget = ({
         mintedCoins.push(symbol)
       }
 
-      await addMintableToken(usdt, usdtContract, 'usdt')
+      await addMintableToken(ceur, ceurContract, 'ceur')
 
-      await addMintableToken(usdc, usdcContract, 'usdc')
-
-      await addMintableToken(dai, daiContract, 'dai')
+      await addMintableToken(cusd, cusdContract, 'cusd')
 
       const absoluteGasLimitBuffer = 20000
       const percentGasLimitBuffer = 0.1
@@ -340,9 +314,8 @@ const BuySellWidget = ({
       setBuyWidgetState(`${prependStage}waiting-network`)
       onResetStableCoins()
       storeTransaction(result, `mint`, mintedCoins.join(','), {
-        usdt,
-        dai,
-        usdc,
+        ceur,
+        cusd,
         ousd: totalOUSD,
       })
       setStoredCoinValuesToZero()
@@ -413,7 +386,7 @@ const BuySellWidget = ({
       location: 'Mint widget',
     })
 
-    const allowancesNotLoaded = ['dai', 'usdt', 'usdc'].filter(
+    const allowancesNotLoaded = ['cusd', 'ceur'].filter(
       (coin) => !allowances[coin] || Number.isNaN(parseFloat(allowances[coin]))
     )
 
@@ -444,9 +417,8 @@ const BuySellWidget = ({
       }
     }
 
-    checkForApproval('dai', dai)
-    checkForApproval('usdt', usdt)
-    checkForApproval('usdc', usdc)
+    checkForApproval('cusd', cusd)
+    checkForApproval('ceur', ceur)
     setCurrenciesNeedingApproval(needsApproval)
     if (needsApproval.length > 0) {
       setShowApproveModal(true)
@@ -457,19 +429,14 @@ const BuySellWidget = ({
 
   let currenciesActive = [
     {
-      name: 'usdt',
-      active: usdtActive,
-      amount: usdt,
+      name: 'ceur',
+      active: ceurActive,
+      amount: ceur,
     },
     {
-      name: 'dai',
-      active: daiActive,
-      amount: dai,
-    },
-    {
-      name: 'usdc',
-      active: usdcActive,
-      amount: usdc,
+      name: 'cusd',
+      active: cusdActive,
+      amount: cusd,
     },
   ]
     .filter((currency) => currency.active && currency.amount > 0)
@@ -566,9 +533,8 @@ const BuySellWidget = ({
         {tab === 'buy' && !parseFloat(totalStablecoins) && (
           <div className="no-coins flex-grow d-flex flex-column align-items-center justify-content-center">
             <div className="d-flex logos">
-              <img src="/images/usdt-icon.svg" alt="USDT logo" />
-              <img src="/images/dai-icon.svg" alt="DAI logo" />
-              <img src="/images/usdc-icon.svg" alt="USDC logo" />
+              <img src="/images/ceur-icon.svg" alt="cEUR logo" />
+              <img src="/images/cusd-icon.svg" alt="cUSD logo" />
             </div>
             {!stableCoinsLoaded && (
               <h2>{fbt('Loading balances...', 'Loading balances...')}</h2>
@@ -580,8 +546,8 @@ const BuySellWidget = ({
                 </h2>
                 <p>
                   {fbt(
-                    'Get USDT, DAI, or USDC to mint OUSD.',
-                    'Get USDT, DAI, or USDC to mint OUSD.'
+                    'Get cEUR or cUSD to mint OUSD.',
+                    'Get cEUR or cUSD to mint OUSD.'
                   )}
                 </p>
               </>
@@ -623,35 +589,24 @@ const BuySellWidget = ({
               </div>
             </div>
             <CoinRow
-              coin="usdt"
-              formError={buyFormErrors['usdt']}
-              formWarning={buyFormWarnings['usdt']}
-              onOusdChange={setUsdtOusd}
-              onActive={setUsdtActive}
-              exchangeRate={ousdExchangeRates['usdt'].mint}
-              onCoinChange={setUsdt}
+              coin="ceur"
+              formError={buyFormErrors['ceur']}
+              formWarning={buyFormWarnings['ceur']}
+              onOusdChange={setCeurOusd}
+              onActive={setCeurActive}
+              exchangeRate={ousdExchangeRates['ceur'].mint}
+              onCoinChange={setCeur}
               reset={resetStableCoins}
               downsized={downsized}
             />
             <CoinRow
-              coin="dai"
-              formError={buyFormErrors['dai']}
-              formWarning={buyFormWarnings['dai']}
-              onOusdChange={setDaiOusd}
-              onActive={setDaiActive}
-              exchangeRate={ousdExchangeRates['dai'].mint}
-              onCoinChange={setDai}
-              reset={resetStableCoins}
-              downsized={downsized}
-            />
-            <CoinRow
-              coin="usdc"
-              formError={buyFormErrors['usdc']}
-              formWarning={buyFormWarnings['usdc']}
-              onOusdChange={setUsdcOusd}
-              onActive={setUsdcActive}
-              exchangeRate={ousdExchangeRates['usdc'].mint}
-              onCoinChange={setUsdc}
+              coin="cusd"
+              formError={buyFormErrors['cusd']}
+              formWarning={buyFormWarnings['cusd']}
+              onOusdChange={setCusdOusd}
+              onActive={setCusdActive}
+              exchangeRate={ousdExchangeRates['cusd'].mint}
+              onCoinChange={setCusd}
               reset={resetStableCoins}
               downsized={downsized}
             />
