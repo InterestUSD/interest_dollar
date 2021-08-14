@@ -82,7 +82,9 @@ const SellWidget = ({
   } = usePriceTolerance('redeem')
 
   const stableCoinSplitsSum = sellWidgetCoinSplit
-    .map((split) => parseFloat(split.amount))
+    .map(
+      (split) => parseFloat(split.amount) * ousdExchangeRates[split.coin].redeem
+    )
     .reduce((a, b) => a + b, 0)
 
   const exitFee = ousdToSellNumber * redeemFee

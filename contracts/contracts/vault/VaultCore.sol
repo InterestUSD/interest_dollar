@@ -147,7 +147,7 @@ contract VaultCore is VaultStorage {
     /**
      * @dev Withdraw a supported asset and burn OUSD.
      * @param _amount Amount of OUSD to burn
-     * @param _minimumUnitAmount Minimum stablecoin units to receive in return
+     * @param _minimumUnitAmount Minimum stablecoin units (in cUSD) to receive in return
      */
     function redeem(uint256 _amount, uint256 _minimumUnitAmount)
         public
@@ -163,7 +163,7 @@ contract VaultCore is VaultStorage {
     /**
      * @dev Withdraw a supported asset and burn OUSD.
      * @param _amount Amount of OUSD to burn
-     * @param _minimumUnitAmount Minimum stablecoin units to receive in return
+     * @param _minimumUnitAmount Minimum stablecoin units (in cUSD) to receive in return
      */
     function _redeem(uint256 _amount, uint256 _minimumUnitAmount) internal {
         require(_amount > 0, "Amount must be greater than 0");
@@ -211,12 +211,16 @@ contract VaultCore is VaultStorage {
 
         if (_minimumUnitAmount > 0) {
             uint256 unitTotal = 0;
+            uint256[] memory assetPrices = _getAssetPrices(true);
             for (uint256 i = 0; i < outputs.length; i++) {
                 uint256 assetDecimals = Helpers.getDecimals(allAssets[i]);
                 unitTotal = unitTotal.add(
-                    outputs[i].scaleBy(int8(18 - assetDecimals))
+                    outputs[i].scaleBy(int8(18 - assetDecimals)).mul(
+                        assetPrices[i]
+                    )
                 );
             }
+            // console.log("VaultCore::_redeem: unitTotal=%s", unitTotal);
             require(
                 unitTotal >= _minimumUnitAmount,
                 "Redeem amount lower than minimum"
