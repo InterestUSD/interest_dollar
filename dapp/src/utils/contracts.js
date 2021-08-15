@@ -39,7 +39,13 @@ export async function setupContracts(account, library, chainId) {
 
   let network
   try {
-    network = require(`../../${chainId === 1 ? 'prod.' : ''}network.json`)
+    const nt =
+      chainId == 42220
+        ? 'prod.network'
+        : chainId == 44787
+        ? 'network.alfajores'
+        : 'network'
+    network = require(`../../${nt}.json`)
   } catch (e) {
     console.error('network.json file not present')
     // contract addresses not present no need to continue initialisation

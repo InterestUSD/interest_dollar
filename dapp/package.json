@@ -11,6 +11,7 @@
     "build": "next build",
     "start": "per-env",
     "start:development": "NODE_ENV=development ETHEREUM_RPC_PROVIDER=http://localhost:8545 ETHEREUM_RPC_CHAIN_ID=31337 next dev",
+    "start:alfajores": "NODE_ENV=development ETHEREUM_RPC_PROVIDER=https://alfajores-forno.celo-testnet.org ETHEREUM_RPC_CHAIN_ID=44787 next dev",
     "start:fork": "NODE_ENV=development ETHEREUM_RPC_PROVIDER=http://localhost:8545 ETHEREUM_RPC_CHAIN_ID=1 MAINNET_FORK=true next dev",
     "start:production": "NODE_ENV=production ETHEREUM_RPC_CHAIN_ID=1 next start -p 8080",
     "gcp-build": "next build",
@@ -93,7 +94,7 @@
     "sass": "^1.26.10",
     "use-analytics": "^0.0.5",
     "web3modal": "^1.9.0",
-    "@ubeswap/injected-connector": "6.0.9-celo"
+    "@ubeswap/injected-connector": "^6.1.0"
   },
   "babel": {
     "presets": [

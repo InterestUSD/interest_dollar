@@ -2452,10 +2452,10 @@
     "@types/webpack-sources" "*"
     source-map "^0.6.0"
 
-"@ubeswap/injected-connector@6.0.9-celo":
-  version "6.0.9-celo"
-  resolved "https://registry.yarnpkg.com/@ubeswap/injected-connector/-/injected-connector-6.0.9-celo.tgz#a1b7dfe5094a3775d9f68893de889841b49e90b9"
-  integrity sha512-X1W1uQqMvy4vu60zzU9q3iMApnpPBbemrUxLqS61MkNyQOob/8O8ODGA0sfvd+djbMNda0Cq/WywkM/mik6UQw==
+"@ubeswap/injected-connector@^6.1.0":
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/@ubeswap/injected-connector/-/injected-connector-6.1.0.tgz#867f8074d362e390a01be385319082fb9e998b11"
+  integrity sha512-1YpAoZX49PfNldzcX6OUgxvytDoeVvYh6/L/kVP8xVUlI34ISQ4GGACzC49BwXNzIfBp72KY2V0RTuYCzOCaPw==
   dependencies:
     "@web3-react/abstract-connector" "^6.0.7"
     "@web3-react/types" "^6.0.7"
