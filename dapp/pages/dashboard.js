@@ -12,7 +12,7 @@ import { currencies } from 'constants/Contract'
 import { formatCurrency } from 'utils/math'
 import { displayCurrency } from 'utils/math'
 
-const governorAddress = '0xeAD9C93b79Ae7C1591b1FB5323BD777E86e150d4'
+const governorAddress = '0xA202d366B5DB613255871162F3B8502B1DD95d3a'
 
 const Dashboard = ({ locale, onLocale }) => {
   const allowances = useStoreState(AccountStore, s => s.allowances)

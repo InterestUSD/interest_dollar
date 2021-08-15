@@ -470,7 +470,7 @@ const SellWidget = ({
                   {formatCurrency(exitFee, 2)}
                 </div>
               </div>
-              <div className="d-flex justify-content-between mb-2">
+              {/* <div className="d-flex justify-content-between mb-2">
                 <div className="grey-text d-flex">
                   {fbt('Exchange rate loss', 'Exchange rate loss')}
                   <DisclaimerTooltip
@@ -485,11 +485,14 @@ const SellWidget = ({
                 <div className="grey-text text-normal">
                   {formatCurrency(exchangeRateLoss, 2)}
                 </div>
-              </div>
+              </div> */}
               <hr />
               <div className="d-flex justify-content-between mb-1">
                 <div className="grey-text d-flex">
-                  {fbt('Estimated stablecoins', 'Estimated stablecoins')}
+                  {fbt(
+                    'Estimated stablecoins units',
+                    'Estimated stablecoins units'
+                  )}
                   <DisclaimerTooltip
                     smallIcon
                     className="ml-2"
@@ -512,7 +515,7 @@ const SellWidget = ({
               </div>
               <div>
                 {fbt(
-                  'We will show you a preview of the stablecoins you will receive. You can also sell OUSD on Uniswap or another exchange if you prefer to receive a specific stablecoin.',
+                  'We will show you a preview of the stablecoins you will receive. You can also sell OUSD on Ubeswap or another exchange if you prefer to receive a specific stablecoin.',
                   'Enter Ousd to sell text'
                 )}
               </div>
@@ -527,8 +530,8 @@ const SellWidget = ({
                 <DisclaimerTooltip
                   id="howSaleCalculatedPopover"
                   text={fbt(
-                    'The vault is designed to maintain a consistent ratio of various stablecoins. When OUSD is redeemed, stablecoins are withdrawn according to this ratio. This is a security feature that protects the vault in the event that one stablecoin loses its peg to the dollar. If you have a strong preference, consider selling OUSD on Uniswap or another exchange.',
-                    'The vault is designed to maintain a consistent ratio of various stablecoins. When OUSD is redeemed, stablecoins are withdrawn according to this ratio. This is a security feature that protects the vault in the event that one stablecoin loses its peg to the dollar. If you have a strong preference, consider selling OUSD on Uniswap or another exchange.'
+                    'The vault is designed to maintain a consistent ratio of various stablecoins. When OUSD is redeemed, stablecoins are withdrawn according to this ratio. This is a security feature that protects the vault in the event that one stablecoin loses its peg to the celo dollar. If you have a strong preference, consider selling OUSD on Ubeswap or another exchange.',
+                    'The vault is designed to maintain a consistent ratio of various stablecoins. When OUSD is redeemed, stablecoins are withdrawn according to this ratio. This is a security feature that protects the vault in the event that one stablecoin loses its peg to the celo dollar. If you have a strong preference, consider selling OUSD on Ubeswap or another exchange.'
                   )}
                 >
                   <div
@@ -645,8 +648,8 @@ const SellWidget = ({
                   <div className="d-flex min-h-42">
                     <div className="mr-2 d-flex align-items-center">
                       {fbt(
-                        'Min. stablecoins received',
-                        'Min. stablecoins received'
+                        'Min. stablecoins unit received',
+                        'Min. stablecoins unit received'
                       )}
                     </div>
                     <DisclaimerTooltip

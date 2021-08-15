@@ -59,8 +59,8 @@ const PrimarySidePanel = () => {
           >
             <img src="/images/close.svg" alt="Close icon" loading="lazy" />
           </button>
-          <SidePanelInsuranceMessage />
-          <SidePanelStakeMessage />
+          {/* <SidePanelInsuranceMessage /> */}
+          {/* <SidePanelStakeMessage /> */}
           {sortedTransactions.map((tx) => (
             <SidePanelTransactionMessage
               key={tx.hash}
