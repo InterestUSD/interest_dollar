@@ -15,5 +15,5 @@ then
     # the --no-install is here so npx doesn't download some package on its own if it can not find one in the repo
     FORK=true npx --no-install hardhat node --export '../dapp/network.json' ${params[@]}
 else
-    npx --no-install hardhat node --export '../dapp/network.json'
+    npx --no-install hardhat node --watch --export '../dapp/network.json'
 fi
