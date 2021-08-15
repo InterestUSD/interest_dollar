@@ -1,8 +1,10 @@
 const hre = require("hardhat");
 const { utils } = require("ethers");
 
-const addresses = require("../utils/addresses");
-const { getAssetAddresses, isMainnetOrFork } = require("../test/helpers.js");
+const {
+  getAssetAddresses,
+  isMainnetOrAlfajoresOrFork,
+} = require("../test/helpers.js");
 const {
   log,
   deployWithConfirmation,
@@ -177,10 +179,12 @@ const configureVault = async () => {
  * Deploy the OracleRouter.
  */
 const deployOracles = async () => {
-  const oracleContract = isMainnetOrFork ? "OracleRouter" : "OracleRouterDev";
+  const oracleContract = isMainnetOrAlfajoresOrFork
+    ? "OracleRouter"
+    : "OracleRouterDev";
   await deployWithConfirmation("OracleRouter", [], oracleContract);
 
-  if (!isMainnetOrFork) {
+  if (!isMainnetOrAlfajoresOrFork) {
     // set the mock values for cUSD  and cEUR
     const assetAddresses = await getAssetAddresses(deployments);
     const oracleRouter = await ethers.getContract("OracleRouter");
@@ -288,13 +292,7 @@ const deployFlipper = async () => {
   await withConfirmation(flipper.connect(sGovernor).claimGovernance());
 };
 
-const main = async () => {
-  console.log("Running 001_core deployment...");
-  await deployOracles();
-  await deployCore();
-
-  // Need to set Uniswap address in vault before initializing the
-  // AaveStrategy
+const configureUniswapRouterBeforeStrategy = async () => {
   const assetAddresses = await getAssetAddresses(deployments);
   const { governorAddr } = await getNamedAccounts();
   const sGovernor = await ethers.provider.getSigner(governorAddr);
@@ -311,7 +309,7 @@ const main = async () => {
   );
 
   // For testnets and local, initialize MockUniswapRouter
-  if (!isMainnetOrFork) {
+  if (!isMainnetOrAlfajoresOrFork) {
     const cMockUniswapRouter = await ethers.getContract("MockUniswapRouter");
     await withConfirmation(
       cMockUniswapRouter
@@ -324,6 +322,16 @@ const main = async () => {
     );
     log("Initialized MockUniswapRouter");
   }
+};
+
+const main = async () => {
+  console.log("Running 001_core deployment...");
+  await deployOracles();
+  await deployCore();
+
+  // Need to set Uniswap address in vault before initializing the
+  // AaveStrategy
+  await configureUniswapRouterBeforeStrategy();
 
   await deployAaveStrategy();
   await configureVault();
