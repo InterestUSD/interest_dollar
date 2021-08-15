@@ -1,5 +1,5 @@
 const ethers = require("ethers");
-
+require("dotenv").config();
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-solhint");
 require("hardhat-deploy");

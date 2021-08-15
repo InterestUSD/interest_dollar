@@ -45,6 +45,8 @@ addresses.mainnet.OUSD = "0xB72b3f5523851C2EB0cA14137803CA4ac7295f3F";
 /* --- Alfajores --- */
 addresses.alfajores = {};
 
+addresses.alfajores.uniswapRouter = "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121";
+
 // Aave/Moola
 addresses.alfajores.lendingPool = "0xE15FEBDc920022347231e6Ae176836B4946a8e07";
 addresses.alfajores.mCUSD = "0x71DB38719f9113A36e14F409bAD4F07B58b4730b";
