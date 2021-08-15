@@ -34,9 +34,7 @@ const getAssetAddresses = async (hre, deployments) => {
       //   ? addresses.alfajores.OGN
       //   : (await deployments.get("MockOGN")).address,
       UBE: (await deployments.get("MockUBE")).address,
-      uniswapRouter: isAlfajores
-        ? addresses.alfajores.uniswapRouter
-        : (await deployments.get("MockUniswapRouter")).address,
+      uniswapRouter: (await deployments.get("MockUniswapRouter")).address,
       MOO: (await deployments.get("MockMOO")).address,
       MOO_LP: (await deployments.get("MockMCUSDMEURLPToken")).address,
       UBEStaking: (await deployments.get("MockUbeStaking")).address,

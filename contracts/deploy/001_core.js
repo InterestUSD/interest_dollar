@@ -4,6 +4,7 @@ const { utils } = require("ethers");
 const {
   getAssetAddresses,
   isMainnetOrAlfajoresOrFork,
+  isMainnetOrFork,
 } = require("../test/helpers.js");
 const {
   log,
@@ -179,19 +180,17 @@ const configureVault = async () => {
  * Deploy the OracleRouter.
  */
 const deployOracles = async () => {
-  const oracleContract = isMainnetOrAlfajoresOrFork
-    ? "OracleRouter"
-    : "OracleRouterDev";
+  const oracleContract = isMainnetOrFork ? "OracleRouter" : "OracleRouterDev";
   await deployWithConfirmation("OracleRouter", [], oracleContract);
 
-  if (!isMainnetOrAlfajoresOrFork) {
+  if (!isMainnetOrFork) {
     // set the mock values for cUSD  and cEUR
     const assetAddresses = await getAssetAddresses(deployments);
     const oracleRouter = await ethers.getContract("OracleRouter");
-    withConfirmation(
+    await withConfirmation(
       oracleRouter.setPrice(assetAddresses.CUSD, "1000000000000000000") // 1.0000
     );
-    withConfirmation(
+    await withConfirmation(
       oracleRouter.setPrice(assetAddresses.CEUR, "1200100000000000000") // 1.2001
     );
   }
@@ -309,7 +308,7 @@ const configureUniswapRouterBeforeStrategy = async () => {
   );
 
   // For testnets and local, initialize MockUniswapRouter
-  if (!isMainnetOrAlfajoresOrFork) {
+  if (!isMainnetOrFork) {
     const cMockUniswapRouter = await ethers.getContract("MockUniswapRouter");
     await withConfirmation(
       cMockUniswapRouter
