@@ -453,4 +453,76 @@ INFO: Proposal: Update Aave implementation, enable cEUR and set MOO as reward to
 INFO: Successfully Executed: Update Aave implementation, enable cEUR and set MOO as reward token
 017_aave_strategy_update deploy done.
 Done in 44.45s.
+
+
+
+
+
+Running 000_mock deployment...
+Deployer address 0x3084F0b94d41111526f8d1e5fFf43e1752907d48
+Governor address 0xA202d366B5DB613255871162F3B8502B1DD95d3a
+000_mock deploy done.
+
+Running 001_core deployment...
+Previous storage layout for OracleRouter not found. Treating OracleRouter as a new contract
+INFO: Deployed OracleRouter Address: 0xeaa99269a72BFc5a73c357ed61f4419DF414A72d Gas Used: 451837
+INFO: Using asset addresses: {
+  "CELO": "0xD32831769aE4f399A8F6405755aC79173EfAEC7c",
+  "CUSD": "0x1731FC1f338920f643638C61d252660E2DD4a86e",
+  "CEUR": "0x4cAF8f1B9d616E900427457C15d3f1B6252D3394",
+  "NonStandardToken": "0x2e1b07f948F8B4B550B6b482E937fB3a91E599ee",
+  "mCUSD": "0xA1e5E15aA7d7E33fB868aEBb7a6b43F412A67335",
+  "mCEUR": "0xbe5AeFc67151dCEC9010E1d5F9eFb948a716995d",
+  "AAVE": "0xc72f1d86978AC57FD9F0D771b496eFDF64F0E91b",
+  "AAVE_ADDRESS_PROVIDER": "0xc72f1d86978AC57FD9F0D771b496eFDF64F0E91b",
+  "UBE": "0x14f6392a624E1FCD651c688582a3051157635510",
+  "uniswapRouter": "0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121",
+  "MOO": "0x4BBf3bD45128195111F6E93035e3F199Ba376f3B",
+  "MOO_LP": "0xBB939E7Eb0663B9414e59efb29638fbb0AC6A9bA",
+  "UBEStaking": "0x2dA53BBad5d6c1c3Ebe0edcCEBf2157471ebB1f7"
+}
+Skipping storage slot validation of OUSDProxy.
+INFO: Deployed OUSDProxy Address: 0x90580C08A02530E5959A365473D2A6F0c398911f Gas Used: 612961
+Skipping storage slot validation of VaultProxy.
+INFO: Deployed VaultProxy Address: 0x3a708B56cbB4428461C568c5dfC018D52C69C73E Gas Used: 612949
+Previous storage layout for OUSD not found. Treating OUSD as a new contract
+INFO: Deployed OUSD Address: 0x587e2Afa03ed00438EF3911d97AeCC50Be5f8C1C Gas Used: 1976301
+Previous storage layout for Vault not found. Treating Vault as a new contract
+INFO: Deployed Vault Address: 0x81d120b49421F6E6CD56ED29B4CD45649AdDc8F2 Gas Used: 2810360
+Previous storage layout for VaultCore not found. Treating VaultCore as a new contract
+INFO: Deployed VaultCore Address: 0xbeA9934e9452b6aAfc56cF42f6372543a3ce672F Gas Used: 3153017
+Previous storage layout for VaultAdmin not found. Treating VaultAdmin as a new contract
+INFO: Deployed VaultAdmin Address: 0xC1eac23C2107A6127B4B3Aafb496b33911A22568 Gas Used: 2678253
+Previous storage layout for Governor not found. Treating Governor as a new contract
+INFO: Deployed Governor Address: 0x3813fd4aDf0a6A7a888fdAC8aa65A7e23b3613F9 Gas Used: 2446571
+INFO: Initialized OUSDProxy
+INFO: Initialized VaultProxy
+INFO: Initialized Vault
+INFO: Upgraded VaultCore implementation
+INFO: Initialized VaultAdmin implementation
+INFO: Initialized OUSD
+Skipping storage slot validation of AaveStrategyProxy.
+INFO: Deployed AaveStrategyProxy Address: 0x02450fb7162BE96fbA169E2Bdd2Cc19BA0c31dA9 Gas Used: 612961
+Previous storage layout for AaveStrategy not found. Treating AaveStrategy as a new contract
+INFO: Deployed AaveStrategy Address: 0xaB660c4e3EA1CB922a6826aB0a075C337c36d72C Gas Used: 3665818
+INFO: Initialized AaveStrategyProxy
+INFO: Initialized AaveStrategy
+INFO: AaveStrategy transferGovernance(0xA202d366B5DB613255871162F3B8502B1DD95d3a) called
+INFO: Claimed governance for AaveStrategy
+INFO: Configuring Vault
+INFO:  - Set Uniswap address: 0xE3D8bd6Aed4F159bc8000a9cD47CffDb95F96121
+INFO:  - Set Celo Gold Token address: 0xD32831769aE4f399A8F6405755aC79173EfAEC7c
+INFO:  - Set Strategist address: 0x3084F0b94d41111526f8d1e5fFf43e1752907d48
+INFO:  - Set Vault buffer: 0.02%
+INFO:  - Set Redeem free bps: 50
+INFO:  - Added cUSD asset to Vault
+INFO:  - Added cEUR asset to Vault
+INFO:  - Approve AaveStrategy(0x02450fb7162BE96fbA169E2Bdd2Cc19BA0c31dA9)
+INFO:  - Set AaveStrategy(0x02450fb7162BE96fbA169E2Bdd2Cc19BA0c31dA9) as default for cUSD deposits
+INFO:  - Set AaveStrategy(0x02450fb7162BE96fbA169E2Bdd2Cc19BA0c31dA9) as default for cEUR deposits
+INFO:  - Unpaused deposits on Vault
+Previous storage layout for FlipperDev not found. Treating FlipperDev as a new contract
+INFO: Deployed FlipperDev Address: 0x148eC3Eb6a51Da3914C1ABabBAD3fA1A88B73a06 Gas Used: 1026125
+001_core deploy done.
+Done in 1016.46s.
 ```
