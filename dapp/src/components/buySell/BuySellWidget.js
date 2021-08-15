@@ -554,17 +554,17 @@ const BuySellWidget = ({
             )}
             {stableCoinsLoaded && (
               <a
-                href="https://app.uniswap.org/"
+                href="https://app.ubeswap.org/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="btn btn-clear-blue btn-lg get-coins"
               >
                 <img
                   src="/images/uniswap-icon.svg"
-                  alt="Uniswap logo"
+                  alt="Ubeswap logo"
                   className="mr-3"
                 />
-                <div>{fbt('Visit Uniswap', 'Visit Uniswap')}</div>
+                <div>{fbt('Visit Ubeswap', 'Visit Ubeswap')}</div>
               </a>
             )}
           </div>
@@ -619,7 +619,7 @@ const BuySellWidget = ({
                     alt="OUSD token icon"
                   />
                 </div>
-                <div className="d-flex flex-column w-100 h-100">
+                <div className="d-flex flex-column w-100 h-150">
                   <div className="d-flex bottom-border">
                     <div className="approx-purchase d-flex align-items-center justify-content-start">
                       <div className="mr-2 grey-bold">

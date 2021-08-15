@@ -31,9 +31,9 @@ const SidePanelWelcomeMessage = () => {
               'You can buy up to ~' +
                 fbt.param('ousd-coin', formatCurrency(ousdToBuy, 2)) +
                 ' OUSD with the ' +
-                fbt.param('ceur-coin', formatCurrency(balances['ceur'], 0)) +
+                fbt.param('ceur-coin', formatCurrency(balances['ceur'], 1)) +
                 ' cEUR, ' +
-                fbt.param('cusd-coin', formatCurrency(balances['cusd'], 0)) +
+                fbt.param('cusd-coin', formatCurrency(balances['cusd'], 1)) +
                 ' cUSD in your wallet.',
               'welcome-message-buying-power'
             )}

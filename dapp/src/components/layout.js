@@ -71,8 +71,8 @@ const Layout = ({
         <div className="container d-flex flex-column flex-md-row align-items-center">
           <img src="/images/horsey.svg" className="mb-2 mb-md-0 mr-md-3" />
           {fbt(
-            'Gas fees are high right now. It might be cheaper to buy OUSD on Uniswap.',
-            'Uniswap notice'
+            'Gas fees are high right now. It might be cheaper to buy OUSD on Ubeswap.',
+            'Ubeswap notice'
           )}
           <a
             href={UNISWAP_URL}
@@ -80,7 +80,7 @@ const Layout = ({
             rel="noopener noreferrer"
             className="btn btn-dark mt-3 mt-md-0 ml-md-auto"
           >
-            Try Uniswap
+            Try Ubeswap
           </a>
         </div>
       </div>
