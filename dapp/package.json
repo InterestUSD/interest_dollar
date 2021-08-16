@@ -116,8 +116,7 @@
         }
       ],
       "babel-plugin-fbt",
-      "babel-plugin-fbt-runtime",
-      "inline-json-import"
+      "babel-plugin-fbt-runtime"
     ]
   },
   "husky": {
