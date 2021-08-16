@@ -12,9 +12,9 @@ let envFile = 'local.env'
  * build step. For that reason we decode production and staging all into deploy.env and have google instaces
  * read from that env file.
  */
-if (isProduction || isStaging) {
-  envFile = 'deploy.env'
-}
+// if (isProduction || isStaging) {
+//   envFile = 'deploy.env'
+// }
 
 require("dotenv").config({
   /* can not use ".env" file name for local environment, because env vars from .env file
