@@ -2,6 +2,7 @@ const { utils } = require("ethers");
 const { formatUnits } = utils;
 
 const erc20Abi = require("../test/abi/erc20.json");
+const stakingAbi = require("../test/abi/IStakingRewards.json");
 const { getAssetAddresses } = require("../test/addressHelper");
 const addresses = require("../utils/addresses");
 
@@ -27,6 +28,10 @@ async function debug(taskArguments, hre) {
     aaveProxy.address
   );
   const cAaveStrategy = await hre.ethers.getContract("AaveStrategy");
+  const ubeStaking = await hre.ethers.getContractAt(
+    stakingAbi,
+    assetAddresses.UBEStaking
+  );
 
   const oracleRouter = await hre.ethers.getContract("OracleRouter");
 
@@ -49,6 +54,7 @@ async function debug(taskArguments, hre) {
   console.log(`AaveStrategy proxy:      ${aaveProxy.address}`);
   console.log(`AaveStrategy impl:       ${await aaveProxy.implementation()}`);
   console.log(`AaveStrategy:            ${cAaveStrategy.address}`);
+  console.log(`UbeLPStaking:            ${ubeStaking.address}`);
   console.log(`Governor:                ${governor.address}`);
 
   //
@@ -121,7 +127,6 @@ async function debug(taskArguments, hre) {
   const rebasePaused = await vault.rebasePaused();
   const capitalPaused = await vault.capitalPaused();
   const redeemFeeBps = Number(await vault.redeemFeeBps());
-  const trusteeFeeBps = Number(await vault.trusteeFeeBps());
   const vaultBuffer = Number(
     formatUnits((await vault.vaultBuffer()).toString(), 18)
   );
@@ -133,7 +138,6 @@ async function debug(taskArguments, hre) {
   const strategyCount = await vault.getStrategyCount();
   const assetCount = await vault.getAssetCount();
   const strategistAddress = await vault.strategistAddr();
-  const trusteeAddress = await vault.trusteeAddress();
   const priceProvider = await vault.priceProvider();
 
   console.log("\nVault Settings");
@@ -141,9 +145,6 @@ async function debug(taskArguments, hre) {
   console.log("rebasePaused:\t\t\t", rebasePaused);
   console.log("capitalPaused:\t\t\t", capitalPaused);
   console.log(`redeemFeeBps:\t\t\t ${redeemFeeBps} (${redeemFeeBps / 100}%)`);
-  console.log(
-    `trusteeFeeBps:\t\t\t ${trusteeFeeBps} (${trusteeFeeBps / 100}%)`
-  );
   console.log(`vaultBuffer:\t\t\t ${vaultBuffer} (${vaultBuffer * 100}%)`);
   console.log(
     "autoAllocateThreshold (USD):\t",
@@ -221,6 +222,10 @@ async function debug(taskArguments, hre) {
     let balance = formatUnits(balanceRaw.toString(), asset.decimals);
     console.log(`Aave ${asset.symbol}:\t balance=${balance}`);
   }
+
+  let lpStakedRaw = await ubeStaking.balanceOf(cAaveStrategy.address);
+  let lpStaked = formatUnits(lpStakedRaw.toString(), 18);
+  console.log(`Aave Liquidity Token Staked:\t ${lpStaked}`);
 
   //
   // Strategies settings
