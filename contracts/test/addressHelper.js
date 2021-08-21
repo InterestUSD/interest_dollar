@@ -22,21 +22,38 @@ const getAssetAddresses = async (hre, deployments) => {
     };
   } else {
     return {
-      CELO: (await deployments.get("MockCELO")).address,
-      CUSD: (await deployments.get("MockCUSD")).address,
-      CEUR: (await deployments.get("MockCEUR")).address,
+      CELO: isAlfajores
+        ? addresses.alfajores.CELO
+        : (await deployments.get("MockCELO")).address,
+      CUSD: isAlfajores
+        ? addresses.alfajores.CUSD
+        : (await deployments.get("MockCUSD")).address,
+      CEUR: isAlfajores
+        ? addresses.alfajores.CEUR
+        : (await deployments.get("MockCEUR")).address,
       NonStandardToken: (await deployments.get("MockNonStandardToken")).address,
-      mCUSD: (await deployments.get("MockMCUSD")).address,
-      mCEUR: (await deployments.get("MockMCEUR")).address,
-      AAVE: (await deployments.get("MockAave")).address,
-      AAVE_ADDRESS_PROVIDER: (await deployments.get("MockAave")).address,
+      mCUSD: isAlfajores
+        ? addresses.alfajores.mCUSD
+        : (await deployments.get("MockMCUSD")).address,
+      mCEUR: isAlfajores
+        ? addresses.alfajores.mCEUR
+        : (await deployments.get("MockMCEUR")).address,
+      AAVE: isAlfajores
+        ? addresses.alfajores.AAVE
+        : (await deployments.get("MockAave")).address,
+      AAVE_ADDRESS_PROVIDER: isAlfajores
+        ? addresses.alfajores.AAVE_ADDRESS_PROVIDER
+        : (await deployments.get("MockAave")).address,
       // OGN: isAlfajores
       //   ? addresses.alfajores.OGN
       //   : (await deployments.get("MockOGN")).address,
       UBE: (await deployments.get("MockUBE")).address,
-      uniswapRouter: (await deployments.get("MockUniswapRouter")).address,
       MOO: (await deployments.get("MockMOO")).address,
-      MOO_LP: (await deployments.get("MockMCUSDMEURLPToken")).address,
+      uniswapRouter: isAlfajores
+        ? addresses.alfajores.uniswapRouter
+        : (await deployments.get("MockUniswapRouter")).address,
+      UBEmCUSDmCEURPair: (await deployments.get("MockMCUSDMEURLPToken"))
+        .address,
       UBEStaking: (await deployments.get("MockUbeStaking")).address,
     };
   }
