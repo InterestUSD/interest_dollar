@@ -84,9 +84,12 @@ export async function setupContracts(account, library, chainId) {
   vault = getContract(vaultProxy.address, iVaultJson.abi)
 
   ousd = getContract(ousdProxy.address, network.contracts['OUSD'].abi)
-  if (chainId == 31337 || chainId == 44787) {
+  if (chainId == 31337) {
     cusd = contracts['MockCUSD']
     ceur = contracts['MockCEUR']
+  } else if (chainId == 44787) {
+    cusd = getContract(addresses.alfajores.CUSD, erc20Abi.abi)
+    ceur = getContract(addresses.alfajores.CEUR, erc20Abi.abi)
   } else {
     cusd = getContract(addresses.mainnet.CUSD, erc20Abi.abi)
     ceur = getContract(addresses.mainnet.CEUR, erc20Abi.abi)
