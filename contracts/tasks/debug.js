@@ -11,6 +11,7 @@ const addresses = require("../utils/addresses");
  */
 async function debug(taskArguments, hre) {
   let assetAddresses = await getAssetAddresses(hre, hre.deployments);
+  const less = taskArguments.less;
 
   //
   // Get all contracts to operate on.
@@ -36,135 +37,139 @@ async function debug(taskArguments, hre) {
   const oracleRouter = await hre.ethers.getContract("OracleRouter");
 
   const governor = await hre.ethers.getContract("Governor");
+  if (!less) {
+    //
+    // Addresses
+    //
+    console.log("\nContract addresses");
+    console.log("====================");
+    console.log(`OUSD proxy:              ${ousdProxy.address}`);
+    console.log(`OUSD impl:               ${await ousdProxy.implementation()}`);
+    console.log(`OUSD:                    ${cOusd.address}`);
+    console.log(`Vault proxy:             ${vaultProxy.address}`);
+    console.log(
+      `Vault impl:              ${await vaultProxy.implementation()}`
+    );
+    console.log(`Vault:                   ${cVault.address}`);
+    console.log(`VaultCore:               ${vaultCore.address}`);
+    console.log(`VaultAdmin:              ${vaultAdmin.address}`);
+    console.log(`OracleRouter:            ${oracleRouter.address}`);
+    console.log(`AaveStrategy proxy:      ${aaveProxy.address}`);
+    console.log(`AaveStrategy impl:       ${await aaveProxy.implementation()}`);
+    console.log(`AaveStrategy:            ${cAaveStrategy.address}`);
+    console.log(`UbeLPStaking:            ${ubeStaking.address}`);
+    console.log(`Governor:                ${governor.address}`);
 
-  //
-  // Addresses
-  //
-  console.log("\nContract addresses");
-  console.log("====================");
-  console.log(`OUSD proxy:              ${ousdProxy.address}`);
-  console.log(`OUSD impl:               ${await ousdProxy.implementation()}`);
-  console.log(`OUSD:                    ${cOusd.address}`);
-  console.log(`Vault proxy:             ${vaultProxy.address}`);
-  console.log(`Vault impl:              ${await vaultProxy.implementation()}`);
-  console.log(`Vault:                   ${cVault.address}`);
-  console.log(`VaultCore:               ${vaultCore.address}`);
-  console.log(`VaultAdmin:              ${vaultAdmin.address}`);
-  console.log(`OracleRouter:            ${oracleRouter.address}`);
-  console.log(`AaveStrategy proxy:      ${aaveProxy.address}`);
-  console.log(`AaveStrategy impl:       ${await aaveProxy.implementation()}`);
-  console.log(`AaveStrategy:            ${cAaveStrategy.address}`);
-  console.log(`UbeLPStaking:            ${ubeStaking.address}`);
-  console.log(`Governor:                ${governor.address}`);
+    //
+    // Governor
+    //
+    const govAdmin = await governor.admin();
+    const govPendingAdmin = await governor.pendingAdmin();
+    const govDelay = await governor.delay();
+    const govPropCount = await governor.proposalCount();
+    console.log("\nGovernor");
+    console.log("====================");
+    console.log("Admin:           ", govAdmin);
+    console.log("PendingAdmin:    ", govPendingAdmin);
+    console.log("Delay (seconds): ", govDelay.toString());
+    console.log("ProposalCount:   ", govPropCount.toString());
 
-  //
-  // Governor
-  //
-  const govAdmin = await governor.admin();
-  const govPendingAdmin = await governor.pendingAdmin();
-  const govDelay = await governor.delay();
-  const govPropCount = await governor.proposalCount();
-  console.log("\nGovernor");
-  console.log("====================");
-  console.log("Admin:           ", govAdmin);
-  console.log("PendingAdmin:    ", govPendingAdmin);
-  console.log("Delay (seconds): ", govDelay.toString());
-  console.log("ProposalCount:   ", govPropCount.toString());
+    //
+    // Governance
+    //
 
-  //
-  // Governance
-  //
+    // Read the current governor address on all the contracts.
+    const ousdGovernorAddr = await ousd.governor();
+    const vaultGovernorAddr = await vault.governor();
+    const aaveStrategyGovernorAddr = await aaveStrategy.governor();
 
-  // Read the current governor address on all the contracts.
-  const ousdGovernorAddr = await ousd.governor();
-  const vaultGovernorAddr = await vault.governor();
-  const aaveStrategyGovernorAddr = await aaveStrategy.governor();
+    console.log("\nGovernor addresses");
+    console.log("====================");
+    console.log("OUSD:              ", ousdGovernorAddr);
+    console.log("Vault:             ", vaultGovernorAddr);
+    console.log("AaveStrategy:      ", aaveStrategyGovernorAddr);
+    //
+    // OUSD
+    //
+    const name = await ousd.name();
+    const decimals = await ousd.decimals();
+    const symbol = await ousd.symbol();
+    const totalSupply = await ousd.totalSupply();
+    const vaultAddress = await ousd.vaultAddress();
+    const nonRebasingSupply = await ousd.nonRebasingSupply();
+    const rebasingSupply = totalSupply.sub(nonRebasingSupply);
+    const rebasingCreditsPerToken = await ousd.rebasingCreditsPerToken();
+    const rebasingCredits = await ousd.rebasingCredits();
 
-  console.log("\nGovernor addresses");
-  console.log("====================");
-  console.log("OUSD:              ", ousdGovernorAddr);
-  console.log("Vault:             ", vaultGovernorAddr);
-  console.log("AaveStrategy:      ", aaveStrategyGovernorAddr);
+    console.log("\nOUSD");
+    console.log("=======");
+    console.log(`name:                    ${name}`);
+    console.log(`symbol:                  ${symbol}`);
+    console.log(`decimals:                ${decimals}`);
+    console.log(`totalSupply:             ${formatUnits(totalSupply, 18)}`);
+    console.log(`vaultAddress:            ${vaultAddress}`);
+    console.log(
+      `nonRebasingSupply:       ${formatUnits(nonRebasingSupply, 18)}`
+    );
+    console.log(`rebasingSupply:          ${formatUnits(rebasingSupply, 18)}`);
+    console.log(`rebasingCreditsPerToken: ${rebasingCreditsPerToken}`);
+    console.log(`rebasingCredits:         ${rebasingCredits}`);
 
-  //
-  // OUSD
-  //
-  const name = await ousd.name();
-  const decimals = await ousd.decimals();
-  const symbol = await ousd.symbol();
-  const totalSupply = await ousd.totalSupply();
-  const vaultAddress = await ousd.vaultAddress();
-  const nonRebasingSupply = await ousd.nonRebasingSupply();
-  const rebasingSupply = totalSupply.sub(nonRebasingSupply);
-  const rebasingCreditsPerToken = await ousd.rebasingCreditsPerToken();
-  const rebasingCredits = await ousd.rebasingCredits();
+    //
+    // Oracle
+    //
+    console.log("\nOracle");
+    console.log("========");
+    const priceCUSD = await oracleRouter.price(assetAddresses.CUSD);
+    const priceCEUR = await oracleRouter.price(assetAddresses.CEUR);
+    console.log(`CUSD price :  ${formatUnits(priceCUSD, 18)} CUSD`);
+    console.log(`CEUR price:  ${formatUnits(priceCEUR, 18)} CUSD`);
 
-  console.log("\nOUSD");
-  console.log("=======");
-  console.log(`name:                    ${name}`);
-  console.log(`symbol:                  ${symbol}`);
-  console.log(`decimals:                ${decimals}`);
-  console.log(`totalSupply:             ${formatUnits(totalSupply, 18)}`);
-  console.log(`vaultAddress:            ${vaultAddress}`);
-  console.log(`nonRebasingSupply:       ${formatUnits(nonRebasingSupply, 18)}`);
-  console.log(`rebasingSupply:          ${formatUnits(rebasingSupply, 18)}`);
-  console.log(`rebasingCreditsPerToken: ${rebasingCreditsPerToken}`);
-  console.log(`rebasingCredits:         ${rebasingCredits}`);
+    //
+    // Vault
+    //
+    const rebasePaused = await vault.rebasePaused();
+    const capitalPaused = await vault.capitalPaused();
+    const redeemFeeBps = Number(await vault.redeemFeeBps());
+    const vaultBuffer = Number(
+      formatUnits((await vault.vaultBuffer()).toString(), 18)
+    );
+    const autoAllocateThreshold = await vault.autoAllocateThreshold();
+    const rebaseThreshold = await vault.rebaseThreshold();
+    const maxSupplyDiff = await vault.maxSupplyDiff();
+    const uniswapAddr = await vault.uniswapAddr();
+    const celoGoldAddr = await vault.celoGoldAddr();
+    const strategyCount = await vault.getStrategyCount();
+    const assetCount = await vault.getAssetCount();
+    const strategistAddress = await vault.strategistAddr();
+    const priceProvider = await vault.priceProvider();
 
-  //
-  // Oracle
-  //
-  console.log("\nOracle");
-  console.log("========");
-  const priceCUSD = await oracleRouter.price(assetAddresses.CUSD);
-  const priceCEUR = await oracleRouter.price(assetAddresses.CEUR);
-  console.log(`CUSD price :  ${formatUnits(priceCUSD, 8)} CUSD`);
-  console.log(`CEUR price:  ${formatUnits(priceCEUR, 8)} CUSD`);
+    console.log("\nVault Settings");
+    console.log("================");
+    console.log("rebasePaused:\t\t\t", rebasePaused);
+    console.log("capitalPaused:\t\t\t", capitalPaused);
+    console.log(`redeemFeeBps:\t\t\t ${redeemFeeBps} (${redeemFeeBps / 100}%)`);
+    console.log(`vaultBuffer:\t\t\t ${vaultBuffer} (${vaultBuffer * 100}%)`);
+    console.log(
+      "autoAllocateThreshold (USD):\t",
+      formatUnits(autoAllocateThreshold.toString(), 18)
+    );
+    console.log(
+      "rebaseThreshold (USD):\t\t",
+      formatUnits(rebaseThreshold.toString(), 18)
+    );
 
-  //
-  // Vault
-  //
-  const rebasePaused = await vault.rebasePaused();
-  const capitalPaused = await vault.capitalPaused();
-  const redeemFeeBps = Number(await vault.redeemFeeBps());
-  const vaultBuffer = Number(
-    formatUnits((await vault.vaultBuffer()).toString(), 18)
-  );
-  const autoAllocateThreshold = await vault.autoAllocateThreshold();
-  const rebaseThreshold = await vault.rebaseThreshold();
-  const maxSupplyDiff = await vault.maxSupplyDiff();
-  const uniswapAddr = await vault.uniswapAddr();
-  const celoGoldAddr = await vault.celoGoldAddr();
-  const strategyCount = await vault.getStrategyCount();
-  const assetCount = await vault.getAssetCount();
-  const strategistAddress = await vault.strategistAddr();
-  const priceProvider = await vault.priceProvider();
+    console.log(
+      `maxSupplyDiff:\t\t\t ${formatUnits(maxSupplyDiff.toString(), 16)}%`
+    );
 
-  console.log("\nVault Settings");
-  console.log("================");
-  console.log("rebasePaused:\t\t\t", rebasePaused);
-  console.log("capitalPaused:\t\t\t", capitalPaused);
-  console.log(`redeemFeeBps:\t\t\t ${redeemFeeBps} (${redeemFeeBps / 100}%)`);
-  console.log(`vaultBuffer:\t\t\t ${vaultBuffer} (${vaultBuffer * 100}%)`);
-  console.log(
-    "autoAllocateThreshold (USD):\t",
-    formatUnits(autoAllocateThreshold.toString(), 18)
-  );
-  console.log(
-    "rebaseThreshold (USD):\t\t",
-    formatUnits(rebaseThreshold.toString(), 18)
-  );
-
-  console.log(
-    `maxSupplyDiff:\t\t\t ${formatUnits(maxSupplyDiff.toString(), 16)}%`
-  );
-
-  console.log("Price provider address:\t\t", priceProvider);
-  console.log("Uniswap address:\t\t", uniswapAddr);
-  console.log("Celo Gold address:\t\t", celoGoldAddr);
-  console.log("Strategy count:\t\t\t", Number(strategyCount));
-  console.log("Asset count:\t\t\t", Number(assetCount));
-  console.log("Strategist address:\t\t", strategistAddress);
+    console.log("Price provider address:\t\t", priceProvider);
+    console.log("Uniswap address:\t\t", uniswapAddr);
+    console.log("Celo Gold address:\t\t", celoGoldAddr);
+    console.log("Strategy count:\t\t\t", Number(strategyCount));
+    console.log("Asset count:\t\t\t", Number(assetCount));
+    console.log("Strategist address:\t\t", strategistAddress);
+  }
 
   const assets = [
     {
@@ -231,32 +236,34 @@ async function debug(taskArguments, hre) {
   // Strategies settings
   //
 
-  console.log("\nDefault strategies");
-  console.log("============================");
-  for (const asset of assets) {
-    console.log(
-      asset.symbol,
-      `\t${await vault.assetDefaultStrategies(asset.address)}`
-    );
-  }
+  if (!less) {
+    console.log("\nDefault strategies");
+    console.log("============================");
+    for (const asset of assets) {
+      console.log(
+        asset.symbol,
+        `\t${await vault.assetDefaultStrategies(asset.address)}`
+      );
+    }
 
-  console.log("\nAave strategy settings");
-  console.log("============================");
-  console.log("vaultAddress:\t\t\t", await aaveStrategy.vaultAddress());
-  console.log("platformAddress:\t\t", await aaveStrategy.platformAddress());
-  console.log(
-    "rewardTokenAddress:\t\t",
-    await aaveStrategy.rewardTokenAddress()
-  );
-  console.log(
-    "rewardLiquidationThreshold:\t",
-    (await aaveStrategy.rewardLiquidationThreshold()).toString()
-  );
-  for (const asset of assets) {
+    console.log("\nAave strategy settings");
+    console.log("============================");
+    console.log("vaultAddress:\t\t\t", await aaveStrategy.vaultAddress());
+    console.log("platformAddress:\t\t", await aaveStrategy.platformAddress());
     console.log(
-      `supportsAsset(${asset.symbol}):\t\t`,
-      await aaveStrategy.supportsAsset(asset.address)
+      "rewardTokenAddress:\t\t",
+      await aaveStrategy.rewardTokenAddress()
     );
+    console.log(
+      "rewardLiquidationThreshold:\t",
+      (await aaveStrategy.rewardLiquidationThreshold()).toString()
+    );
+    for (const asset of assets) {
+      console.log(
+        `supportsAsset(${asset.symbol}):\t\t`,
+        await aaveStrategy.supportsAsset(asset.address)
+      );
+    }
   }
 }
 
