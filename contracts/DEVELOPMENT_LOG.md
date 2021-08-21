@@ -526,3 +526,99 @@ INFO: Deployed FlipperDev Address: 0x148eC3Eb6a51Da3914C1ABabBAD3fA1A88B73a06 Ga
 001_core deploy done.
 Done in 1016.46s.
 ```
+
+
+Contract addresses
+====================
+OUSD proxy:              0x3bC815CF8Cfd9297e7f951a25e70914217A01443
+OUSD impl:               0xCc3b09510367AB0ab1d45cd0cc19E98F03a5327D
+OUSD:                    0xCc3b09510367AB0ab1d45cd0cc19E98F03a5327D
+Vault proxy:             0xe129D52585f456c5eBc48B57aaf1a0275e3e0ad4
+Vault impl:              0x76050FAEAab488C9C59F52Cc9862ECe37ed8a2d3
+Vault:                   0xc0F260D6cb825B826d31F3Ac6cece87A927991Cf
+VaultCore:               0x76050FAEAab488C9C59F52Cc9862ECe37ed8a2d3
+VaultAdmin:              0xfe11f886608D885741fEE52aec7eAA1D1267c9D6
+OracleRouter:            0xdB8789a89dF3d4dd821bc85F3941e2269afc3afb
+AaveStrategy proxy:      0x5472b37a25860cb61C311d7E565A5ED99b29F1E6
+AaveStrategy impl:       0x8238eEeFbC804BA97610CCFCDF2e38998b9D4cB9
+AaveStrategy:            0x8238eEeFbC804BA97610CCFCDF2e38998b9D4cB9
+UbeLPStaking:            0x2dA53BBad5d6c1c3Ebe0edcCEBf2157471ebB1f7
+Governor:                0xf5EA14D40107E659623b924c23536376b8c7AB3b
+
+Governor
+====================
+Admin:            0xA202d366B5DB613255871162F3B8502B1DD95d3a
+PendingAdmin:     0x0000000000000000000000000000000000000000
+Delay (seconds):  60
+ProposalCount:    0
+
+Governor addresses
+====================
+OUSD:               0xA202d366B5DB613255871162F3B8502B1DD95d3a
+Vault:              0xA202d366B5DB613255871162F3B8502B1DD95d3a
+AaveStrategy:       0xA202d366B5DB613255871162F3B8502B1DD95d3a
+
+OUSD
+=======
+name:                    Origin Dollar
+symbol:                  OUSD
+decimals:                18
+totalSupply:             319829085.629897631567065923
+vaultAddress:            0xe129D52585f456c5eBc48B57aaf1a0275e3e0ad4
+nonRebasingSupply:       0.0
+rebasingSupply:          319829085.629897631567065923
+rebasingCreditsPerToken: 139634658516912906
+rebasingCredits:         44659225155707252435150479
+
+Oracle
+========
+CUSD price :  10000000000.0 CUSD
+CEUR price:  12001000000.0 CUSD
+
+Vault Settings
+================
+rebasePaused:                    false
+capitalPaused:                   false
+redeemFeeBps:                    50 (0.5%)
+vaultBuffer:                     0.02 (2%)
+autoAllocateThreshold (USD):     25000.0
+rebaseThreshold (USD):           1000.0
+maxSupplyDiff:                   0.0%
+Price provider address:          0xdB8789a89dF3d4dd821bc85F3941e2269afc3afb
+Uniswap address:                 0x88efe587D728853807B5afdfaf5ea8f72B6A71F9
+Celo Gold address:               0xD32831769aE4f399A8F6405755aC79173EfAEC7c
+Strategy count:                  1
+Asset count:                     2
+Strategist address:              0x3084F0b94d41111526f8d1e5fFf43e1752907d48
+
+Vault balances
+================
+totalValue (cUSD):       $323123361.62
+  cUSD:                  148882149.40
+  cEUR:                  145188911.11
+
+Vault buffer balances
+================
+cUSD:                    7088979.785757775
+cEUR:                    2168050.924689546
+
+Strategies balances
+=====================
+Aave cUSD:       balance=141793169.611208768200087314
+Aave cEUR:       balance=143020860.183393809421322721
+Aave Liquidity Token Staked:     0.0
+
+Default strategies
+============================
+cUSD    0x5472b37a25860cb61C311d7E565A5ED99b29F1E6
+cEUR    0x5472b37a25860cb61C311d7E565A5ED99b29F1E6
+
+Aave strategy settings
+============================
+vaultAddress:                    0xe129D52585f456c5eBc48B57aaf1a0275e3e0ad4
+platformAddress:                 0xc72f1d86978AC57FD9F0D771b496eFDF64F0E91b
+rewardTokenAddress:              0x4BBf3bD45128195111F6E93035e3F199Ba376f3B
+rewardLiquidationThreshold:      0
+supportsAsset(cUSD):             true
+supportsAsset(cEUR):             true
+Done in 99.22s.

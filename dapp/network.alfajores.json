@@ -3,7 +3,7 @@
   "chainId": "44787",
   "contracts": {
     "AaveStrategy": {
-      "address": "0x8238eEeFbC804BA97610CCFCDF2e38998b9D4cB9",
+      "address": "0xc103274f0771730147d143688D636DfBdDf48E35",
       "abi": [
         {
           "constant": false,
@@ -666,7 +666,7 @@
       ]
     },
     "AaveStrategyProxy": {
-      "address": "0x5472b37a25860cb61C311d7E565A5ED99b29F1E6",
+      "address": "0x5074C889a6F1a3CDC3D376E463EaeE334742438b",
       "abi": [
         {
           "constant": true,
@@ -871,7 +871,7 @@
       ]
     },
     "FlipperDev": {
-      "address": "0xa0f96B812c6a6273f2F3C8C3c81F5AcC1fd2F2B6",
+      "address": "0x15CbCAb92477be559C5dC3BCb40A6F3CA1442e8a",
       "abi": [
         {
           "constant": false,
@@ -1088,7 +1088,7 @@
       ]
     },
     "Governor": {
-      "address": "0xf5EA14D40107E659623b924c23536376b8c7AB3b",
+      "address": "0x907c7F4F7EC51EE1c14d323219A13f3087cB43F2",
       "abi": [
         {
           "constant": true,
@@ -5521,7 +5521,7 @@
       ]
     },
     "MockUbeStaking": {
-      "address": "0x2dA53BBad5d6c1c3Ebe0edcCEBf2157471ebB1f7",
+      "address": "0x6FeCA6009Be23Eb9cF0EE9520a2e911923A9d8Cd",
       "abi": [
         {
           "constant": true,
@@ -6865,7 +6865,7 @@
       ]
     },
     "OUSD": {
-      "address": "0xCc3b09510367AB0ab1d45cd0cc19E98F03a5327D",
+      "address": "0xa83cB79625aF33A7AC57137961788fB672e50dfB",
       "abi": [
         {
           "constant": true,
@@ -7520,7 +7520,7 @@
       ]
     },
     "OUSDProxy": {
-      "address": "0x3bC815CF8Cfd9297e7f951a25e70914217A01443",
+      "address": "0xc18CB6BaEC464b258E5032adC0a49243e63D6EEE",
       "abi": [
         {
           "constant": true,
@@ -7725,63 +7725,17 @@
       ]
     },
     "OracleRouter": {
-      "address": "0xdB8789a89dF3d4dd821bc85F3941e2269afc3afb",
+      "address": "0xAFAd2B6c15C946A6Cdc3FcDcf02BCf99AA32241B",
       "abi": [
         {
-          "constant": false,
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "_asset",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "_price",
-              "type": "uint256"
-            }
-          ],
-          "name": "setPrice",
-          "outputs": [],
-          "payable": false,
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "constant": false,
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "_asset",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "_feed",
-              "type": "address"
-            }
-          ],
-          "name": "setFeed",
-          "outputs": [],
-          "payable": false,
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
           "constant": true,
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "name": "assetToPrice",
+          "inputs": [],
+          "name": "registry",
           "outputs": [
             {
-              "internalType": "uint256",
+              "internalType": "contract IRegistry",
               "name": "",
-              "type": "uint256"
+              "type": "address"
             }
           ],
           "payable": false,
@@ -7808,32 +7762,11 @@
           "payable": false,
           "stateMutability": "view",
           "type": "function"
-        },
-        {
-          "constant": true,
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "name": "assetToFeed",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "payable": false,
-          "stateMutability": "view",
-          "type": "function"
         }
       ]
     },
     "Vault": {
-      "address": "0xc0F260D6cb825B826d31F3Ac6cece87A927991Cf",
+      "address": "0x92E592b3F43A913ab5dDfA6fE7E5D1B87469Cf9f",
       "abi": [
         {
           "constant": false,
@@ -8881,7 +8814,7 @@
       ]
     },
     "VaultAdmin": {
-      "address": "0xfe11f886608D885741fEE52aec7eAA1D1267c9D6",
+      "address": "0xF3801bfD9033A4148bC1C7c99DCf4f6D4CaFD43c",
       "abi": [
         {
           "constant": false,
@@ -9909,7 +9842,7 @@
       ]
     },
     "VaultCore": {
-      "address": "0x76050FAEAab488C9C59F52Cc9862ECe37ed8a2d3",
+      "address": "0xF5dB11565F2cfe725FE3339D4eD313F42a6710e6",
       "abi": [
         {
           "constant": true,
@@ -10756,7 +10689,7 @@
       ]
     },
     "VaultProxy": {
-      "address": "0xe129D52585f456c5eBc48B57aaf1a0275e3e0ad4",
+      "address": "0x40991a6c55fbfd7598da8eCAE4B65594527e1fA3",
       "abi": [
         {
           "constant": true,
