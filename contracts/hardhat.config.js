@@ -90,7 +90,11 @@ task("transfer", "Transfer OUSD")
   .setAction(transfer);
 
 // Debug tasks.
-task("debug", "Print info about contracts and their configs", debug);
+task(
+  "debug",
+  "Print info about contracts and their configs",
+  debug
+).addOptionalParam("less", "Print less info");
 
 // OUSD tasks.
 task("balance", "Get OUSD balance of an account")
