@@ -58,8 +58,8 @@ const deployAaveStrategy = async () => {
         [assetAddresses.CUSD, assetAddresses.CEUR],
         [assetAddresses.mCUSD, assetAddresses.mCEUR],
         assetAddresses.UBEStaking, // Staking contract address
-        assetAddresses.CUSD, // LP Reward Pair 1
-        assetAddresses.CEUR, // LP Reward Pair 1
+        assetAddresses.CUSD, // LP Reward Pair Token 1
+        assetAddresses.CEUR, // LP Reward Pair Token 2
         assetAddresses.UBE // Setting UBE as secondary reward
       )
   );
@@ -180,10 +180,10 @@ const configureVault = async () => {
  * Deploy the OracleRouter.
  */
 const deployOracles = async () => {
-  const oracleContract = isMainnetOrFork ? "OracleRouter" : "OracleRouterDev";
+  const oracleContract = isMainnetOrAlfajoresOrFork ? "OracleRouter" : "OracleRouterDev";
   await deployWithConfirmation("OracleRouter", [], oracleContract);
 
-  if (!isMainnetOrFork) {
+  if (!isMainnetOrAlfajoresOrFork) {
     // set the mock values for cUSD  and cEUR
     const assetAddresses = await getAssetAddresses(deployments);
     const oracleRouter = await ethers.getContract("OracleRouter");

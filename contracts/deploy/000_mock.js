@@ -1,5 +1,6 @@
 const { parseUnits } = require("ethers").utils;
-const { isMainnetOrFork } = require("../test/helpers");
+const { isMainnetOrFork, isAlfajores } = require("../test/helpers");
+const addresses = require("../utils/addresses");
 
 const deployMocks = async ({
   getNamedAccounts,
@@ -75,12 +76,14 @@ const deployMocks = async ({
     args: [mcusd.address, mceur.address, uniswapRouter.address],
   });
 
-  const mooLp = await ethers.getContract("MockMCUSDMEURLPToken");
+  const mCUSDmCEURPair_address = isAlfajores
+    ? addresses.alfajores.mCUSD_mCEUR_Pair
+    : (await ethers.getContract("MockMCUSDMEURLPToken")).address;
 
   // Deploy mock Ube Staking contract
   await deploy("MockUbeStaking", {
     from: deployerAddr,
-    args: [ube.address, moo.address, mooLp.address],
+    args: [ube.address, moo.address, mCUSDmCEURPair_address],
   });
 
   await deploy("MockNonRebasing", {
