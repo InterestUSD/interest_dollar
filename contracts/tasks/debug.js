@@ -224,11 +224,15 @@ async function debug(taskArguments, hre) {
   //
   for (asset of assets) {
     let balanceRaw = await aaveStrategy.checkBalance(asset.address);
+    let balanceLpRaw = await aaveStrategy.checkLPBalance(asset.address);
     let balance = formatUnits(balanceRaw.toString(), asset.decimals);
-    console.log(`Aave ${asset.symbol}:\t balance=${balance}`);
+    let balanceLP = formatUnits(balanceLpRaw.toString(), asset.decimals);
+    console.log(
+      `Aave ${asset.symbol}:\t balance=${balance} (staked=${balanceLP})`
+    );
   }
 
-  let lpStakedRaw = await ubeStaking.balanceOf(cAaveStrategy.address);
+  let lpStakedRaw = await ubeStaking.balanceOf(aaveProxy.address);
   let lpStaked = formatUnits(lpStakedRaw.toString(), 18);
   console.log(`Aave Liquidity Token Staked:\t ${lpStaked}`);
 
@@ -250,6 +254,18 @@ async function debug(taskArguments, hre) {
     console.log("============================");
     console.log("vaultAddress:\t\t\t", await aaveStrategy.vaultAddress());
     console.log("platformAddress:\t\t", await aaveStrategy.platformAddress());
+    console.log(
+      "ubeStakingAddress:\t\t",
+      await aaveStrategy.ubeStakingAddress()
+    );
+    console.log(
+      "rewardPoolAddress:\t\t",
+      await aaveStrategy.rewardPoolAddress()
+    );
+    console.log(
+      "secondaryRewardTokenAddress:\t",
+      await aaveStrategy.secondaryRewardTokenAddress()
+    );
     console.log(
       "rewardTokenAddress:\t\t",
       await aaveStrategy.rewardTokenAddress()
