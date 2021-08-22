@@ -25,14 +25,7 @@ const {
   assertStorageLayoutChangeSafe,
   assertStorageLayoutChangeSafeForAll,
 } = require("./tasks/storageSlots");
-const {
-  isAdjusterLocked,
-  fundCompAccountsWithEth,
-  // claimOGN,
-  claimOUSD,
-  checkOUSDBalances,
-  // supplyStakingContractWithOGN,
-} = require("./tasks/compensation");
+const { checkOUSDBalances } = require("./tasks/compensation");
 const {
   allocate,
   capital,
@@ -127,30 +120,10 @@ task("proposal", "Dumps the state of a proposal")
   .addParam("id", "Id of the proposal")
   .setAction(proposal);
 
-// Compensation tasks
-task("isAdjusterLocked", "Is adjuster on Compensation claims locked").setAction(
-  isAdjusterLocked
-);
-task(
-  "fundCompAccountsWithEth",
-  "Fund compensation accounts with minimal eth"
-).setAction(fundCompAccountsWithEth);
-task(
-  "claimOUSD",
-  "Claim the OUSD part of the compensation plan for all eligible users"
-).setAction(claimOUSD);
 task(
   "checkOUSDBalances",
   "Check ousd balances of contract and accounts"
 ).setAction(checkOUSDBalances);
-// task(
-//   "supplyStakingWithOGN",
-//   "Supplies a great amount of ogn to staking contract"
-// ).setAction(supplyStakingContractWithOGN);
-// task(
-//   "claimOGN",
-//   "Claims the OGN part of the compensation plan for all eligible users"
-// ).setAction(claimOGN);
 
 // Smoke tests
 task(
