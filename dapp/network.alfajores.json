@@ -3,7 +3,7 @@
   "chainId": "44787",
   "contracts": {
     "AaveStrategy": {
-      "address": "0xc103274f0771730147d143688D636DfBdDf48E35",
+      "address": "0xBc5458D89F2e3eB78a0706c5a7332FA4DC0800e9",
       "abi": [
         {
           "constant": false,
@@ -106,6 +106,21 @@
           "type": "function"
         },
         {
+          "constant": true,
+          "inputs": [],
+          "name": "uniswapAddr",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "constant": false,
           "inputs": [
             {
@@ -123,6 +138,21 @@
           "outputs": [],
           "payable": false,
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "ubeStakingAddress",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -286,12 +316,48 @@
           "type": "function"
         },
         {
+          "constant": true,
+          "inputs": [],
+          "name": "rewardPoolAddress",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "constant": false,
           "inputs": [],
           "name": "withdrawAll",
           "outputs": [],
           "payable": false,
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_asset",
+              "type": "address"
+            }
+          ],
+          "name": "checkLPBalance",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "balance",
+              "type": "uint256"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -455,6 +521,21 @@
           "type": "function"
         },
         {
+          "constant": true,
+          "inputs": [],
+          "name": "referralCode",
+          "outputs": [
+            {
+              "internalType": "uint16",
+              "name": "",
+              "type": "uint16"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "constant": false,
           "inputs": [
             {
@@ -516,6 +597,21 @@
           "outputs": [],
           "payable": false,
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "secondaryRewardTokenAddress",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -666,7 +762,7 @@
       ]
     },
     "AaveStrategyProxy": {
-      "address": "0x5074C889a6F1a3CDC3D376E463EaeE334742438b",
+      "address": "0x68E8227B6C8D4861b6B1e50aE2B36b5A973b3768",
       "abi": [
         {
           "constant": true,
@@ -871,7 +967,7 @@
       ]
     },
     "FlipperDev": {
-      "address": "0x15CbCAb92477be559C5dC3BCb40A6F3CA1442e8a",
+      "address": "0x38d32664791a81C1ba11B49C9117e192716976Ae",
       "abi": [
         {
           "constant": false,
@@ -1088,7 +1184,7 @@
       ]
     },
     "Governor": {
-      "address": "0x907c7F4F7EC51EE1c14d323219A13f3087cB43F2",
+      "address": "0xF51980E7a24e7f987D15fC710657CDc1Ce0F32e3",
       "abi": [
         {
           "constant": true,
@@ -6865,7 +6961,7 @@
       ]
     },
     "OUSD": {
-      "address": "0xa83cB79625aF33A7AC57137961788fB672e50dfB",
+      "address": "0x4090ABE3ad908E0e9D5204E5a9A848aea004270e",
       "abi": [
         {
           "constant": true,
@@ -7520,7 +7616,7 @@
       ]
     },
     "OUSDProxy": {
-      "address": "0xc18CB6BaEC464b258E5032adC0a49243e63D6EEE",
+      "address": "0x273a12d6061045A11084d0d60D7731101d8B62Ad",
       "abi": [
         {
           "constant": true,
@@ -7725,7 +7821,7 @@
       ]
     },
     "OracleRouter": {
-      "address": "0xAFAd2B6c15C946A6Cdc3FcDcf02BCf99AA32241B",
+      "address": "0x00e857c8FDb1e8aBA2AB7c0D8C4Fb9E9143c5a3f",
       "abi": [
         {
           "constant": true,
@@ -7766,7 +7862,7 @@
       ]
     },
     "Vault": {
-      "address": "0x92E592b3F43A913ab5dDfA6fE7E5D1B87469Cf9f",
+      "address": "0x6d4eAF2C46b075e6Ca663D640b98C947a1ABa2cE",
       "abi": [
         {
           "constant": false,
@@ -8814,7 +8910,7 @@
       ]
     },
     "VaultAdmin": {
-      "address": "0xF3801bfD9033A4148bC1C7c99DCf4f6D4CaFD43c",
+      "address": "0x9FA8741B117bF04c09b3aDE25Ba933cAfe6D01ad",
       "abi": [
         {
           "constant": false,
@@ -9842,7 +9938,7 @@
       ]
     },
     "VaultCore": {
-      "address": "0xF5dB11565F2cfe725FE3339D4eD313F42a6710e6",
+      "address": "0x3493499b19cAf1e693a24E0ee9442db5BfC551B1",
       "abi": [
         {
           "constant": true,
@@ -10689,7 +10785,7 @@
       ]
     },
     "VaultProxy": {
-      "address": "0x40991a6c55fbfd7598da8eCAE4B65594527e1fA3",
+      "address": "0x753Bd82ec40cB042cbAB3443C5E57a46bAE31e72",
       "abi": [
         {
           "constant": true,
