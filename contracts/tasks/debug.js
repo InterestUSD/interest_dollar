@@ -255,6 +255,10 @@ async function debug(taskArguments, hre) {
     console.log("vaultAddress:\t\t\t", await aaveStrategy.vaultAddress());
     console.log("platformAddress:\t\t", await aaveStrategy.platformAddress());
     console.log(
+      "uniswapAddr:\t\t\t",
+      await aaveStrategy.uniswapAddr()
+    );
+    console.log(
       "ubeStakingAddress:\t\t",
       await aaveStrategy.ubeStakingAddress()
     );
