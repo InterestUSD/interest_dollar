@@ -6,6 +6,7 @@ const {
   isMainnetOrAlfajoresOrFork,
   isMainnetOrFork,
   isAlfajores,
+  cusdUnits,
 } = require("../test/helpers.js");
 const {
   log,
