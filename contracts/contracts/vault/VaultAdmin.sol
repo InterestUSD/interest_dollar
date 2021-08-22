@@ -364,7 +364,7 @@ contract VaultAdmin is VaultStorage {
             strategy.collectRewardToken();
 
             if (uniswapAddr != address(0)) {
-                IERC20 rewardToken = IERC20(strategy.rewardTokenAddress());
+                IERC20 rewardToken = IERC20(rewardTokenAddress);
                 uint256 rewardTokenAmount = rewardToken.balanceOf(
                     address(this)
                 );
@@ -375,7 +375,7 @@ contract VaultAdmin is VaultStorage {
 
                     // Uniswap redemption path
                     address[] memory path = new address[](3);
-                    path[0] = strategy.rewardTokenAddress();
+                    path[0] = rewardTokenAddress;
                     // path[1] = IUniswapV2Router(uniswapAddr).WETH();
                     path[1] = celoGoldAddr; // CELO
                     path[2] = allAssets[0]; // cUSD
