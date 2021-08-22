@@ -5,6 +5,7 @@ const {
   getAssetAddresses,
   isMainnetOrAlfajoresOrFork,
   isMainnetOrFork,
+  isAlfajores,
 } = require("../test/helpers.js");
 const {
   log,
@@ -174,13 +175,27 @@ const configureVault = async () => {
   await withConfirmation(
     cVault.connect(sGovernor).setTrusteeFeeBps(1000) // 10%
   );
+
+  // reduce thresholds for alfajores
+  if (isAlfajores) {
+    console.log(` -  Set setAutoAllocateThreshold("25")`);
+    await withConfirmation(
+      cVault.connect(sGovernor).setAutoAllocateThreshold(cusdUnits("25"))
+    );
+    console.log(` - Set setRebaseThreshold("1")`);
+    await withConfirmation(
+      cVault.connect(sGovernor).setRebaseThreshold(cusdUnits("1"))
+    );
+  }
 };
 
 /**
  * Deploy the OracleRouter.
  */
 const deployOracles = async () => {
-  const oracleContract = isMainnetOrAlfajoresOrFork ? "OracleRouter" : "OracleRouterDev";
+  const oracleContract = isMainnetOrAlfajoresOrFork
+    ? "OracleRouter"
+    : "OracleRouterDev";
   await deployWithConfirmation("OracleRouter", [], oracleContract);
 
   if (!isMainnetOrAlfajoresOrFork) {
