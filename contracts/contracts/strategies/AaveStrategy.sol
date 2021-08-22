@@ -15,11 +15,11 @@ import { IVault } from "../interfaces/IVault.sol";
 import { UsingRegistry } from "../utils/UsingRegistry.sol";
 
 contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
-    uint16 private referralCode;
-    address private uniswapAddr;
-    address private ubeStakingAddress;
-    address private rewardPoolAddress;
-    address private secondaryRewardTokenAddress;
+    uint16 public referralCode;
+    address public uniswapAddr;
+    address public ubeStakingAddress;
+    address public rewardPoolAddress;
+    address public secondaryRewardTokenAddress;
     // Note: this is a mapping of native asset to native asset (like cUSD-cEUR), not ATokens
     mapping(address => address) private rewardLiquidityPair;
 
