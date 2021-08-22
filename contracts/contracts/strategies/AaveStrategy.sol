@@ -239,6 +239,31 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         }
     }
 
+    /**
+     * @dev Check total amount in reward Liquidity Pool
+     * @param _asset Address of asset
+     * @return amountLP Amount of asset in Ube Pool
+     */
+    function checkLPBalance(address _asset)
+        external
+        view
+        returns (uint256 balance)
+    {
+        // If some LP Tokens are left, not staked
+        uint256 lpBalance = IStakingRewards(ubeStakingAddress).balanceOf(
+            address(this)
+        );
+        // LP Tokens staked in staking contract
+        lpBalance.add(
+            IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
+        );
+
+        if (lpBalance != uint256(0)) {
+            uint256 amountLP = _checkLPBalance(_asset, lpBalance);
+            balance = balance.add(amountLP);
+        }
+    }
+
     function _stakeLPTokens() internal {
         uint256 lpAmount = IUniswapV2ERC20(rewardPoolAddress).balanceOf(
             address(this)
