@@ -56,6 +56,10 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         external
         onlyGovernor
     {
+        require(
+            uniswapAddr != address(0),
+            "AaveStrategy::_provideLiquidity: uniswapAddr is zero"
+        );
         // Get the Pool address for pair
         address lpPair = IUniswapV2Router(uniswapAddr).pairFor(
             address(_getATokenFor(_token1)),
@@ -107,11 +111,15 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             _pTokens
         );
 
-        // set uniswap addr
-        uniswapAddr = IVault(vaultAddress).uniswapAddr();
-
         // set referal code
         referralCode = 0;
+
+        // set uniswap addr
+        uniswapAddr = IVault(vaultAddress).uniswapAddr();
+        require(
+            uniswapAddr != address(0),
+            "AaveStrategy::initialize: uniswapAddr is zero"
+        );
 
         ubeStakingAddress = _ubeStakingAddress;
         secondaryRewardTokenAddress = _secondaryRewardTokenAddress;
@@ -143,6 +151,10 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     }
 
     function _provideLiquidity(address _asset) internal {
+        require(
+            uniswapAddr != address(0),
+            "AaveStrategy::_provideLiquidity: uniswapAddr is zero"
+        );
         address _assetPair = rewardLiquidityPair[_asset];
         IVault vault = IVault(vaultAddress);
         IOracle oracle = IOracle(vault.priceProvider());
@@ -188,6 +200,10 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
     }
 
     function _removeLiquidity(address _asset) internal {
+        require(
+            uniswapAddr != address(0),
+            "AaveStrategy::_removeLiquidity: uniswapAddr is zero"
+        );
         address _assetPair = rewardLiquidityPair[_asset];
         IUniswapV2ERC20 lpToken = IUniswapV2ERC20(rewardPoolAddress);
         IAaveAToken aToken1 = _getATokenFor(_asset);
@@ -254,7 +270,7 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
             address(this)
         );
         // LP Tokens staked in staking contract
-        lpBalance.add(
+        lpBalance = lpBalance.add(
             IUniswapV2ERC20(rewardPoolAddress).balanceOf(address(this))
         );
 
