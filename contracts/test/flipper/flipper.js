@@ -1,15 +1,6 @@
 const { defaultFixture } = require("../_fixture");
 const { expect } = require("chai");
-const { utils } = require("ethers");
-const {
-  daiUnits,
-  ousdUnits,
-  usdcUnits,
-  usdtUnits,
-  loadFixture,
-  isFork,
-  isTest,
-} = require("../helpers");
+const { cusdUnits, ousdUnits, loadFixture, isFork } = require("../helpers");
 const { parseUnits } = require("ethers/lib/utils");
 
 describe("Flipper", async function () {
@@ -144,32 +135,26 @@ describe("Flipper", async function () {
 
       it("Supports withdraw all", async () => {
         const fixture = await loadFixture(loadedFlipper);
-        const { governor, dai, ousd, usdt, usdc, flipper } = fixture;
+        const { governor, cusd, ousd, flipper } = fixture;
 
         // Make each token have a different , ousdUnits("13") to be able to catch
         // if the contract uses the balance of the wrong contract.
-        await flipper.connect(governor).withdraw(dai.address, daiUnits("11"));
+        await flipper.connect(governor).withdraw(cusd.address, cusdUnits("11"));
         await flipper.connect(governor).withdraw(ousd.address, ousdUnits("12"));
-        await flipper.connect(governor).withdraw(usdc.address, usdcUnits("13"));
-        await flipper.connect(governor).withdraw(usdt.address, usdtUnits("14"));
 
         await flipper.connect(governor).withdrawAll();
-        await expect(flipper).balanceOf("0", dai);
+        await expect(flipper).balanceOf("0", cusd);
         await expect(flipper).balanceOf("0", ousd);
-        await expect(flipper).balanceOf("0", usdc);
-        await expect(flipper).balanceOf("0", usdt);
 
-        await expect(governor).balanceOf("51000", dai);
+        await expect(governor).balanceOf("51000", cusd);
         await expect(governor).balanceOf("50000", ousd);
-        await expect(governor).balanceOf("51000", usdc);
-        await expect(governor).balanceOf("51000", usdt);
       });
     });
 
     describe("Failure cases", async () => {
       it("Only governer can withdraw", async () => {
-        const { matt, usdc, flipper } = await loadFixture(loadedFlipper);
-        const call = flipper.connect(matt).withdraw(usdc.address, 1);
+        const { matt, cusd, flipper } = await loadFixture(loadedFlipper);
+        const call = flipper.connect(matt).withdraw(cusd.address, 1);
         expect(call).to.be.revertedWith("Caller is not the Governor");
       });
       it("Only governer can withdrawAll", async () => {
@@ -190,29 +175,23 @@ describe("Flipper", async function () {
 
 async function loadedFlipper() {
   const fixture = await loadFixture(defaultFixture);
-  const { ousd, dai, usdc, usdt, flipper, vault, matt } = fixture;
+  const { ousd, cusd, flipper, vault, matt } = fixture;
 
-  await dai.connect(matt).mint(daiUnits("50100"));
-  await usdc.connect(matt).mint(usdcUnits("100000"));
-  await usdt.connect(matt).mint(usdtUnits("50000"));
-  await usdc.connect(matt).approve(vault.address, usdcUnits("990000"));
-  await vault.connect(matt).mint(usdc.address, usdcUnits("50000"), 0);
+  await cusd.connect(matt).mint(cusdUnits("100100"));
+  await cusd.connect(matt).approve(vault.address, cusdUnits("990000"));
+  await vault.connect(matt).mint(cusd.address, cusdUnits("50000"), 0);
 
-  await dai.connect(matt).transfer(flipper.address, daiUnits("50000"));
+  await cusd.connect(matt).transfer(flipper.address, cusdUnits("50000"));
   await ousd.connect(matt).transfer(flipper.address, ousdUnits("50000"));
-  await usdc.connect(matt).transfer(flipper.address, usdcUnits("50000"));
-  await usdt.connect(matt).transfer(flipper.address, usdtUnits("50000"));
 
-  await dai.connect(matt).approve(flipper.address, daiUnits("990000"));
+  await cusd.connect(matt).approve(flipper.address, cusdUnits("990000"));
   await ousd.connect(matt).approve(flipper.address, ousdUnits("990000"));
-  await usdc.connect(matt).approve(flipper.address, usdcUnits("990000"));
-  await usdt.connect(matt).approve(flipper.address, usdtUnits("990000"));
 
   return fixture;
 }
 
 function withEachCoinIt(title, fn) {
-  const stablecoins = ["DAI", "USDC", "USDT"];
+  const stablecoins = ["CUSD"];
   for (const name of stablecoins) {
     it(`${name} ${title}`, async () => {
       const fixture = await loadFixture(loadedFlipper);
