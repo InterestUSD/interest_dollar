@@ -150,25 +150,21 @@ const getOracleAddress = async (deployments) => {
 };
 
 /**
- * Sets the price in USD the mix oracle will return for a specific token.
- * This first sets the ETH price in USD, then token price in ETH
+ * Sets the price in USD the oracle will return for a specific token.
  *
- * @param {string} tokenSymbol: "DAI", USDC", etc...
- * @param {number} usdPrice: price of the token in USD.
+ * @param {string} token: token address
+ * @param {number} cusdPrice: price of the token in cUSD.
  * @returns {Promise<void>}
  */
-const setOracleTokenPriceUsd = async (tokenSymbol, usdPrice) => {
+const setOracleTokenPriceCusd = async (tokenAddr, cusdPrice) => {
   if (isMainnetOrFork) {
     throw new Error(
-      `setOracleTokenPriceUsd not supported on network ${hre.network.name}`
+      `setOracleTokenPriceCusd not supported on network ${hre.network.name}`
     );
   }
-  // Set the chainlink token price in USD, with 8 decimals.
-  const tokenFeed = await ethers.getContract(
-    "MockChainlinkOracleFeed" + tokenSymbol
-  );
-  await tokenFeed.setDecimals(8);
-  await tokenFeed.setPrice(parseUnits(usdPrice, 8));
+  // Set the oracle token price in cUSD, with 18 decimals.
+  const oracle = await ethers.getContract("OracleRouter");
+  await oracle.setPrice(tokenAddr, cusdUnits(cusdPrice));
 };
 
 const getOracleAddresses = async (deployments) => {
@@ -288,7 +284,7 @@ module.exports = {
   isMainnetOrAlfajoresOrFork,
   loadFixture,
   getOracleAddress,
-  setOracleTokenPriceUsd,
+  setOracleTokenPriceCusd,
   getOracleAddresses,
   getAssetAddresses,
   governorArgs,

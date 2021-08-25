@@ -8,29 +8,16 @@ const tusdAbi = require("../test/abi/erc20.json");
 const usdcAbi = require("../test/abi/erc20.json");
 const ognAbi = require("../test/abi/erc20.json");
 
-const {
-  usdtUnits,
-  daiUnits,
-  usdcUnits,
-  tusdUnits,
-  ognUnits,
-  isFork,
-} = require("../test/helpers");
+const { cusdUnits, isFork } = require("../test/helpers");
 
 const fundAccounts = async () => {
-  let usdt, dai, tusd, usdc, nonStandardToken;
+  let cusd, ceur, nonStandardToken;
   if (isFork) {
-    usdt = await ethers.getContractAt(usdtAbi, addresses.mainnet.USDT);
-    dai = await ethers.getContractAt(daiAbi, addresses.mainnet.DAI);
-    tusd = await ethers.getContractAt(tusdAbi, addresses.mainnet.TUSD);
-    usdc = await ethers.getContractAt(usdcAbi, addresses.mainnet.USDC);
-    ogn = await ethers.getContractAt(ognAbi, addresses.mainnet.OGN);
+    cusd = await ethers.getContractAt(usdtAbi, addresses.mainnet.CUSD);
+    ceur = await ethers.getContractAt(daiAbi, addresses.mainnet.CEUR);
   } else {
-    usdt = await ethers.getContract("MockUSDT");
-    dai = await ethers.getContract("MockDAI");
-    tusd = await ethers.getContract("MockTUSD");
-    usdc = await ethers.getContract("MockUSDC");
-    ogn = await ethers.getContract("MockOGN");
+    cusd = await ethers.getContract("MockCUSD");
+    ceur = await ethers.getContract("MockCEUR");
     nonStandardToken = await ethers.getContract("MockNonStandardToken");
   }
 
@@ -53,28 +40,16 @@ const fundAccounts = async () => {
 
   for (let i = 0; i < 10; i++) {
     if (isFork) {
-      await dai
+      await cusd
         .connect(binanceSigner)
-        .transfer(await signers[i].getAddress(), daiUnits("1000"));
-      await usdc
+        .transfer(await signers[i].getAddress(), cusdUnits("1000"));
+      await ceur
         .connect(binanceSigner)
-        .transfer(await signers[i].getAddress(), usdcUnits("1000"));
-      await usdt
-        .connect(binanceSigner)
-        .transfer(await signers[i].getAddress(), usdtUnits("1000"));
-      await tusd
-        .connect(binanceSigner)
-        .transfer(await signers[i].getAddress(), tusdUnits("1000"));
-      await ogn
-        .connect(binanceSigner)
-        .transfer(await signers[i].getAddress(), ognUnits("1000"));
+        .transfer(await signers[i].getAddress(), cusdUnits("1000"));
     } else {
-      await dai.connect(signers[i]).mint(daiUnits("1000"));
-      await usdc.connect(signers[i]).mint(usdcUnits("1000"));
-      await usdt.connect(signers[i]).mint(usdtUnits("1000"));
-      await tusd.connect(signers[i]).mint(tusdUnits("1000"));
-      await ogn.connect(signers[i]).mint(ognUnits("1000"));
-      await nonStandardToken.connect(signers[i]).mint(usdtUnits("1000"));
+      await cusd.connect(signers[i]).mint(cusdUnits("1000"));
+      await ceur.connect(signers[i]).mint(cusdUnits("1000"));
+      await nonStandardToken.connect(signers[i]).mint(cusdUnits("1000"));
     }
   }
 

@@ -6,8 +6,6 @@ import { ISortedOracles } from "../interfaces/ISortedOracles.sol";
 
 contract OracleRouterBase is UsingRegistry {
     using SafeMath for uint256;
-    uint256 constant MIN_DRIFT = uint256(70000000);
-    uint256 constant MAX_DRIFT = uint256(130000000);
 
     /**
      * @dev The price feed contract to use for a particular asset.

@@ -29,7 +29,7 @@ addresses.mainnet.mCUSD = "0x64dEFa3544c695db8c535D289d843a189aa26b98";
 addresses.mainnet.mCEUR = "0xa8d0E6799FF3Fd19c6459bf02689aE09c4d78Ba7";
 addresses.mainnet.mCUSD_mCEUR_Pair =
   "0x27616d3dba43f55279726c422daf644bc60128a8";
-// Currently don't have dual staking address 
+// Currently don't have dual staking address
 addresses.mainnet.UBE_DualStaking =
   "abcdabcdabcdabcdabcdabcbdabcadaldkqlkafllf";
 
