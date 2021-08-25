@@ -418,9 +418,9 @@ contract VaultAdmin is VaultStorage {
      */
     function priceUSDRedeem(address asset) external view returns (uint256) {
         uint256 price = IOracle(priceProvider).price(asset);
-        // if (price < 1e8) {
-        //     price = 1e8;
-        // }
+        if (price < 1e18) {
+            price = 1e18;
+        }
         // return price.scaleBy(10);
         return price;
     }
