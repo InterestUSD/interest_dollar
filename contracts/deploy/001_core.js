@@ -285,9 +285,9 @@ const deployCore = async () => {
   await withConfirmation(
     cOUSD
       .connect(sGovernor)
-      .initialize("Origin Dollar", "OUSD", cVaultProxy.address)
+      .initialize("Interest Dollar", "iUSD", cVaultProxy.address)
   );
-  log("Initialized OUSD");
+  log("Initialized iUSD");
 };
 
 // Deploy the Flipper trading contract
@@ -299,7 +299,6 @@ const deployFlipper = async () => {
 
   await deployWithConfirmation("FlipperDev", [
     assetAddresses.CUSD,
-    assetAddresses.CEUR,
     ousd.address,
   ]);
   const flipper = await ethers.getContract("FlipperDev");
