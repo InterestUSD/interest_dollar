@@ -6,7 +6,7 @@ import "../interfaces/Tether.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-// Contract to exchange ceur, cusd from and to ousd.
+// Contract to exchange cusd from and to ousd.
 //   - 1 to 1. No slippage
 //   - Optimized for low gas usage
 //   - No guarantee of availability
@@ -18,7 +18,6 @@ contract Flipper is Governable {
 
     // Saves approx 4K gas per swap by using hardcoded addresses.
     IERC20 cusd = IERC20(0x765DE816845861e75A25fCA122bb6898B8B1282a);
-    IERC20 ceur = IERC20(0xD8763CBa276a3738E6DE85b4b3bF5FDed6D6cA73);
     OUSD constant ousd = OUSD(0x2A8e1E676Ec238d8A992307B495b45B3fEAa5e86);
 
     // -----------
@@ -46,23 +45,6 @@ contract Flipper is Governable {
         require(ousd.transferFrom(msg.sender, address(this), amount));
     }
 
-    /// @notice Purchase OUSD with cEUR
-    /// @param amount Amount of OUSD to purchase, in 18 fixed decimals.
-    function buyOusdWithCeur(uint256 amount) external {
-        require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        // Potential rounding error is an intentional tradeoff
-        require(ceur.transferFrom(msg.sender, address(this), amount / 1e12));
-        require(ousd.transfer(msg.sender, amount));
-    }
-
-    /// @notice Sell OUSD for cEUR
-    /// @param amount Amount of OUSD to sell, in 18 fixed decimals.
-    function sellOusdForCeur(uint256 amount) external {
-        require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        require(ceur.transfer(msg.sender, amount / 1e12));
-        require(ousd.transferFrom(msg.sender, address(this), amount));
-    }
-
     // --------------------
     // Governance functions
     // --------------------
@@ -87,6 +69,5 @@ contract Flipper is Governable {
     function withdrawAll() external onlyGovernor nonReentrant {
         IERC20(cusd).safeTransfer(_governor(), cusd.balanceOf(address(this)));
         IERC20(ousd).safeTransfer(_governor(), ousd.balanceOf(address(this)));
-        IERC20(ceur).safeTransfer(_governor(), ceur.balanceOf(address(this)));
     }
 }

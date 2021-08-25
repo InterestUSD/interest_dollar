@@ -6,7 +6,7 @@ import "../interfaces/Tether.sol";
 import { IERC20 } from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import { SafeERC20 } from "@openzeppelin/contracts/token/ERC20/SafeERC20.sol";
 
-// Contract to exchange ceur, cusd from and to ousd.
+// Contract to exchange cusd from and to ousd.
 //   - 1 to 1. No slippage
 //   - Optimized for low gas usage
 //   - No guarantee of availability
@@ -18,7 +18,6 @@ contract FlipperDev is Governable {
 
     // Settable coin addresses allow easy testing and use of mock currencies.
     IERC20 cusd = IERC20(0);
-    IERC20 ceur = IERC20(0);
     OUSD ousd = OUSD(0);
 
     // ---------------------
@@ -26,14 +25,11 @@ contract FlipperDev is Governable {
     // ---------------------
     constructor(
         address cusd_,
-        address ceur_,
         address ousd_
     ) public {
         cusd = IERC20(cusd_);
-        ceur = IERC20(ceur_);
         ousd = OUSD(ousd_);
         require(address(ousd) != address(0));
-        require(address(ceur) != address(0));
         require(address(cusd) != address(0));
     }
 
@@ -54,23 +50,6 @@ contract FlipperDev is Governable {
     function sellOusdForCusd(uint256 amount) external {
         require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
         require(cusd.transfer(msg.sender, amount));
-        require(ousd.transferFrom(msg.sender, address(this), amount));
-    }
-
-    /// @notice Purchase OUSD with cEUR
-    /// @param amount Amount of OUSD to purchase, in 18 fixed decimals.
-    function buyOusdWithCeur(uint256 amount) external {
-        require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        // Potential rounding error is an intentional tradeoff
-        require(ceur.transferFrom(msg.sender, address(this), amount / 1e12));
-        require(ousd.transfer(msg.sender, amount));
-    }
-
-    /// @notice Sell OUSD for cEUR
-    /// @param amount Amount of OUSD to sell, in 18 fixed decimals.
-    function sellOusdForCeur(uint256 amount) external {
-        require(amount <= MAXIMUM_PER_TRADE, "Amount too large");
-        require(ceur.transfer(msg.sender, amount / 1e12));
         require(ousd.transferFrom(msg.sender, address(this), amount));
     }
 
@@ -98,6 +77,5 @@ contract FlipperDev is Governable {
     function withdrawAll() external onlyGovernor nonReentrant {
         IERC20(cusd).safeTransfer(_governor(), cusd.balanceOf(address(this)));
         IERC20(ousd).safeTransfer(_governor(), ousd.balanceOf(address(this)));
-        IERC20(ceur).safeTransfer(_governor(), ceur.balanceOf(address(this)));
     }
 }
