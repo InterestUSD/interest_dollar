@@ -121,16 +121,6 @@ const configureVault = async () => {
   );
   log(` - Set Strategist address: ${strategistAddr}`);
 
-  // Set Vault buffer
-  await withConfirmation(
-    cVault.connect(sGovernor).setVaultBuffer(utils.parseUnits("2", 16))
-  );
-  log(" - Set Vault buffer: 0.02%");
-
-  // Set Redeem fee BPS
-  await withConfirmation(cVault.connect(sGovernor).setRedeemFeeBps(50));
-  log(" - Set Redeem free bps: 50");
-
   await withConfirmation(
     cVault.connect(sGovernor).supportAsset(assetAddresses.CUSD)
   );
@@ -141,52 +131,68 @@ const configureVault = async () => {
   );
   log(" - Added cEUR asset to Vault");
 
-  // approve aave strategy
-  await withConfirmation(
-    cVault.connect(sGovernor).approveStrategy(aaveStrategyAddr)
-  );
-  log(` - Approve AaveStrategy(${aaveStrategyAddr})`);
-
-  // set default strategy for cUSD
-  await withConfirmation(
-    cVault
-      .connect(sGovernor)
-      .setAssetDefaultStrategy(assetAddresses.CUSD, aaveStrategyAddr)
-  );
-  log(` - Set AaveStrategy(${aaveStrategyAddr}) as default for cUSD deposits`);
-
-  // set default strategy for cEUR
-  await withConfirmation(
-    cVault
-      .connect(sGovernor)
-      .setAssetDefaultStrategy(assetAddresses.CEUR, aaveStrategyAddr)
-  );
-  log(` - Set AaveStrategy(${aaveStrategyAddr}) as default for cEUR deposits`);
-
-  // Unpause deposits
-  await withConfirmation(cVault.connect(sGovernor).unpauseCapital());
-  log(" - Unpaused deposits on Vault");
-
-  // set trustee
-  await withConfirmation(
-    cVault
-      .connect(sGovernor)
-      .setTrusteeAddress("0x1F692dB804328376104bCc666c7d7C0bEE4869F9")
-  );
-  await withConfirmation(
-    cVault.connect(sGovernor).setTrusteeFeeBps(1000) // 10%
-  );
-
-  // reduce thresholds for alfajores
-  if (isAlfajores) {
-    console.log(` -  Set setAutoAllocateThreshold("25")`);
+  if (isMainnetOrAlfajoresOrFork) {
+    // Set Vault buffer
     await withConfirmation(
-      cVault.connect(sGovernor).setAutoAllocateThreshold(cusdUnits("25"))
+      cVault.connect(sGovernor).setVaultBuffer(utils.parseUnits("2", 16))
     );
-    console.log(` - Set setRebaseThreshold("1")`);
+    log(" - Set Vault buffer: 0.02%");
+
+    // Set Redeem fee BPS
+    await withConfirmation(cVault.connect(sGovernor).setRedeemFeeBps(50));
+    log(" - Set Redeem free bps: 50");
+
+    // approve aave strategy
     await withConfirmation(
-      cVault.connect(sGovernor).setRebaseThreshold(cusdUnits("1"))
+      cVault.connect(sGovernor).approveStrategy(aaveStrategyAddr)
     );
+    log(` - Approve AaveStrategy(${aaveStrategyAddr})`);
+
+    // set default strategy for cUSD
+    await withConfirmation(
+      cVault
+        .connect(sGovernor)
+        .setAssetDefaultStrategy(assetAddresses.CUSD, aaveStrategyAddr)
+    );
+    log(
+      ` - Set AaveStrategy(${aaveStrategyAddr}) as default for cUSD deposits`
+    );
+
+    // set default strategy for cEUR
+    await withConfirmation(
+      cVault
+        .connect(sGovernor)
+        .setAssetDefaultStrategy(assetAddresses.CEUR, aaveStrategyAddr)
+    );
+    log(
+      ` - Set AaveStrategy(${aaveStrategyAddr}) as default for cEUR deposits`
+    );
+
+    // Unpause deposits
+    await withConfirmation(cVault.connect(sGovernor).unpauseCapital());
+    log(" - Unpaused deposits on Vault");
+
+    // set trustee
+    await withConfirmation(
+      cVault
+        .connect(sGovernor)
+        .setTrusteeAddress("0x1F692dB804328376104bCc666c7d7C0bEE4869F9")
+    );
+    await withConfirmation(
+      cVault.connect(sGovernor).setTrusteeFeeBps(1000) // 10%
+    );
+
+    // reduce thresholds for alfajores
+    if (isAlfajores) {
+      console.log(` -  Set setAutoAllocateThreshold("25")`);
+      await withConfirmation(
+        cVault.connect(sGovernor).setAutoAllocateThreshold(cusdUnits("25"))
+      );
+      console.log(` - Set setRebaseThreshold("1")`);
+      await withConfirmation(
+        cVault.connect(sGovernor).setRebaseThreshold(cusdUnits("1"))
+      );
+    }
   }
 };
 
@@ -207,7 +213,7 @@ const deployOracles = async () => {
       oracleRouter.setPrice(assetAddresses.CUSD, "1000000000000000000") // 1.0000
     );
     await withConfirmation(
-      oracleRouter.setPrice(assetAddresses.CEUR, "1200100000000000000") // 1.2001
+      oracleRouter.setPrice(assetAddresses.CEUR, "1250000000000000000") // 1.2500
     );
   }
 };
