@@ -7,7 +7,7 @@ import "./MintableERC20.sol";
  * throw/revert when a transfer/transferFrom call fails
  */
 contract MockNonStandardToken is MintableERC20 {
-    uint256 public constant decimals = 6;
+    uint256 public constant decimals = 18;
     string public constant symbol = "NonStandardToken";
     string public constant name = "NonStandardToken";
 
