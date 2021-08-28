@@ -124,30 +124,39 @@ contract AaveStrategy is InitializableAbstractStrategy, UsingRegistry {
         ubeStakingAddress = _ubeStakingAddress;
         secondaryRewardTokenAddress = _secondaryRewardTokenAddress;
 
-        // Set the Pool address for AToken pair
-        rewardPoolAddress = IUniswapV2Router(uniswapAddr).pairFor(
-            address(_getATokenFor(_liquidityToken1Address)),
-            address(_getATokenFor(_liquidityToken2Address))
-        );
+        if (ubeStakingAddress != address(0)) {
+            // Set the Pool address for AToken pair
+            rewardPoolAddress = IUniswapV2Router(uniswapAddr).pairFor(
+                address(_getATokenFor(_liquidityToken1Address)),
+                address(_getATokenFor(_liquidityToken2Address))
+            );
 
-        // safe approve LP Tokens for staking contract
-        IUniswapV2ERC20(rewardPoolAddress).approve(ubeStakingAddress, 0);
-        IUniswapV2ERC20(rewardPoolAddress).approve(
-            ubeStakingAddress,
-            uint256(-1)
-        );
+            // safe approve LP Tokens for staking contract
+            IUniswapV2ERC20(rewardPoolAddress).approve(ubeStakingAddress, 0);
+            IUniswapV2ERC20(rewardPoolAddress).approve(
+                ubeStakingAddress,
+                uint256(-1)
+            );
 
-        // safe approve LP Tokens for ubeswap router
-        IUniswapV2ERC20(rewardPoolAddress).approve(uniswapAddr, 0);
-        IUniswapV2ERC20(rewardPoolAddress).approve(uniswapAddr, uint256(-1));
+            // safe approve LP Tokens for ubeswap router
+            IUniswapV2ERC20(rewardPoolAddress).approve(uniswapAddr, 0);
+            IUniswapV2ERC20(rewardPoolAddress).approve(
+                uniswapAddr,
+                uint256(-1)
+            );
 
-        // safe approve ATokens for providing uniswap liquidity
-        for (uint256 i = 0; i < _pTokens.length; i++) {
-            IERC20(_pTokens[i]).approve(uniswapAddr, uint256(-1));
+            // safe approve ATokens for providing uniswap liquidity
+            for (uint256 i = 0; i < _pTokens.length; i++) {
+                IERC20(_pTokens[i]).approve(uniswapAddr, uint256(-1));
+            }
+
+            rewardLiquidityPair[
+                _liquidityToken1Address
+            ] = _liquidityToken2Address;
+            rewardLiquidityPair[
+                _liquidityToken2Address
+            ] = _liquidityToken1Address;
         }
-
-        rewardLiquidityPair[_liquidityToken1Address] = _liquidityToken2Address;
-        rewardLiquidityPair[_liquidityToken2Address] = _liquidityToken1Address;
     }
 
     function _provideLiquidity(address _asset) internal {
