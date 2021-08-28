@@ -9,7 +9,6 @@ pragma solidity 0.5.11;
            of OUSD.
  * @author Origin Protocol Inc
  */
-// import "hardhat/console.sol";
 import "./VaultStorage.sol";
 import { IOracle } from "../interfaces/IOracle.sol";
 import { IVault } from "../interfaces/IVault.sol";
@@ -217,10 +216,9 @@ contract VaultCore is VaultStorage {
                 unitTotal = unitTotal.add(
                     outputs[i].scaleBy(int8(18 - assetDecimals)).mul(
                         assetPrices[i]
-                    )
+                    ).div(1 ether)
                 );
             }
-            // console.log("VaultCore::_redeem: unitTotal=%s", unitTotal);
             require(
                 unitTotal >= _minimumUnitAmount,
                 "Redeem amount lower than minimum"
