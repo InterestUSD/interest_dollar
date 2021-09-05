@@ -6,7 +6,7 @@ const {
   loadFixture,
   units,
   isFork,
-  daiUnits,
+  cusdUnits,
   ousdUnits,
 } = require("../helpers");
 
@@ -18,8 +18,8 @@ describe("Reborn Attack Protection", function () {
   describe("Vault", function () {
     it("Should correctly do accounting when reborn calls mint as different types of addresses", async function () {
       const fixture = await loadFixture(rebornFixture);
-      const { dai, ousd, matt, reborner, rebornAttack } = fixture;
-      await dai.connect(matt).transfer(reborner.address, daiUnits("4"));
+      const { cusd, ousd, matt, reborner, rebornAttack } = fixture;
+      await cusd.connect(matt).transfer(reborner.address, cusdUnits("4"));
       await reborner.mint();
       await reborner.bye();
       await rebornAttack(true);
@@ -29,8 +29,8 @@ describe("Reborn Attack Protection", function () {
 
     it("Should correctly do accounting when reborn calls burn as different types of addresses", async function () {
       const fixture = await loadFixture(rebornFixture);
-      const { dai, ousd, matt, reborner, rebornAttack } = fixture;
-      await dai.connect(matt).transfer(reborner.address, daiUnits("4"));
+      const { cusd, ousd, matt, reborner, rebornAttack } = fixture;
+      await cusd.connect(matt).transfer(reborner.address, cusdUnits("4"));
       await reborner.mint();
       await reborner.bye();
       await rebornAttack(true, 1);
@@ -40,8 +40,8 @@ describe("Reborn Attack Protection", function () {
 
     it("Should correctly do accounting when reborn calls transfer as different types of addresses", async function () {
       const fixture = await loadFixture(rebornFixture);
-      const { dai, ousd, matt, reborner, rebornAttack } = fixture;
-      await dai.connect(matt).transfer(reborner.address, daiUnits("4"));
+      const { cusd, ousd, matt, reborner, rebornAttack } = fixture;
+      await cusd.connect(matt).transfer(reborner.address, cusdUnits("4"));
       await reborner.mint();
       await reborner.bye();
       expect(await ousd.nonRebasingSupply()).to.equal(ousdUnits("1"));
@@ -51,12 +51,12 @@ describe("Reborn Attack Protection", function () {
     });
 
     it("Should have correct balance even after recreating", async function () {
-      const { dai, matt, reborner, rebornAttack, ousd } = await loadFixture(
+      const { cusd, matt, reborner, rebornAttack, ousd } = await loadFixture(
         rebornFixture
       );
 
       // Mint one OUSD and self-destruct
-      await dai.connect(matt).transfer(reborner.address, daiUnits("4"));
+      await cusd.connect(matt).transfer(reborner.address, cusdUnits("4"));
       await reborner.mint();
       await expect(reborner).to.have.a.balanceOf("1", ousd);
       await reborner.bye();

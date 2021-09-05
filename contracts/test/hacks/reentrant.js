@@ -11,10 +11,10 @@ describe("Reentry Attack Protection", function () {
 
   describe("Vault", function () {
     it("Should not allow malicious coin to reentrant call vault function", async function () {
-      const { evilDAI, vault } = await loadFixture(hackedVaultFixture);
+      const { evilCUSD, vault } = await loadFixture(hackedVaultFixture);
 
       // to see this fail just comment out the require in the nonReentrant() in Governable.sol
-      await expect(vault.mint(evilDAI.address, 10, 0)).to.be.revertedWith(
+      await expect(vault.mint(evilCUSD.address, 10, 0)).to.be.revertedWith(
         "SafeERC20: low-level call failed"
       );
     });

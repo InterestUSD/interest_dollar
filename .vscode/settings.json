@@ -1,5 +1,6 @@
 {
     "solidity.compileUsingRemoteVersion": "v0.5.11+commit.c082d0b4",
     "solidity.packageDefaultDependenciesDirectory": "contracts/node_modules",
-    "svg.preview.background": "transparent"
+    "svg.preview.background": "transparent",
+    "restructuredtext.syntaxHighlighting.disabled": true
 }

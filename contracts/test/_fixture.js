@@ -35,6 +35,7 @@ async function defaultFixture() {
     nonStandardToken,
     acusd,
     aceur,
+    moo,
     mockNonRebasing,
     mockNonRebasingTwo;
 
@@ -43,6 +44,7 @@ async function defaultFixture() {
   if (isFork) {
     ceur = await ethers.getContractAt(ceurAbi, addresses.mainnet.CEUR);
     cusd = await ethers.getContractAt(cusdAbi, addresses.mainnet.CUSD);
+    moo = await ethers.getContractAt(cusdAbi, addresses.mainnet.MOO);
     aaveAddressProvider = await ethers.getContractAt(
       "ILendingPoolAddressesProvider",
       addresses.mainnet.AAVE_ADDRESS_PROVIDER
@@ -50,6 +52,7 @@ async function defaultFixture() {
   } else {
     ceur = await ethers.getContract("MockCEUR");
     cusd = await ethers.getContract("MockCUSD");
+    moo = await ethers.getContract("MockMOO");
     nonStandardToken = await ethers.getContract("MockNonStandardToken");
 
     acusd = await ethers.getContract("MockMCUSD");
@@ -116,6 +119,7 @@ async function defaultFixture() {
     // aTokens,
     acusd,
     aceur,
+    moo,
     // strategy
     aaveStrategy,
     aaveAddressProvider,
@@ -207,23 +211,27 @@ async function multiStrategyVaultFixture() {
 
   const cStrategyTwo = await ethers.getContract("StrategyTwo");
   // Initialize the second strategy with DAI and USDC
-  await cStrategyTwo.connect(sGovernor).initialize(
-    addresses.dead,
-    fixture.vault.address,
-    assetAddresses.MOO, // Setting MOO as primary reward token
-    [assetAddresses.CUSD, assetAddresses.CEUR],
-    [assetAddresses.mCUSD, assetAddresses.mCEUR],
-    assetAddresses.UBEStaking, // Staking contract address
-    assetAddresses.CUSD, // LP Reward Pair Token 1
-    assetAddresses.CEUR, // LP Reward Pair Token 2
-    assetAddresses.UBE // Setting UBE as secondary reward
-  );
+  await cStrategyTwo
+    .connect(sGovernor)
+    [
+      "initialize(address,address,address,address[],address[],address,address,address,address)"
+    ](
+      fixture.aaveAddressProvider.address,
+      fixture.vault.address,
+      addresses.zero, // Setting MOO as primary reward token
+      [assetAddresses.CEUR],
+      [assetAddresses.mCEUR],
+      addresses.zero, // Staking contract address
+      assetAddresses.CUSD, // LP Reward Pair Token 1
+      assetAddresses.CEUR, // LP Reward Pair Token 2
+      assetAddresses.UBE // Setting UBE as secondary reward
+    );
   // Add second strategy to Vault
   await fixture.vault.connect(sGovernor).approveStrategy(cStrategyTwo.address);
-  // DAI to second strategy
+  // cusd to second strategy
   await fixture.vault
     .connect(sGovernor)
-    .setAssetDefaultStrategy(fixture.cusd.address, cStrategyTwo.address);
+    .setAssetDefaultStrategy(fixture.ceur.address, cStrategyTwo.address);
 
   // Set up third strategy
   await deploy("StrategyThree", {
@@ -232,17 +240,21 @@ async function multiStrategyVaultFixture() {
   });
   const cStrategyThree = await ethers.getContract("StrategyThree");
   // Initialize the third strategy with only DAI
-  await cStrategyThree.connect(sGovernor).initialize(
-    addresses.dead,
-    fixture.vault.address,
-    assetAddresses.MOO, // Setting MOO as primary reward token
-    [assetAddresses.CUSD, assetAddresses.CEUR],
-    [assetAddresses.mCUSD, assetAddresses.mCEUR],
-    assetAddresses.UBEStaking, // Staking contract address
-    assetAddresses.CUSD, // LP Reward Pair Token 1
-    assetAddresses.CEUR, // LP Reward Pair Token 2
-    assetAddresses.UBE // Setting UBE as secondary reward
-  );
+  await cStrategyThree
+    .connect(sGovernor)
+    [
+      "initialize(address,address,address,address[],address[],address,address,address,address)"
+    ](
+      fixture.aaveAddressProvider.address,
+      fixture.vault.address,
+      addresses.zero,
+      [assetAddresses.CUSD],
+      [assetAddresses.mCUSD],
+      addresses.zero, 
+      assetAddresses.CUSD, // LP Reward Pair Token 1
+      assetAddresses.CEUR, // LP Reward Pair Token 2
+      assetAddresses.UBE // Setting UBE as secondary reward
+    );
 
   fixture.strategyTwo = cStrategyTwo;
   fixture.strategyThree = cStrategyThree;
